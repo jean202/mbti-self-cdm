@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ENTJ",
+  "cognitive_stack": {
+    "dominant": "Te",
+    "auxiliary": "Ni",
+    "tertiary": "Se",
+    "inferior": "Fi"
+  },
+  "differentiation": {
+    "core_driver": "중요한 목표를 구조화해 빠르게 전진시키는 데 강한 추진력을 보이는 경향",
+    "decision_support": "우선순위와 기대 결과가 분명할수록 실행력이 크게 올라감",
+    "close_type_contrasts": [
+      {
+        "type_code": "INTJ",
+        "difference_summary": "내부 전략 완성보다 외부 실행 전개와 결정 속도에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "command_focus",
+    "default_interaction": "structured",
+    "card_priority": [
+      "today_focus",
+      "priority_tasks",
+      "personalized_prompt",
+      "calendar_summary",
+      "recovery_card"
+    ],
+    "empty_state_route": "today_focus_first",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "outcome_commitment",
+    "default_target_bias": "TASK",
+    "prompt_mode": "structured_first",
+    "suggested_fields": [
+      "title",
+      "expected_outcome",
+      "deadline_hint"
+    ],
+    "idea_to_task_prompt_style": "immediate_structuring"
+  },
+  "planning_style": {
+    "style_key": "outcomes_first",
+    "today_strategy": "one_high_leverage_outcome_then_batch_tasks",
+    "week_strategy": "map_outcomes_to_calendar",
+    "backlog_strategy": "sort_by_impact_and_owner",
+    "default_sort": [
+      "strategic_value",
+      "due_soon",
+      "today_focus_linked"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "sharp_strategic",
+    "intensity_floor": "medium",
+    "intensity_ceiling": "high",
+    "cadence_bias": "steady"
+  },
+  "review_prompts": [
+    {
+      "key": "outcome_check",
+      "surface": "reflect",
+      "intent": "오늘 만든 결과와 전진 폭 확인"
+    },
+    {
+      "key": "constraint_check",
+      "surface": "reflect",
+      "intent": "진전을 막은 제약과 비효율 파악"
+    },
+    {
+      "key": "tomorrow_leverage",
+      "surface": "reflect",
+      "intent": "내일 가장 레버리지가 큰 행동 하나 고르기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "control_friction",
+      "trigger_hint": "통제되지 않는 변수와 느린 흐름이 많아짐",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "overdrive_mode",
+      "trigger_hint": "쉬지 않고 밀어붙이며 피로를 무시함",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "low_leverage_drag",
+      "trigger_hint": "중요하지 않은 일에 과도하게 시간 소모",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "reduce_scope_and_restore_leverage",
+    "default_duration_minutes": 9,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "pause_expansion",
+        "duration_minutes": 2
+      },
+      {
+        "order": 2,
+        "action_key": "cut_to_primary_outcome",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "define_high_leverage_step",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "leverage_restore_note",
+      "scope_cut_reset",
+      "brief_control_pause"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "soft_vague_prompts",
+      "rule": "행동과 목표가 모호한 완곡한 문구를 핵심 위치에 두지 않는다"
+    },
+    {
+      "key": "endless_options",
+      "rule": "동급 선택지를 너무 많이 열어두지 않는다"
+    },
+    {
+      "key": "frequent_low_signal_notifications",
+      "rule": "의미 없는 잦은 reminder를 보내지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "medium",
+      "max": "high"
+    },
+    "task_granularity": {
+      "min": "small",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "today_focus"
+      ],
+      "mutable": [
+        "priority_tasks",
+        "personalized_prompt",
+        "calendar_summary",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "practical_direct",
+        "calm_analytical"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ENTJ",
+      "type_summary": "중요한 목표를 구조화하고 빠르게 전진시킬 때 가장 강한 추진력이 살아납니다.",
+      "onboarding": {
+        "result_summary": "당신은 방향을 실행으로 연결하고, 큰 목표를 앞으로 움직이게 만드는 데 강합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 추진력과 구조화 방식에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 가장 레버리지가 큰 결과 한 가지를 먼저 잡으세요.",
+        "empty_state_prompt": "먼저 오늘 밀어야 할 핵심 결과를 한 줄로 적어보세요.",
+        "overload_prompt": "지금은 더 넓히기보다, 범위를 줄이고 가장 큰 결과에 다시 붙어야 합니다."
+      },
+      "capture": {
+        "placeholder": "해야 할 일이나 아이디어를 적어보세요. 가능하면 기대 결과와 기한도 함께요.",
+        "task_hint": "기대 결과가 분명할수록 바로 실행 구조로 옮기기 쉽습니다.",
+        "idea_hint": "아직 실행 단계가 아니면 결과 가설만 남겨두세요."
+      },
+      "plan": {
+        "today_prompt": "오늘은 가장 큰 결과를 만드는 한 가지를 먼저 보호하세요.",
+        "week_prompt": "주간 계획은 결과를 먼저 그리고 시간을 배치하는 편이 맞습니다.",
+        "backlog_prompt": "보류한 일은 영향력과 담당 기준으로 정리해두세요."
+      },
+      "reminders": {
+        "samples": [
+          "지금 가장 레버리지가 큰 한 가지로 다시 돌아갈까요?",
+          "범위를 줄이면 속도와 통제감이 함께 돌아옵니다.",
+          "오늘은 가장 큰 결과 한 가지면 충분합니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "outcome_check": "오늘 어떤 결과를 만들어냈나요?",
+        "constraint_check": "진전을 막은 제약은 무엇이었나요?",
+        "tomorrow_leverage": "내일 가장 레버리지가 큰 행동 하나는 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "레버리지를 회복하는 9분",
+        "card_body": "범위를 줄이고, 오늘 가장 큰 결과에 연결되는 다음 행동 하나를 다시 잡아보세요.",
+        "step_labels": {
+          "pause_expansion": "새 확장과 입력 잠시 멈추기",
+          "cut_to_primary_outcome": "핵심 결과 하나만 남기기",
+          "define_high_leverage_step": "가장 효과 큰 다음 행동 정하기"
+        }
+      }
+    }
+  }
+}

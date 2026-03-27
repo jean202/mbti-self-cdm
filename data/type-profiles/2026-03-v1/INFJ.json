@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "INFJ",
+  "cognitive_stack": {
+    "dominant": "Ni",
+    "auxiliary": "Fe",
+    "tertiary": "Ti",
+    "inferior": "Se"
+  },
+  "differentiation": {
+    "core_driver": "하루를 의미 있는 하나의 흐름으로 정리하려는 경향",
+    "decision_support": "사람과 맥락을 고려해 우선순위를 정리할 때 안정적으로 움직임",
+    "close_type_contrasts": [
+      {
+        "type_code": "INFP",
+        "difference_summary": "내적 감정의 진정성 자체보다 장기적 패턴과 전체 흐름 정리에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "guided_focus",
+    "default_interaction": "prompted",
+    "card_priority": [
+      "today_focus",
+      "personalized_prompt",
+      "priority_tasks",
+      "calendar_summary",
+      "recovery_card"
+    ],
+    "empty_state_route": "today_focus_first",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "intent_first",
+    "default_target_bias": "TASK",
+    "prompt_mode": "structured_light",
+    "suggested_fields": [
+      "title",
+      "why_it_matters",
+      "timing_hint"
+    ],
+    "idea_to_task_prompt_style": "gentle_commitment"
+  },
+  "planning_style": {
+    "style_key": "single_thread_with_buffer",
+    "today_strategy": "protect_one_priority_thread",
+    "week_strategy": "preserve_capacity_before_filling",
+    "backlog_strategy": "cluster_by_theme",
+    "default_sort": [
+      "today_focus_linked",
+      "due_soon",
+      "energy_fit"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "gentle_directive",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "steady"
+  },
+  "review_prompts": [
+    {
+      "key": "alignment_check",
+      "surface": "reflect",
+      "intent": "오늘 한 일이 내가 중요하게 여긴 방향과 맞았는지 점검"
+    },
+    {
+      "key": "drain_source",
+      "surface": "reflect",
+      "intent": "에너지를 빼앗은 상호작용이나 맥락 확인"
+    },
+    {
+      "key": "tomorrow_clarity",
+      "surface": "reflect",
+      "intent": "내일의 초점을 하나로 줄이기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "fragmented_commitments",
+      "trigger_hint": "조금씩 시작한 일만 많고 닫힌 루프가 없음",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "social_overextension",
+      "trigger_hint": "기대에 맞추느라 본인 우선순위가 사라짐",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "sensory_overload",
+      "trigger_hint": "일정과 자극이 너무 많아 집중 축이 흐려짐",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "reduce_input_and_recentre",
+    "default_duration_minutes": 10,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "clear_visual_noise",
+        "duration_minutes": 2
+      },
+      {
+        "order": 2,
+        "action_key": "name_single_priority",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "take_small_grounding_action",
+        "duration_minutes": 5
+      }
+    ],
+    "recommended_prompt_keys": [
+      "reset_breath_3m",
+      "single_surface_reset",
+      "quiet_recenter_walk"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "hyper_busy_dashboard",
+      "rule": "동일 우선순위 카드 여러 개를 첫 화면 상단에 동시에 두지 않는다"
+    },
+    {
+      "key": "guilt_heavy_reminders",
+      "rule": "죄책감이나 실망을 유발하는 reminder 문구를 사용하지 않는다"
+    },
+    {
+      "key": "constant_interruptions",
+      "rule": "짧은 간격의 연속 reminder를 보내지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "small",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "today_focus"
+      ],
+      "mutable": [
+        "personalized_prompt",
+        "priority_tasks",
+        "calendar_summary",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "soft_reflective",
+        "practical_gentle"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "INFJ",
+      "type_summary": "전체 흐름을 읽고 의미 있는 한 줄기를 정리할 때 가장 안정적으로 움직입니다.",
+      "onboarding": {
+        "result_summary": "당신은 많은 선택지보다 방향이 분명한 하루에서 힘을 냅니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 일 처리 방식과 꽤 비슷하게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 한 가지 흐름만 선명하게 잡아도 충분합니다.",
+        "empty_state_prompt": "먼저 오늘의 초점을 한 줄로 정리해보세요.",
+        "overload_prompt": "지금은 더 추가하기보다 흐트러진 축을 다시 모을 때입니다."
+      },
+      "capture": {
+        "placeholder": "해야 할 일이나 떠오른 생각을 적어보세요. 가능하면 왜 중요한지도 함께요.",
+        "task_hint": "이 일의 의미가 분명하면 실행이 빨라집니다.",
+        "idea_hint": "아직 모양이 흐릿하면 Idea로 두고 나중에 정리해도 됩니다."
+      },
+      "plan": {
+        "today_prompt": "오늘은 가장 중요한 한 줄기를 먼저 보호하세요.",
+        "week_prompt": "주간 계획은 꽉 채우기보다 여유를 남겨두는 편이 맞습니다.",
+        "backlog_prompt": "비슷한 맥락끼리 묶어두면 다시 꺼내기 쉽습니다."
+      },
+      "reminders": {
+        "samples": [
+          "지금 가장 중요한 한 가지만 다시 확인해볼까요?",
+          "흩어진 일을 줄이고 핵심으로 돌아가도 괜찮습니다.",
+          "다음 행동을 하나로 줄이면 다시 움직이기 쉬워집니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "alignment_check": "오늘 한 일이 내가 중요하게 여긴 방향과 맞았나요?",
+        "drain_source": "어디서 에너지가 가장 많이 빠졌나요?",
+        "tomorrow_clarity": "내일의 초점을 한 문장으로 줄이면 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "흐름을 다시 모으는 10분",
+        "card_body": "입력을 줄이고, 가장 중요한 한 가지를 다시 잡아보세요.",
+        "step_labels": {
+          "clear_visual_noise": "열린 탭과 알림을 잠시 정리하기",
+          "name_single_priority": "지금 가장 중요한 한 가지 적기",
+          "take_small_grounding_action": "2-5분 안에 끝나는 첫 행동 시작하기"
+        }
+      }
+    }
+  }
+}

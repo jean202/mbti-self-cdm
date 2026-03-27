@@ -1,0 +1,369 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  KAKAO
+  GOOGLE
+  APPLE
+  NAVER
+}
+
+enum OnboardingStatus {
+  AUTH_ONLY
+  MBTI_PENDING
+  CALENDAR_PENDING
+  COMPLETED
+}
+
+enum MbtiSource {
+  SELF_SELECTED
+  FINDER_RESULT
+  MANUAL_CHANGE
+}
+
+enum FinderAttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum TaskStatus {
+  INBOX
+  PLANNED
+  IN_PROGRESS
+  DONE
+  ARCHIVED
+}
+
+enum TaskSourceType {
+  QUICK_CAPTURE
+  IDEA_CONVERSION
+  ROUTINE
+  MANUAL
+}
+
+enum IdeaStatus {
+  ACTIVE
+  ARCHIVED
+  CONVERTED
+}
+
+enum TodayFocusStatus {
+  ACTIVE
+  COMPLETED
+  SKIPPED
+}
+
+enum RoutineCadenceType {
+  DAILY
+  WEEKLY
+  CUSTOM
+}
+
+enum CalendarProvider {
+  GOOGLE
+  APPLE
+  OTHER
+}
+
+enum CalendarConnectionStatus {
+  ACTIVE
+  SYNCING
+  ERROR
+  REVOKED
+}
+
+enum CalendarEventStatus {
+  CONFIRMED
+  TENTATIVE
+  CANCELLED
+}
+
+enum CheckContext {
+  MORNING
+  EVENING
+  ADHOC
+}
+
+model User {
+  id                    String               @id @default(uuid()) @db.Uuid
+  displayName           String?              @map("display_name") @db.VarChar(100)
+  primaryEmail          String?              @map("primary_email") @db.VarChar(255)
+  locale                String               @default("ko-KR") @db.VarChar(16)
+  timezone              String               @default("Asia/Seoul") @db.VarChar(64)
+  onboardingStatus      OnboardingStatus     @default(AUTH_ONLY) @map("onboarding_status")
+  notificationPrefsJson Json?                @map("notification_prefs_json")
+  lastActiveAt          DateTime?            @map("last_active_at") @db.Timestamptz(6)
+  createdAt             DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  authIdentities        AuthIdentity[]
+  mbtiProfile           MbtiProfile?
+  mbtiFinderAttempts    MbtiFinderAttempt[]
+  ideas                 Idea[]
+  tasks                 Task[]
+  todayFocuses          TodayFocus[]
+  routines              Routine[]
+  calendarConnections   CalendarConnection[]
+  calendarEvents        CalendarEvent[]
+  moodEnergyChecks      MoodEnergyCheck[]
+  reflections           Reflection[]
+
+  @@index([onboardingStatus], map: "idx_users_onboarding_status")
+  @@map("users")
+}
+
+model AuthIdentity {
+  id                  String       @id @default(uuid()) @db.Uuid
+  userId              String       @map("user_id") @db.Uuid
+  provider            AuthProvider
+  providerUserId      String       @map("provider_user_id") @db.VarChar(255)
+  providerEmail       String?      @map("provider_email") @db.VarChar(255)
+  providerDisplayName String?      @map("provider_display_name") @db.VarChar(255)
+  rawProfileJson      Json?        @map("raw_profile_json")
+  linkedAt            DateTime     @default(now()) @map("linked_at") @db.Timestamptz(6)
+  lastLoginAt         DateTime?    @map("last_login_at") @db.Timestamptz(6)
+  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId], map: "auth_identities_provider_provider_user_id_key")
+  @@index([userId], map: "idx_auth_identities_user_id")
+  @@map("auth_identities")
+}
+
+model MbtiProfile {
+  id              String     @id @default(uuid()) @db.Uuid
+  userId          String     @unique @map("user_id") @db.Uuid
+  typeCode        String     @map("type_code") @db.Char(4)
+  source          MbtiSource
+  isUserConfirmed Boolean    @default(false) @map("is_user_confirmed")
+  confidenceScore Decimal?   @map("confidence_score") @db.Decimal(5, 4)
+  finderVersion   String?    @map("finder_version") @db.VarChar(32)
+  profileVersion  String?    @map("profile_version") @db.VarChar(32)
+  lastChangedAt   DateTime   @default(now()) @map("last_changed_at") @db.Timestamptz(6)
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("mbti_profiles")
+}
+
+model MbtiFinderAttempt {
+  id                 String              @id @default(uuid()) @db.Uuid
+  userId             String              @map("user_id") @db.Uuid
+  status             FinderAttemptStatus
+  questionSetVersion String              @map("question_set_version") @db.VarChar(32)
+  predictedTypeCode  String?             @map("predicted_type_code") @db.Char(4)
+  confidenceScore    Decimal?            @map("confidence_score") @db.Decimal(5, 4)
+  startedAt          DateTime            @default(now()) @map("started_at") @db.Timestamptz(6)
+  completedAt        DateTime?           @map("completed_at") @db.Timestamptz(6)
+  abandonedAt        DateTime?           @map("abandoned_at") @db.Timestamptz(6)
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers            MbtiFinderAnswer[]
+
+  @@index([userId, startedAt(sort: Desc)], map: "idx_mbti_finder_attempts_user_id_started_at")
+  @@map("mbti_finder_attempts")
+}
+
+model MbtiFinderAnswer {
+  id          String            @id @default(uuid()) @db.Uuid
+  attemptId   String            @map("attempt_id") @db.Uuid
+  questionId  String            @map("question_id") @db.VarChar(64)
+  answerValue Int               @map("answer_value") @db.SmallInt
+  answeredAt  DateTime          @default(now()) @map("answered_at") @db.Timestamptz(6)
+  attempt     MbtiFinderAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId], map: "mbti_finder_answers_attempt_id_question_id_key")
+  @@map("mbti_finder_answers")
+}
+
+model Idea {
+  id              String     @id @default(uuid()) @db.Uuid
+  userId          String     @map("user_id") @db.Uuid
+  title           String     @db.VarChar(255)
+  note            String?    @db.Text
+  status          IdeaStatus @default(ACTIVE)
+  tagsJson        Json?      @map("tags_json")
+  convertedTaskId String?    @unique @map("converted_task_id") @db.Uuid
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  archivedAt      DateTime?  @map("archived_at") @db.Timestamptz(6)
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  convertedTask   Task?      @relation("IdeaConvertedTask", fields: [convertedTaskId], references: [id], onDelete: SetNull)
+  linkedTasks     Task[]     @relation("TaskLinkedIdea")
+
+  @@index([userId, status, updatedAt(sort: Desc)], map: "idx_ideas_user_id_status_updated_at")
+  @@map("ideas")
+}
+
+model TodayFocus {
+  id           String           @id @default(uuid()) @db.Uuid
+  userId       String           @map("user_id") @db.Uuid
+  localDate    DateTime         @map("local_date") @db.Date
+  title        String           @db.VarChar(255)
+  note         String?          @db.Text
+  linkedTaskId String?          @map("linked_task_id") @db.Uuid
+  status       TodayFocusStatus @default(ACTIVE)
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkedTask   Task?            @relation("TodayFocusPrimaryTask", fields: [linkedTaskId], references: [id], onDelete: SetNull)
+  tasks        Task[]           @relation("TaskTodayFocus")
+  reflections  Reflection[]
+
+  @@unique([userId, localDate], map: "today_focuses_user_id_local_date_key")
+  @@map("today_focuses")
+}
+
+model Task {
+  id                    String         @id @default(uuid()) @db.Uuid
+  userId                String         @map("user_id") @db.Uuid
+  title                 String         @db.VarChar(255)
+  note                  String?        @db.Text
+  status                TaskStatus     @default(INBOX)
+  sourceType            TaskSourceType @map("source_type")
+  linkedIdeaId          String?        @map("linked_idea_id") @db.Uuid
+  todayFocusId          String?        @map("today_focus_id") @db.Uuid
+  linkedCalendarEventId String?        @map("linked_calendar_event_id") @db.Uuid
+  dueAt                 DateTime?      @map("due_at") @db.Timestamptz(6)
+  localDueDate          DateTime?      @map("local_due_date") @db.Date
+  reminderAt            DateTime?      @map("reminder_at") @db.Timestamptz(6)
+  energyEstimate        Int?           @map("energy_estimate") @db.SmallInt
+  sortOrder             Int?           @map("sort_order")
+  completedAt           DateTime?      @map("completed_at") @db.Timestamptz(6)
+  createdAt             DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user                  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkedIdea            Idea?          @relation("TaskLinkedIdea", fields: [linkedIdeaId], references: [id], onDelete: SetNull)
+  convertedFromIdea     Idea?          @relation("IdeaConvertedTask")
+  todayFocus            TodayFocus?    @relation("TaskTodayFocus", fields: [todayFocusId], references: [id], onDelete: SetNull)
+  primaryForFocuses     TodayFocus[]   @relation("TodayFocusPrimaryTask")
+  linkedCalendarEvent   CalendarEvent? @relation(fields: [linkedCalendarEventId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status, dueAt], map: "idx_tasks_user_id_status_due_at")
+  @@index([userId, todayFocusId], map: "idx_tasks_user_id_today_focus_id")
+  @@index([userId, updatedAt(sort: Desc)], map: "idx_tasks_user_id_updated_at")
+  @@map("tasks")
+}
+
+model Routine {
+  id                 String             @id @default(uuid()) @db.Uuid
+  userId             String             @map("user_id") @db.Uuid
+  name               String             @db.VarChar(255)
+  note               String?            @db.Text
+  cadenceType        RoutineCadenceType @map("cadence_type")
+  cadencePayloadJson Json               @map("cadence_payload_json")
+  isActive           Boolean            @default(true) @map("is_active")
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("routines")
+}
+
+model CalendarConnection {
+  id                String                   @id @default(uuid()) @db.Uuid
+  userId            String                   @map("user_id") @db.Uuid
+  provider          CalendarProvider
+  providerAccountId String                   @map("provider_account_id") @db.VarChar(255)
+  accountLabel      String?                  @map("account_label") @db.VarChar(255)
+  status            CalendarConnectionStatus @default(ACTIVE)
+  credentialsRef    String?                  @map("credentials_ref") @db.VarChar(255)
+  scopesJson        Json?                    @map("scopes_json")
+  syncCursorJson    Json?                    @map("sync_cursor_json")
+  lastSyncedAt      DateTime?                @map("last_synced_at") @db.Timestamptz(6)
+  lastErrorCode     String?                  @map("last_error_code") @db.VarChar(64)
+  connectedAt       DateTime                 @default(now()) @map("connected_at") @db.Timestamptz(6)
+  revokedAt         DateTime?                @map("revoked_at") @db.Timestamptz(6)
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events            CalendarEvent[]
+
+  @@unique([userId, provider, providerAccountId], map: "calendar_connections_user_id_provider_provider_account_id_key")
+  @@index([userId, status], map: "idx_calendar_connections_user_id_status")
+  @@map("calendar_connections")
+}
+
+model CalendarEvent {
+  id                String              @id @default(uuid()) @db.Uuid
+  userId            String              @map("user_id") @db.Uuid
+  connectionId      String              @map("connection_id") @db.Uuid
+  providerEventId   String              @map("provider_event_id") @db.VarChar(255)
+  calendarName      String?             @map("calendar_name") @db.VarChar(255)
+  title             String              @db.VarChar(255)
+  description       String?             @db.Text
+  location          String?             @db.Text
+  startsAt          DateTime            @map("starts_at") @db.Timestamptz(6)
+  endsAt            DateTime            @map("ends_at") @db.Timestamptz(6)
+  isAllDay          Boolean             @default(false) @map("is_all_day")
+  eventStatus       CalendarEventStatus @default(CONFIRMED) @map("event_status")
+  providerUpdatedAt DateTime?           @map("provider_updated_at") @db.Timestamptz(6)
+  lastSyncedAt      DateTime            @map("last_synced_at") @db.Timestamptz(6)
+  rawPayloadJson    Json?               @map("raw_payload_json")
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connection        CalendarConnection  @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  linkedTasks       Task[]
+
+  @@unique([connectionId, providerEventId], map: "calendar_events_connection_id_provider_event_id_key")
+  @@index([userId, startsAt], map: "idx_calendar_events_user_id_starts_at")
+  @@map("calendar_events")
+}
+
+model MoodEnergyCheck {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String       @map("user_id") @db.Uuid
+  localDate   DateTime     @map("local_date") @db.Date
+  context     CheckContext
+  moodScore   Int          @map("mood_score") @db.SmallInt
+  energyScore Int          @map("energy_score") @db.SmallInt
+  note        String?      @db.Text
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reflections Reflection[]
+
+  @@unique([userId, localDate, context], map: "mood_energy_checks_user_id_local_date_context_key")
+  @@map("mood_energy_checks")
+}
+
+model MindfulnessPrompt {
+  id              String       @id @default(uuid()) @db.Uuid
+  typeCode        String?      @map("type_code") @db.Char(4)
+  title           String       @db.VarChar(255)
+  body            String       @db.Text
+  stressSignalKey String?      @map("stress_signal_key") @db.VarChar(64)
+  recoveryMode    String?      @map("recovery_mode") @db.VarChar(64)
+  durationMinutes Int?         @map("duration_minutes") @db.SmallInt
+  isActive        Boolean      @default(true) @map("is_active")
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+  reflections     Reflection[]
+
+  @@map("mindfulness_prompts")
+}
+
+model Reflection {
+  id                  String             @id @default(uuid()) @db.Uuid
+  userId              String             @map("user_id") @db.Uuid
+  localDate           DateTime           @map("local_date") @db.Date
+  todayFocusId        String?            @map("today_focus_id") @db.Uuid
+  moodEnergyCheckId   String?            @map("mood_energy_check_id") @db.Uuid
+  mindfulnessPromptId String?            @map("mindfulness_prompt_id") @db.Uuid
+  completedSummary    String?            @map("completed_summary") @db.Text
+  carryForwardNote    String?            @map("carry_forward_note") @db.Text
+  promptAnswersJson   Json?              @map("prompt_answers_json")
+  submittedAt         DateTime?          @map("submitted_at") @db.Timestamptz(6)
+  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  todayFocus          TodayFocus?        @relation(fields: [todayFocusId], references: [id], onDelete: SetNull)
+  moodEnergyCheck     MoodEnergyCheck?   @relation(fields: [moodEnergyCheckId], references: [id], onDelete: SetNull)
+  mindfulnessPrompt   MindfulnessPrompt? @relation(fields: [mindfulnessPromptId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, localDate], map: "reflections_user_id_local_date_key")
+  @@map("reflections")
+}

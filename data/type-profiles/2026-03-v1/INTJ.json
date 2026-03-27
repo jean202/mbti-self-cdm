@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "INTJ",
+  "cognitive_stack": {
+    "dominant": "Ni",
+    "auxiliary": "Te",
+    "tertiary": "Fi",
+    "inferior": "Se"
+  },
+  "differentiation": {
+    "core_driver": "장기 방향을 현실적인 구조로 압축해 실행하려는 경향",
+    "decision_support": "잡음이 적고 목표와 이유가 분명할수록 실행 속도가 올라감",
+    "close_type_contrasts": [
+      {
+        "type_code": "INFJ",
+        "difference_summary": "관계 조화보다 구조적 효율과 전략적 정렬에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "strategic_map",
+    "default_interaction": "structured",
+    "card_priority": [
+      "today_focus",
+      "priority_tasks",
+      "personalized_prompt",
+      "calendar_summary",
+      "recovery_card"
+    ],
+    "empty_state_route": "today_focus_first",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "outcome_first",
+    "default_target_bias": "TASK",
+    "prompt_mode": "structured_light",
+    "suggested_fields": [
+      "title",
+      "expected_outcome",
+      "deadline_hint"
+    ],
+    "idea_to_task_prompt_style": "direct_translation"
+  },
+  "planning_style": {
+    "style_key": "long_arc_with_checkpoints",
+    "today_strategy": "protect_deep_work_block",
+    "week_strategy": "map_outcomes_then_slots",
+    "backlog_strategy": "cluster_by_strategy",
+    "default_sort": [
+      "strategic_value",
+      "due_soon",
+      "energy_fit"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "concise_strategic",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "sparse"
+  },
+  "review_prompts": [
+    {
+      "key": "signal_vs_noise",
+      "surface": "reflect",
+      "intent": "오늘 중요한 신호와 잡음을 구분하기"
+    },
+    {
+      "key": "leverage_check",
+      "surface": "reflect",
+      "intent": "가장 큰 효과를 낸 행동이 무엇인지 확인"
+    },
+    {
+      "key": "tomorrow_bottleneck",
+      "surface": "reflect",
+      "intent": "내일의 병목을 미리 줄일 한 가지 찾기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "context_switch_overload",
+      "trigger_hint": "짧은 전환이 많아 집중 축이 무너짐",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "low_leverage_work",
+      "trigger_hint": "중요하지 않은 운영성 일에 과도하게 묶임",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "forced_reactivity",
+      "trigger_hint": "계획 없는 대응이 하루를 지배함",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "reduce_noise_and_reclaim_control",
+    "default_duration_minutes": 9,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "silence_inputs",
+        "duration_minutes": 2
+      },
+      {
+        "order": 2,
+        "action_key": "name_primary_outcome",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "define_next_leverage_step",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "deep_focus_reset",
+      "leverage_reframe_note",
+      "quiet_block_setup"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "hyper_social_prompting",
+      "rule": "관계성 호소를 기본 행동 유도로 과도하게 사용하지 않는다"
+    },
+    {
+      "key": "redundant_explanations",
+      "rule": "이미 명확한 정보에 장황한 설명을 반복하지 않는다"
+    },
+    {
+      "key": "rapid_fire_notifications",
+      "rule": "짧은 간격의 반복 reminder를 보내지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "small",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "today_focus"
+      ],
+      "mutable": [
+        "priority_tasks",
+        "personalized_prompt",
+        "calendar_summary",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "calm_analytical",
+        "practical_direct"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "INTJ",
+      "type_summary": "장기 방향이 분명하고 구조가 맞을 때 가장 강하게 움직입니다.",
+      "onboarding": {
+        "result_summary": "당신은 중요한 목표를 구조화하고, 잡음을 줄여 실행하는 방식에 강합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 전략적 사고와 실행 방식에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 가장 큰 결과를 만드는 한 가지에 집중하세요.",
+        "empty_state_prompt": "먼저 오늘의 핵심 결과를 한 줄로 정의해보세요.",
+        "overload_prompt": "지금은 대응을 늘리기보다, 통제할 수 있는 핵심 축으로 돌아와야 합니다."
+      },
+      "capture": {
+        "placeholder": "해야 할 일이나 아이디어를 적어보세요. 가능하면 기대 결과도 함께요.",
+        "task_hint": "기대 결과가 보이면 실행 속도가 빨라집니다.",
+        "idea_hint": "아직 결과가 흐리다면 가설로 남겨두고 나중에 구조화해도 됩니다."
+      },
+      "plan": {
+        "today_prompt": "오늘은 고효율 결과 한 가지를 보호하세요.",
+        "week_prompt": "주간 계획은 결과를 먼저 그리고 시간을 배치하는 편이 맞습니다.",
+        "backlog_prompt": "보류된 일은 전략적 중요도로 묶어두세요."
+      },
+      "reminders": {
+        "samples": [
+          "지금 이 행동이 오늘의 핵심 결과와 연결되어 있나요?",
+          "잡음을 줄이면 더 적은 힘으로도 앞으로 나아갈 수 있습니다.",
+          "다음 가장 레버리지가 큰 한 걸음만 다시 잡아보세요."
+        ]
+      },
+      "review_prompt_labels": {
+        "signal_vs_noise": "오늘 중요한 신호와 잡음은 무엇이었나요?",
+        "leverage_check": "가장 큰 효과를 낸 행동은 무엇이었나요?",
+        "tomorrow_bottleneck": "내일의 병목을 줄일 한 가지는 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "통제를 회복하는 9분",
+        "card_body": "입력을 줄이고, 오늘 가장 중요한 결과와 다음 한 걸음을 다시 연결해보세요.",
+        "step_labels": {
+          "silence_inputs": "알림과 불필요한 입력 잠시 끄기",
+          "name_primary_outcome": "오늘의 핵심 결과 한 줄로 적기",
+          "define_next_leverage_step": "가장 효과 큰 다음 행동 하나 정하기"
+        }
+      }
+    }
+  }
+}

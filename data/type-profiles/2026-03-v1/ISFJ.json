@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ISFJ",
+  "cognitive_stack": {
+    "dominant": "Si",
+    "auxiliary": "Fe",
+    "tertiary": "Ti",
+    "inferior": "Ne"
+  },
+  "differentiation": {
+    "core_driver": "필요한 사람과 일상을 안정적으로 챙기며 하루를 무리 없이 유지하려는 경향",
+    "decision_support": "관계와 책임이 분명할 때 꾸준한 실행력이 살아남",
+    "close_type_contrasts": [
+      {
+        "type_code": "INFJ",
+        "difference_summary": "추상적인 미래 흐름보다 지금 필요한 사람과 구체적 일상 맥락에 더 빠르게 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "supportive_routine",
+    "default_interaction": "guided",
+    "card_priority": [
+      "today_focus",
+      "calendar_summary",
+      "priority_tasks",
+      "personalized_prompt",
+      "recovery_card"
+    ],
+    "empty_state_route": "today_focus_first",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "context_care_first",
+    "default_target_bias": "TASK",
+    "prompt_mode": "structured_light",
+    "suggested_fields": [
+      "title",
+      "who_or_context",
+      "timing_hint"
+    ],
+    "idea_to_task_prompt_style": "supportive_commitment"
+  },
+  "planning_style": {
+    "style_key": "care_commitments_balance",
+    "today_strategy": "protect_core_commitments_then_small_tasks",
+    "week_strategy": "place_people_commitments_first",
+    "backlog_strategy": "organize_by_context_and_responsibility",
+    "default_sort": [
+      "today_focus_linked",
+      "calendar_context",
+      "due_soon"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "warm_steady",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "steady"
+  },
+  "review_prompts": [
+    {
+      "key": "care_balance",
+      "surface": "reflect",
+      "intent": "오늘 챙긴 일과 스스로를 챙긴 균형을 점검"
+    },
+    {
+      "key": "energy_leak",
+      "surface": "reflect",
+      "intent": "어디서 예상보다 에너지가 빠졌는지 확인"
+    },
+    {
+      "key": "tomorrow_support",
+      "surface": "reflect",
+      "intent": "내일을 더 부드럽게 만들 한 가지 준비 찾기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "overhelping",
+      "trigger_hint": "다른 사람 일은 챙겼지만 자기 우선순위는 비어 있음",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "schedule_crowding",
+      "trigger_hint": "배려 때문에 일정 사이 여유가 전혀 없음",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "unspoken_need_pressure",
+      "trigger_hint": "말하지 않은 기대를 혼자 짊어짐",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "quiet_restore_and_reprioritize",
+    "default_duration_minutes": 10,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "step_back_from_requests",
+        "duration_minutes": 3
+      },
+      {
+        "order": 2,
+        "action_key": "name_personal_priority",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "prepare_one_supportive_step",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "quiet_boundary_check",
+      "gentle_reset_list",
+      "soft_breath_3m"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "harsh_tone",
+      "rule": "명령형 압박이나 차가운 reminder 문구를 기본값으로 두지 않는다"
+    },
+    {
+      "key": "chaotic_dashboard",
+      "rule": "맥락 없이 카드가 뒤섞인 첫 화면을 만들지 않는다"
+    },
+    {
+      "key": "constant_reprioritization",
+      "rule": "계속 우선순위를 바꾸라고 요구하는 흐름을 강요하지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "small",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "today_focus"
+      ],
+      "mutable": [
+        "calendar_summary",
+        "priority_tasks",
+        "personalized_prompt",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "warm_reflective",
+        "calm_supportive"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ISFJ",
+      "type_summary": "일상과 사람을 안정적으로 챙길 수 있을 때 가장 꾸준하게 움직입니다.",
+      "onboarding": {
+        "result_summary": "당신은 필요한 일을 조용히 잘 챙기고, 흐트러진 일상을 다시 안정시키는 데 강합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 배려 방식과 일상 운영 감각에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘 필요한 일과 사람을 무리 없이 챙길 수 있게 흐름을 먼저 정리해보세요.",
+        "empty_state_prompt": "먼저 오늘 꼭 챙겨야 할 한 가지를 적어보세요.",
+        "overload_prompt": "지금은 더 받아들이기보다, 이미 맡은 것을 편안하게 유지하는 편이 맞습니다."
+      },
+      "capture": {
+        "placeholder": "해야 할 일을 적어보세요. 누가 관련되는지나 언제 필요한지도 함께 적으면 더 편합니다.",
+        "task_hint": "맥락이 분명할수록 부담이 줄어듭니다.",
+        "idea_hint": "아직 실행할 필요가 없다면 가볍게 남겨두기만 해도 됩니다."
+      },
+      "plan": {
+        "today_prompt": "오늘의 핵심 책임을 먼저 안정시켜두세요.",
+        "week_prompt": "주간 계획은 사람과 약속을 먼저 배치한 뒤 내 일을 넣는 편이 자연스럽습니다.",
+        "backlog_prompt": "미뤄둔 일은 상황과 책임 기준으로 묶어두면 다시 보기 쉽습니다."
+      },
+      "reminders": {
+        "samples": [
+          "지금 챙겨야 할 가장 중요한 한 가지를 먼저 확인해볼까요?",
+          "조금만 정리해도 오늘 흐름이 한결 편해질 수 있습니다.",
+          "이미 충분히 많이 하고 있으니, 다음 한 가지에만 집중해도 괜찮습니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "care_balance": "오늘 챙긴 일과 스스로를 챙긴 균형은 어땠나요?",
+        "energy_leak": "어디서 에너지가 가장 많이 빠졌나요?",
+        "tomorrow_support": "내일을 더 편하게 만들 준비 한 가지는 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "조용히 다시 정리하는 10분",
+        "card_body": "다른 기대에서 잠시 물러나, 내 우선순위를 하나만 다시 잡아보세요.",
+        "step_labels": {
+          "step_back_from_requests": "들어온 요청과 메시지에서 잠시 거리 두기",
+          "name_personal_priority": "오늘 나에게 중요한 한 가지 적기",
+          "prepare_one_supportive_step": "내일을 편하게 할 준비 한 가지 하기"
+        }
+      }
+    }
+  }
+}

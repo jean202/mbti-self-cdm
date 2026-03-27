@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ESTJ",
+  "cognitive_stack": {
+    "dominant": "Te",
+    "auxiliary": "Si",
+    "tertiary": "Ne",
+    "inferior": "Fi"
+  },
+  "differentiation": {
+    "core_driver": "명확한 목표와 책임을 빠르게 정리해 실행으로 닫아가려는 경향",
+    "decision_support": "기준과 우선순위가 분명할수록 추진력이 매우 높아짐",
+    "close_type_contrasts": [
+      {
+        "type_code": "ENTJ",
+        "difference_summary": "장기 전략보다 당장 운영 가능한 질서와 실행 안정에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "execution_board",
+    "default_interaction": "structured",
+    "card_priority": [
+      "today_focus",
+      "priority_tasks",
+      "calendar_summary",
+      "personalized_prompt",
+      "recovery_card"
+    ],
+    "empty_state_route": "task_list_first",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "task_first",
+    "default_target_bias": "TASK",
+    "prompt_mode": "structured_first",
+    "suggested_fields": [
+      "title",
+      "deadline_hint",
+      "owner_or_context"
+    ],
+    "idea_to_task_prompt_style": "direct_assignment"
+  },
+  "planning_style": {
+    "style_key": "execution_grid",
+    "today_strategy": "top_priority_then_batch_rest",
+    "week_strategy": "assign_slots_and_follow_through",
+    "backlog_strategy": "sort_by_obligation_and_impact",
+    "default_sort": [
+      "due_soon",
+      "today_focus_linked",
+      "strategic_value"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "direct_command",
+    "intensity_floor": "medium",
+    "intensity_ceiling": "high",
+    "cadence_bias": "steady"
+  },
+  "review_prompts": [
+    {
+      "key": "result_check",
+      "surface": "reflect",
+      "intent": "오늘 실제 성과와 미완료를 분명히 확인"
+    },
+    {
+      "key": "bottleneck_check",
+      "surface": "reflect",
+      "intent": "실행을 막은 병목이 무엇이었는지 파악"
+    },
+    {
+      "key": "tomorrow_priority",
+      "surface": "reflect",
+      "intent": "내일 가장 먼저 처리할 우선순위 하나 정하기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "control_overload",
+      "trigger_hint": "모든 걸 직접 관리하려다 에너지가 바닥남",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "delegation_friction",
+      "trigger_hint": "위임이 안 돼 운영 부담이 계속 커짐",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "schedule_overpacking",
+      "trigger_hint": "현실보다 일정이 과하게 빽빽해짐",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "step_back_and_reprioritize",
+    "default_duration_minutes": 9,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "pause_new_inputs",
+        "duration_minutes": 2
+      },
+      {
+        "order": 2,
+        "action_key": "cut_to_top_priority",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "rebuild_realistic_order",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "priority_cut_reset",
+      "realistic_reorder_note",
+      "brief_pause_breath"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "vague_copy",
+      "rule": "행동이 모호한 추상 카피를 핵심 위치에 두지 않는다"
+    },
+    {
+      "key": "passive_voice_prompts",
+      "rule": "지나치게 우회적이고 힘 빠지는 문구를 기본값으로 쓰지 않는다"
+    },
+    {
+      "key": "endless_reflection",
+      "rule": "회고를 너무 길고 느슨하게 만들지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "medium",
+      "max": "high"
+    },
+    "task_granularity": {
+      "min": "small",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "today_focus"
+      ],
+      "mutable": [
+        "priority_tasks",
+        "calendar_summary",
+        "personalized_prompt",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "practical_direct",
+        "calm_structured"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ESTJ",
+      "type_summary": "명확한 우선순위와 책임이 있을 때 강한 실행력을 냅니다.",
+      "onboarding": {
+        "result_summary": "당신은 기준을 세우고, 일을 빠르게 운영 가능한 상태로 만드는 데 강합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 실행 방식과 운영 감각에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 가장 중요한 우선순위부터 분명히 잡아두세요.",
+        "empty_state_prompt": "먼저 오늘의 핵심 우선순위 한 가지를 적어보세요.",
+        "overload_prompt": "지금은 더 얹기보다, 진짜 중요한 것만 남기고 다시 정렬해야 합니다."
+      },
+      "capture": {
+        "placeholder": "해야 할 일을 적어보세요. 가능하면 언제까지, 어떤 맥락인지 함께요.",
+        "task_hint": "우선순위와 마감이 보이면 더 빠르게 움직일 수 있습니다.",
+        "idea_hint": "실행 대상이 아니라면 지금은 짧게만 남겨두세요."
+      },
+      "plan": {
+        "today_prompt": "오늘은 최우선 하나를 먼저 끝낼 수 있게 판을 짜세요.",
+        "week_prompt": "주간 계획은 시간을 배정하고 끝까지 따라가는 편이 맞습니다.",
+        "backlog_prompt": "보류한 일은 의무도와 영향력 기준으로 정리해두세요."
+      },
+      "reminders": {
+        "samples": [
+          "지금 가장 중요한 우선순위로 다시 돌아갈까요?",
+          "모든 걸 다 할 필요는 없고, 가장 중요한 것부터 닫으면 됩니다.",
+          "순서를 다시 세우면 속도도 다시 살아납니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "result_check": "오늘 실제로 끝낸 일은 무엇이었나요?",
+        "bottleneck_check": "실행을 가장 많이 막은 병목은 무엇이었나요?",
+        "tomorrow_priority": "내일 가장 먼저 처리할 한 가지는 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "우선순위를 다시 세우는 9분",
+        "card_body": "새 입력을 잠시 멈추고, 진짜 중요한 것만 남겨 다시 순서를 잡아보세요.",
+        "step_labels": {
+          "pause_new_inputs": "새 요청과 메시지 잠시 멈추기",
+          "cut_to_top_priority": "진짜 중요한 우선순위만 남기기",
+          "rebuild_realistic_order": "현실적인 순서로 다시 배치하기"
+        }
+      }
+    }
+  }
+}

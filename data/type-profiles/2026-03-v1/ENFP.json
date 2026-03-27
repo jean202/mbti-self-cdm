@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ENFP",
+  "cognitive_stack": {
+    "dominant": "Ne",
+    "auxiliary": "Fi",
+    "tertiary": "Te",
+    "inferior": "Si"
+  },
+  "differentiation": {
+    "core_driver": "새로운 가능성과 개인적 의미가 연결될 때 추진력이 크게 살아나는 경향",
+    "decision_support": "확장 가능한 아이디어와 진짜 하고 싶은 이유가 보일 때 실행이 붙음",
+    "close_type_contrasts": [
+      {
+        "type_code": "INFP",
+        "difference_summary": "내면의 일치에만 머무르기보다 가능성과 외부 연결을 더 빠르게 탐색한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "possibility_spark",
+    "default_interaction": "open_prompt",
+    "card_priority": [
+      "personalized_prompt",
+      "today_focus",
+      "priority_tasks",
+      "calendar_summary",
+      "recovery_card"
+    ],
+    "empty_state_route": "meaning_then_focus",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "idea_burst",
+    "default_target_bias": "IDEA",
+    "prompt_mode": "blank_first_then_scaffold",
+    "suggested_fields": [
+      "title",
+      "why_now",
+      "next_tiny_action"
+    ],
+    "idea_to_task_prompt_style": "playful_translation"
+  },
+  "planning_style": {
+    "style_key": "possibilities_to_two_commitments",
+    "today_strategy": "choose_one_exciting_task_and_one_anchor_task",
+    "week_strategy": "limit_active_threads",
+    "backlog_strategy": "organize_by_theme_and_energy",
+    "default_sort": [
+      "meaning_fit",
+      "smallest_restart",
+      "due_soon"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "energizing_invite",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "adaptive"
+  },
+  "review_prompts": [
+    {
+      "key": "spark_check",
+      "surface": "reflect",
+      "intent": "오늘 무엇이 가장 가능성 있게 느껴졌는지 확인"
+    },
+    {
+      "key": "drift_point",
+      "surface": "reflect",
+      "intent": "어디서 흩어지기 시작했는지 보기"
+    },
+    {
+      "key": "next_alive_step",
+      "surface": "reflect",
+      "intent": "내일 다시 살아나게 할 다음 행동 찾기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "too_many_open_loops",
+      "trigger_hint": "흥미로운 시작은 많지만 닫힌 루프가 거의 없음",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "novelty_scatter",
+      "trigger_hint": "새 자극을 따라가다 집중 축이 사라짐",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "external_expectation_fog",
+      "trigger_hint": "타인의 기대가 많아져 자기 방향이 흐려짐",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "close_loops_and_reignite",
+    "default_duration_minutes": 12,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "capture_all_open_loops",
+        "duration_minutes": 4
+      },
+      {
+        "order": 2,
+        "action_key": "pick_alive_priority",
+        "duration_minutes": 4
+      },
+      {
+        "order": 3,
+        "action_key": "start_tiny_reentry",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "open_loop_dump",
+      "alive_priority_check",
+      "tiny_restart_invite"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "tight_overstructuring",
+      "rule": "처음부터 과도하게 촘촘한 구조를 강요하지 않는다"
+    },
+    {
+      "key": "shame_streaks",
+      "rule": "연속성 실패를 죄책감으로 자극하지 않는다"
+    },
+    {
+      "key": "crowded_priority_stack",
+      "rule": "첫 화면 상단에 동급 우선순위 요소를 과도하게 쌓지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "tiny",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "personalized_prompt"
+      ],
+      "mutable": [
+        "today_focus",
+        "priority_tasks",
+        "calendar_summary",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "warm_energetic",
+        "supportive_direct"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ENFP",
+      "type_summary": "새로운 가능성과 진짜 하고 싶은 이유가 연결될 때 가장 강하게 움직입니다.",
+      "onboarding": {
+        "result_summary": "당신은 의미 있는 가능성을 발견했을 때 빠르게 살아나고, 연결을 확장하는 데 강합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 아이디어 흐름과 실행 감각에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 다시 살아나는 가능성 하나를 먼저 잡아보세요.",
+        "empty_state_prompt": "지금 가장 끌리는 오늘의 초점을 한 줄로 적어보세요.",
+        "overload_prompt": "지금은 더 넓히기보다, 살아 있는 한 가지와 다시 연결되는 편이 맞습니다."
+      },
+      "capture": {
+        "placeholder": "떠오른 생각이나 해야 할 일을 적어보세요. 왜 지금 중요한지도 함께 적어보면 좋습니다.",
+        "task_hint": "다음 아주 작은 행동만 붙여도 실행이 쉬워집니다.",
+        "idea_hint": "아직 확장 단계라면 Idea로 두고 연결을 더 살펴보세요."
+      },
+      "plan": {
+        "today_prompt": "오늘은 설레는 한 가지와 반드시 붙잡을 한 가지면 충분합니다.",
+        "week_prompt": "주간 계획은 동시에 굴리는 가짓수를 줄이는 편이 좋습니다.",
+        "backlog_prompt": "보류한 일은 테마와 에너지 기준으로 묶어두세요."
+      },
+      "reminders": {
+        "samples": [
+          "지금 다시 살아나게 할 한 가지부터 잡아볼까요?",
+          "크게 벌리기보다, 다음 아주 작은 행동 하나면 충분합니다.",
+          "가능성은 많아도 오늘 움직일 건 하나면 됩니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "spark_check": "오늘 무엇이 가장 가능성 있게 느껴졌나요?",
+        "drift_point": "어디서부터 흩어지기 시작했나요?",
+        "next_alive_step": "내일 다시 살아나게 할 다음 행동은 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "다시 불을 붙이는 12분",
+        "card_body": "열린 루프를 빠르게 모으고, 살아 있는 한 가지로 다시 붙어보세요.",
+        "step_labels": {
+          "capture_all_open_loops": "머릿속 열린 루프를 짧게 모두 적기",
+          "pick_alive_priority": "지금 가장 살아 있는 우선순위 하나 고르기",
+          "start_tiny_reentry": "바로 시작할 아주 작은 행동 하나 하기"
+        }
+      }
+    }
+  }
+}

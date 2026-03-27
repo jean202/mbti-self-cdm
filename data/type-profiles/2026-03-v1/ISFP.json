@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ISFP",
+  "cognitive_stack": {
+    "dominant": "Fi",
+    "auxiliary": "Se",
+    "tertiary": "Ni",
+    "inferior": "Te"
+  },
+  "differentiation": {
+    "core_driver": "자기 감각과 진짜 중요한 방향이 맞을 때 자연스럽게 움직이는 경향",
+    "decision_support": "억지보다 지금 맞는 행동과 정서적 납득이 있을 때 실행이 붙음",
+    "close_type_contrasts": [
+      {
+        "type_code": "INFP",
+        "difference_summary": "내적 해석보다 지금 손에 잡히는 경험과 감각적 적합성에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "gentle_presence",
+    "default_interaction": "open_prompt",
+    "card_priority": [
+      "personalized_prompt",
+      "today_focus",
+      "recovery_card",
+      "priority_tasks",
+      "calendar_summary"
+    ],
+    "empty_state_route": "meaning_then_focus",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "feeling_to_action",
+    "default_target_bias": "IDEA",
+    "prompt_mode": "blank_first_then_scaffold",
+    "suggested_fields": [
+      "title",
+      "current_feel",
+      "next_tiny_action"
+    ],
+    "idea_to_task_prompt_style": "kind_translation"
+  },
+  "planning_style": {
+    "style_key": "soft_structure_visible_progress",
+    "today_strategy": "one_true_task_then_small_care_tasks",
+    "week_strategy": "leave_air_between_commitments",
+    "backlog_strategy": "organize_by_energy_and_mood",
+    "default_sort": [
+      "energy_fit",
+      "meaning_fit",
+      "smallest_restart"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "gentle_support",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "adaptive"
+  },
+  "review_prompts": [
+    {
+      "key": "felt_right",
+      "surface": "reflect",
+      "intent": "오늘 자연스럽고 맞는 느낌이 있었던 순간 확인"
+    },
+    {
+      "key": "drain_spot",
+      "surface": "reflect",
+      "intent": "어디서 억지로 버티고 있었는지 보기"
+    },
+    {
+      "key": "small_tomorrow_move",
+      "surface": "reflect",
+      "intent": "내일 시작할 가장 작은 행동 하나 정하기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "external_push_pressure",
+      "trigger_hint": "외부 기준이 너무 강해 자기 리듬이 사라짐",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "sensory_exhaustion",
+      "trigger_hint": "소리, 사람, 일정 자극이 너무 많음",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "self_erasure",
+      "trigger_hint": "내가 원하는 것을 전혀 고려하지 못함",
+      "ui_escalation": "suppress_hard_metrics"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "ground_and_choose_kind_action",
+    "default_duration_minutes": 11,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "reduce_stimulation",
+        "duration_minutes": 3
+      },
+      {
+        "order": 2,
+        "action_key": "check_inner_yes",
+        "duration_minutes": 4
+      },
+      {
+        "order": 3,
+        "action_key": "start_small_kind_action",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "grounding_pause_3m",
+      "kind_action_restart",
+      "quiet_body_check"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "shame_language",
+      "rule": "부끄러움이나 실패감을 자극하는 reminder 문구를 쓰지 않는다"
+    },
+    {
+      "key": "crowded_grids",
+      "rule": "첫 화면에 촘촘한 정보 블록을 과도하게 배치하지 않는다"
+    },
+    {
+      "key": "rigid_timeboxing",
+      "rule": "분 단위 고정 계획을 기본값으로 강요하지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "tiny",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "personalized_prompt"
+      ],
+      "mutable": [
+        "today_focus",
+        "recovery_card",
+        "priority_tasks",
+        "calendar_summary"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "warm_reflective",
+        "gentle_supportive"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ISFP",
+      "type_summary": "지금의 감각과 진짜 중요한 방향이 맞을 때 가장 자연스럽게 움직입니다.",
+      "onboarding": {
+        "result_summary": "당신은 억지보다 자연스러운 리듬과 정서적 납득이 있을 때 더 잘 실행합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 감각과 일 처리 방식에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 지금의 나와 가장 잘 맞는 한 가지부터 시작해보세요.",
+        "empty_state_prompt": "지금 내 감각과 맞는 오늘의 초점을 한 줄로 적어보세요.",
+        "overload_prompt": "지금은 더 세게 밀기보다, 자극을 줄이고 다시 몸과 마음을 맞추는 편이 맞습니다."
+      },
+      "capture": {
+        "placeholder": "떠오른 생각이나 해야 할 일을 적어보세요. 지금 어떤 느낌인지 함께 적어도 좋습니다.",
+        "task_hint": "바로 시작할 수 있는 가장 작은 행동을 함께 적어보세요.",
+        "idea_hint": "아직 모양이 흐리면 Idea로 남겨두고 천천히 다듬어도 됩니다."
+      },
+      "plan": {
+        "today_prompt": "오늘은 진짜 중요한 한 가지와 부담 적은 작은 일 몇 개면 충분합니다.",
+        "week_prompt": "주간 계획에는 숨 돌릴 여백이 남아 있어야 합니다.",
+        "backlog_prompt": "보류한 일은 에너지와 기분 기준으로 묶어두면 다시 꺼내기 쉽습니다."
+      },
+      "reminders": {
+        "samples": [
+          "지금의 나와 가장 잘 맞는 작은 행동 하나부터 시작해볼까요?",
+          "조금 더 부드러운 방식으로 해도 괜찮습니다.",
+          "억지로 세게 밀기보다, 다시 연결되는 첫 움직임이면 충분합니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "felt_right": "오늘 무엇이 가장 자연스럽고 맞는 느낌이었나요?",
+        "drain_spot": "어디서 가장 억지로 버티고 있었나요?",
+        "small_tomorrow_move": "내일 시작할 가장 작은 행동 하나는 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "다시 몸과 마음을 맞추는 11분",
+        "card_body": "자극을 조금 줄이고, 지금 진짜 맞는 한 가지 행동으로 다시 시작해보세요.",
+        "step_labels": {
+          "reduce_stimulation": "소리와 알림, 화면 자극 줄이기",
+          "check_inner_yes": "지금 진짜 맞는 선택이 무엇인지 짧게 확인하기",
+          "start_small_kind_action": "부담 없는 작은 행동 하나 시작하기"
+        }
+      }
+    }
+  }
+}

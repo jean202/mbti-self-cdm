@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "INTP",
+  "cognitive_stack": {
+    "dominant": "Ti",
+    "auxiliary": "Ne",
+    "tertiary": "Si",
+    "inferior": "Fe"
+  },
+  "differentiation": {
+    "core_driver": "개념을 이해하고 구조를 스스로 납득했을 때 에너지가 붙는 경향",
+    "decision_support": "왜 이게 맞는지 설명 가능할수록 실행 저항이 줄어듦",
+    "close_type_contrasts": [
+      {
+        "type_code": "ENTP",
+        "difference_summary": "가능성을 넓히기보다 개념 구조를 정교화하는 쪽에 더 오래 머문다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "concept_console",
+    "default_interaction": "open_prompt",
+    "card_priority": [
+      "personalized_prompt",
+      "priority_tasks",
+      "today_focus",
+      "calendar_summary",
+      "recovery_card"
+    ],
+    "empty_state_route": "meaning_then_focus",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "concept_then_action",
+    "default_target_bias": "IDEA",
+    "prompt_mode": "blank_first_then_scaffold",
+    "suggested_fields": [
+      "title",
+      "question_or_hypothesis",
+      "next_test"
+    ],
+    "idea_to_task_prompt_style": "logic_bridge"
+  },
+  "planning_style": {
+    "style_key": "model_then_commit",
+    "today_strategy": "pick_one_problem_and_one_maintenance_task",
+    "week_strategy": "reserve_think_time_before_scheduling",
+    "backlog_strategy": "organize_by_topic_and_complexity",
+    "default_sort": [
+      "strategic_value",
+      "smallest_restart",
+      "due_soon"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "light_logical",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "sparse"
+  },
+  "review_prompts": [
+    {
+      "key": "understanding_gain",
+      "surface": "reflect",
+      "intent": "오늘 무엇을 더 명확히 이해하게 되었는지 확인"
+    },
+    {
+      "key": "stuck_point",
+      "surface": "reflect",
+      "intent": "멈춘 지점이 개념 문제인지 실행 문제인지 구분"
+    },
+    {
+      "key": "next_experiment",
+      "surface": "reflect",
+      "intent": "다음에 시험할 가장 작은 실험 정하기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "constant_interruptions",
+      "trigger_hint": "사고 흐름이 짧게 계속 끊김",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "low_autonomy",
+      "trigger_hint": "스스로 구조를 만들 여지가 거의 없음",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "half_finished_threads",
+      "trigger_hint": "궁금한 건 많지만 닫힌 사고가 거의 없음",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "reduce_noise_and_restart_thinking",
+    "default_duration_minutes": 10,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "clear_distractions",
+        "duration_minutes": 2
+      },
+      {
+        "order": 2,
+        "action_key": "write_current_question",
+        "duration_minutes": 4
+      },
+      {
+        "order": 3,
+        "action_key": "design_small_test",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "thought_dump_reset",
+      "single_question_focus",
+      "mini_experiment_note"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "emotionally_manipulative_copy",
+      "rule": "감정 압박으로 실행을 유도하는 카피를 사용하지 않는다"
+    },
+    {
+      "key": "forced_social_accountability",
+      "rule": "과도한 사회적 노출이나 책임감을 기본값으로 두지 않는다"
+    },
+    {
+      "key": "overpacked_dashboard",
+      "rule": "첫 화면에 동시다발적 자극을 과하게 배치하지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "tiny",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "personalized_prompt"
+      ],
+      "mutable": [
+        "priority_tasks",
+        "today_focus",
+        "calendar_summary",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "calm_analytical",
+        "practical_sparse"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "INTP",
+      "type_summary": "이해가 되고 구조가 납득될 때 가장 안정적으로 움직입니다.",
+      "onboarding": {
+        "result_summary": "당신은 개념을 정리하고, 스스로 납득한 방식으로 문제를 푸는 데 강합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 사고 방식과 실행 감각에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 풀고 싶은 문제 한 가지를 분명히 잡아보세요.",
+        "empty_state_prompt": "먼저 지금 가장 궁금하거나 막힌 질문 하나를 적어보세요.",
+        "overload_prompt": "생각이 흩어졌다면, 질문 하나와 작은 실험 하나만 남기면 됩니다."
+      },
+      "capture": {
+        "placeholder": "아이디어나 해야 할 일을 적어보세요. 가능하면 질문이나 가설도 함께요.",
+        "task_hint": "다음에 시험할 가장 작은 행동을 붙이면 다시 시작하기 쉬워집니다.",
+        "idea_hint": "아직 생각 단계라면 가설 형태로 남겨두는 편이 좋습니다."
+      },
+      "plan": {
+        "today_prompt": "오늘은 문제 하나와 유지할 일 하나면 충분합니다.",
+        "week_prompt": "주간 계획에는 생각할 시간이 먼저 확보되어야 합니다.",
+        "backlog_prompt": "보류한 일은 주제와 복잡도로 묶어두면 다시 꺼내기 쉽습니다."
+      },
+      "reminders": {
+        "samples": [
+          "지금 가장 중요한 질문 하나만 다시 잡아볼까요?",
+          "완벽한 답보다 작은 실험 하나가 더 도움이 될 수 있습니다.",
+          "생각이 흩어졌다면 다음 테스트만 남겨도 충분합니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "understanding_gain": "오늘 무엇을 더 명확히 이해하게 되었나요?",
+        "stuck_point": "멈춘 지점은 개념 문제였나요, 실행 문제였나요?",
+        "next_experiment": "다음에 시험할 가장 작은 실험은 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "생각을 다시 세우는 10분",
+        "card_body": "잡음을 줄이고, 지금 가장 중요한 질문 하나와 다음 실험 하나만 다시 적어보세요.",
+        "step_labels": {
+          "clear_distractions": "방해되는 탭과 입력 줄이기",
+          "write_current_question": "지금 가장 중요한 질문 한 줄로 적기",
+          "design_small_test": "바로 시도할 작은 실험 정하기"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ESFP",
+  "cognitive_stack": {
+    "dominant": "Se",
+    "auxiliary": "Fi",
+    "tertiary": "Te",
+    "inferior": "Ni"
+  },
+  "differentiation": {
+    "core_driver": "현장감과 정서적 에너지가 살아 있는 일에서 가장 잘 움직이는 경향",
+    "decision_support": "사람, 분위기, 즉각적인 즐거움이 연결될수록 실행이 쉬워짐",
+    "close_type_contrasts": [
+      {
+        "type_code": "ENFP",
+        "difference_summary": "가능성을 멀리 확장하기보다 지금 살아 있는 경험과 즉각 반응에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "energized_presence",
+    "default_interaction": "open_prompt",
+    "card_priority": [
+      "personalized_prompt",
+      "calendar_summary",
+      "priority_tasks",
+      "today_focus",
+      "recovery_card"
+    ],
+    "empty_state_route": "meaning_then_focus",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "spark_first",
+    "default_target_bias": "NEUTRAL",
+    "prompt_mode": "blank_first_then_choice",
+    "suggested_fields": [
+      "title",
+      "who_or_context",
+      "next_fun_step"
+    ],
+    "idea_to_task_prompt_style": "friendly_commitment"
+  },
+  "planning_style": {
+    "style_key": "visible_wins_first",
+    "today_strategy": "start_with_momentum_task_then_core_task",
+    "week_strategy": "keep_social_and_energy_balance",
+    "backlog_strategy": "organize_by_energy_and_context",
+    "default_sort": [
+      "energy_fit",
+      "due_soon",
+      "smallest_restart"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "upbeat_support",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "adaptive"
+  },
+  "review_prompts": [
+    {
+      "key": "what_lit_me_up",
+      "surface": "reflect",
+      "intent": "오늘 나를 가장 살아 있게 만든 순간 확인"
+    },
+    {
+      "key": "where_did_i_drop",
+      "surface": "reflect",
+      "intent": "에너지가 뚝 떨어진 지점 찾기"
+    },
+    {
+      "key": "tomorrow_fun_entry",
+      "surface": "reflect",
+      "intent": "내일 다시 붙기 쉬운 시작점 고르기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "social_drain",
+      "trigger_hint": "사람은 많았지만 회복은 거의 없었음",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "boring_overload",
+      "trigger_hint": "의무감만 큰 지루한 일이 쌓임",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "impulse_sprawl",
+      "trigger_hint": "흥미로운 것에 반응하다 일정이 넓게 퍼짐",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "warm_reset_and_reentry",
+    "default_duration_minutes": 10,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "step_out_of_noise",
+        "duration_minutes": 3
+      },
+      {
+        "order": 2,
+        "action_key": "find_alive_task",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "start_with_easy_momentum",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "energy_reset_songless",
+      "friendly_restart_note",
+      "two_minute_warmup"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "cold_metrics_only",
+      "rule": "숫자 성과만 전면에 내세우는 첫 화면을 기본값으로 두지 않는다"
+    },
+    {
+      "key": "rigid_silence",
+      "rule": "반응과 활기를 지나치게 억누르는 무채색 흐름을 강요하지 않는다"
+    },
+    {
+      "key": "harsh_failure_language",
+      "rule": "실패감을 직접 자극하는 문구를 사용하지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "tiny",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "personalized_prompt"
+      ],
+      "mutable": [
+        "calendar_summary",
+        "priority_tasks",
+        "today_focus",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "warm_energetic",
+        "supportive_short"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ESFP",
+      "type_summary": "지금 살아 있는 에너지와 사람의 온도가 느껴질 때 가장 자연스럽게 움직입니다.",
+      "onboarding": {
+        "result_summary": "당신은 분위기와 에너지가 살아 있는 상황에서 실행력이 크게 올라갑니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 현장감과 움직이는 방식에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 기운을 붙여줄 시작점 하나를 먼저 잡아보세요.",
+        "empty_state_prompt": "지금 가장 살아 있게 느껴지는 오늘의 초점을 한 줄로 적어보세요.",
+        "overload_prompt": "지금은 더 억지로 밀기보다, 다시 에너지가 붙는 시작점을 찾는 편이 맞습니다."
+      },
+      "capture": {
+        "placeholder": "떠오른 생각이나 해야 할 일을 적어보세요. 누구와 관련 있는지도 함께 적으면 좋습니다.",
+        "task_hint": "바로 움직일 수 있는 시작점이 보이면 더 빨리 붙습니다.",
+        "idea_hint": "아직 재미나 감이 먼저라면 Idea로 남겨도 괜찮습니다."
+      },
+      "plan": {
+        "today_prompt": "오늘은 탄력 붙는 일로 시작하고, 핵심 일로 이어가세요.",
+        "week_prompt": "주간 계획은 사람 일정과 에너지 균형을 함께 봐야 합니다.",
+        "backlog_prompt": "보류한 일은 에너지와 상황 기준으로 묶어두세요."
+      },
+      "reminders": {
+        "samples": [
+          "지금 가장 탄력이 붙을 시작점 하나만 잡아볼까요?",
+          "작게 움직이면 다시 리듬이 살아날 수 있습니다.",
+          "오늘은 완벽함보다 기세가 중요합니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "what_lit_me_up": "오늘 무엇이 나를 가장 살아 있게 만들었나요?",
+        "where_did_i_drop": "어디서 기운이 갑자기 떨어졌나요?",
+        "tomorrow_fun_entry": "내일 다시 붙기 쉬운 시작점은 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "다시 탄력을 붙이는 10분",
+        "card_body": "소음을 조금 줄이고, 다시 에너지가 붙는 시작점 하나를 골라보세요.",
+        "step_labels": {
+          "step_out_of_noise": "잠깐 시끄러운 환경에서 벗어나기",
+          "find_alive_task": "지금 가장 살아 있는 작업 하나 고르기",
+          "start_with_easy_momentum": "가볍게 시작할 수 있는 행동 하나 하기"
+        }
+      }
+    }
+  }
+}

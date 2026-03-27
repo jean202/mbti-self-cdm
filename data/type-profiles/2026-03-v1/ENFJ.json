@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ENFJ",
+  "cognitive_stack": {
+    "dominant": "Fe",
+    "auxiliary": "Ni",
+    "tertiary": "Se",
+    "inferior": "Ti"
+  },
+  "differentiation": {
+    "core_driver": "사람과 방향을 연결해 의미 있는 흐름을 만들 때 에너지가 살아나는 경향",
+    "decision_support": "관계적 영향과 장기적 의미가 함께 보일 때 움직임이 강해짐",
+    "close_type_contrasts": [
+      {
+        "type_code": "INFJ",
+        "difference_summary": "내면의 패턴 정리보다 사람을 움직이게 하는 메시지와 흐름 형성에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "guiding_energy",
+    "default_interaction": "prompted",
+    "card_priority": [
+      "personalized_prompt",
+      "today_focus",
+      "priority_tasks",
+      "recovery_card",
+      "calendar_summary"
+    ],
+    "empty_state_route": "today_focus_first",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "people_impact_first",
+    "default_target_bias": "TASK",
+    "prompt_mode": "structured_light",
+    "suggested_fields": [
+      "title",
+      "why_it_matters",
+      "who_it_affects"
+    ],
+    "idea_to_task_prompt_style": "encouraging_commitment"
+  },
+  "planning_style": {
+    "style_key": "meaning_and_people_first",
+    "today_strategy": "one_high_impact_task_then_support_tasks",
+    "week_strategy": "sequence_people_and_deep_work",
+    "backlog_strategy": "cluster_by_impact_and_theme",
+    "default_sort": [
+      "meaning_fit",
+      "today_focus_linked",
+      "due_soon"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "warm_directive",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "steady"
+  },
+  "review_prompts": [
+    {
+      "key": "impact_check",
+      "surface": "reflect",
+      "intent": "오늘 내가 만든 긍정적 영향 확인"
+    },
+    {
+      "key": "drain_check",
+      "surface": "reflect",
+      "intent": "어디서 자신을 너무 많이 소진했는지 보기"
+    },
+    {
+      "key": "tomorrow_alignment",
+      "surface": "reflect",
+      "intent": "내일의 방향과 행동을 다시 정렬하기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "overextension_for_others",
+      "trigger_hint": "다른 사람을 위해 계속 넘치게 움직임",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "message_fatigue",
+      "trigger_hint": "사람을 설득하고 맞추는 데 에너지가 크게 빠짐",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "forgotten_own_priority",
+      "trigger_hint": "자기 방향이 흐려지고 남의 일정만 남음",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "return_to_self_then_reengage",
+    "default_duration_minutes": 11,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "step_back_from_people_noise",
+        "duration_minutes": 3
+      },
+      {
+        "order": 2,
+        "action_key": "name_my_direction",
+        "duration_minutes": 4
+      },
+      {
+        "order": 3,
+        "action_key": "pick_one_aligned_action",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "return_to_self_note",
+      "aligned_action_reset",
+      "quiet_compassion_pause"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "shame_based_motivation",
+      "rule": "실망시킨다는 식의 죄책감 유발 문구를 사용하지 않는다"
+    },
+    {
+      "key": "busy_top_screen",
+      "rule": "첫 화면 상단을 과도한 정보와 긴급도로 채우지 않는다"
+    },
+    {
+      "key": "pressure_without_context",
+      "rule": "왜 중요한지 설명 없이 압박만 주는 흐름을 만들지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "small",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "personalized_prompt"
+      ],
+      "mutable": [
+        "today_focus",
+        "priority_tasks",
+        "recovery_card",
+        "calendar_summary"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "warm_reflective",
+        "supportive_direct"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ENFJ",
+      "type_summary": "사람과 방향이 연결될 때 가장 큰 에너지와 추진력이 살아납니다.",
+      "onboarding": {
+        "result_summary": "당신은 사람을 움직이는 흐름과 의미를 만들 때 강한 집중력과 실행력을 냅니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 영향력과 일 처리 감각에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 의미 있고 영향력 있는 한 가지를 먼저 분명히 해보세요.",
+        "empty_state_prompt": "먼저 오늘의 방향과 초점을 한 줄로 적어보세요.",
+        "overload_prompt": "지금은 모두를 더 끌어안기보다, 내 방향을 다시 붙잡는 편이 맞습니다."
+      },
+      "capture": {
+        "placeholder": "해야 할 일이나 떠오른 생각을 적어보세요. 왜 중요한지, 누구에게 영향을 주는지도 함께 적어보면 좋습니다.",
+        "task_hint": "의미와 영향이 분명하면 실행도 더 빨라집니다.",
+        "idea_hint": "아직 흐름만 보인다면 Idea로 두고 더 다듬어도 됩니다."
+      },
+      "plan": {
+        "today_prompt": "오늘은 영향력이 큰 한 가지를 먼저 보호하세요.",
+        "week_prompt": "주간 계획은 사람 일정과 깊은 일을 함께 정렬하는 편이 좋습니다.",
+        "backlog_prompt": "보류한 일은 영향력과 주제 기준으로 묶어두세요."
+      },
+      "reminders": {
+        "samples": [
+          "지금 가장 의미 있고 영향력 있는 한 가지로 다시 돌아가볼까요?",
+          "다른 사람을 챙기기 전에 내 방향부터 다시 붙잡아도 괜찮습니다.",
+          "오늘은 중요한 흐름 하나만 지켜도 충분합니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "impact_check": "오늘 내가 만든 긍정적 영향은 무엇이었나요?",
+        "drain_check": "어디서 스스로를 너무 많이 소진했나요?",
+        "tomorrow_alignment": "내일은 무엇을 다시 정렬하면 좋을까요?"
+      },
+      "recovery": {
+        "card_title": "나로 다시 돌아오는 11분",
+        "card_body": "사람의 소음에서 잠시 물러나, 내 방향과 맞는 한 가지 행동으로 다시 시작해보세요.",
+        "step_labels": {
+          "step_back_from_people_noise": "요청과 대화 흐름에서 잠시 거리 두기",
+          "name_my_direction": "지금 내 방향 한 줄로 적기",
+          "pick_one_aligned_action": "그 방향과 맞는 행동 하나 고르기"
+        }
+      }
+    }
+  }
+}

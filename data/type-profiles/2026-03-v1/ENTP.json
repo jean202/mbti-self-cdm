@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ENTP",
+  "cognitive_stack": {
+    "dominant": "Ne",
+    "auxiliary": "Ti",
+    "tertiary": "Fe",
+    "inferior": "Si"
+  },
+  "differentiation": {
+    "core_driver": "문제를 새 각도에서 보고 실험할 여지가 있을 때 가장 잘 움직이는 경향",
+    "decision_support": "논쟁 가능한 가설과 빠른 실험 단위가 있으면 추진력이 상승함",
+    "close_type_contrasts": [
+      {
+        "type_code": "INTP",
+        "difference_summary": "개념을 깊게 고정하기보다 가능성을 열고 시험하는 쪽에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "experiment_board",
+    "default_interaction": "open_prompt",
+    "card_priority": [
+      "personalized_prompt",
+      "priority_tasks",
+      "today_focus",
+      "calendar_summary",
+      "recovery_card"
+    ],
+    "empty_state_route": "meaning_then_focus",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "hypothesis_first",
+    "default_target_bias": "IDEA",
+    "prompt_mode": "blank_first_then_scaffold",
+    "suggested_fields": [
+      "title",
+      "hypothesis",
+      "next_test"
+    ],
+    "idea_to_task_prompt_style": "rapid_experiment"
+  },
+  "planning_style": {
+    "style_key": "hypothesis_then_ship",
+    "today_strategy": "one_core_experiment_and_one_closing_task",
+    "week_strategy": "protect_space_for_iteration",
+    "backlog_strategy": "organize_by_leverage_and_novelty",
+    "default_sort": [
+      "strategic_value",
+      "meaning_fit",
+      "due_soon"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "provocative_light",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "adaptive"
+  },
+  "review_prompts": [
+    {
+      "key": "experiment_result",
+      "surface": "reflect",
+      "intent": "오늘 시도한 실험에서 얻은 결과 확인"
+    },
+    {
+      "key": "friction_signal",
+      "surface": "reflect",
+      "intent": "속도를 죽인 제약이나 패턴 찾기"
+    },
+    {
+      "key": "next_test",
+      "surface": "reflect",
+      "intent": "다음에 바로 시험할 질문 하나 정하기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "constraint_boredom",
+      "trigger_hint": "통제와 반복이 심해져 흥미가 급격히 떨어짐",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "too_many_admin_tasks",
+      "trigger_hint": "운영성 잡무가 사고 에너지를 잡아먹음",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "argument_without_progress",
+      "trigger_hint": "아이디어는 많지만 실제 전진이 거의 없음",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "change_angle_and_reduce_noise",
+    "default_duration_minutes": 10,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "drop_admin_noise",
+        "duration_minutes": 3
+      },
+      {
+        "order": 2,
+        "action_key": "rewrite_problem_angle",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "run_small_test",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "angle_shift_note",
+      "quick_test_restart",
+      "noise_cut_reset"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "overexplaining_forms",
+      "rule": "입력 전에 긴 설명과 많은 필드를 강요하지 않는다"
+    },
+    {
+      "key": "repetitive_nudges",
+      "rule": "같은 메시지를 짧은 간격으로 반복하지 않는다"
+    },
+    {
+      "key": "rigid_minute_plans",
+      "rule": "분 단위 고정 계획을 기본 UX로 강제하지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "tiny",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "personalized_prompt"
+      ],
+      "mutable": [
+        "priority_tasks",
+        "today_focus",
+        "calendar_summary",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "playful_direct",
+        "calm_analytical"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ENTP",
+      "type_summary": "새 각도와 실험할 여지가 보일 때 가장 빠르게 살아납니다.",
+      "onboarding": {
+        "result_summary": "당신은 아이디어를 시험하고, 구조를 뒤집어 더 나은 해법을 찾는 데 강합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 실험적 사고와 실행 방식에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 시험해볼 만한 핵심 가설 하나를 먼저 잡아보세요.",
+        "empty_state_prompt": "지금 가장 흥미로운 질문 하나를 적어보세요.",
+        "overload_prompt": "지금은 더 벌리기보다, 각도를 하나만 바꿔 다시 시험해보는 편이 낫습니다."
+      },
+      "capture": {
+        "placeholder": "아이디어나 해야 할 일을 적어보세요. 가능하면 가설이나 시험할 점도 함께요.",
+        "task_hint": "실험 형태로 쪼개면 다시 붙기 쉬워집니다.",
+        "idea_hint": "아직 가능성 탐색 단계라면 Idea로 남겨두세요."
+      },
+      "plan": {
+        "today_prompt": "오늘은 실험 하나와 닫을 일 하나면 충분합니다.",
+        "week_prompt": "주간 계획에는 반복보다 실험 공간이 확보되어야 합니다.",
+        "backlog_prompt": "보류한 일은 새로움과 영향력 기준으로 묶어두세요."
+      },
+      "reminders": {
+        "samples": [
+          "지금 가장 재미있는 가설 하나만 다시 시험해볼까요?",
+          "완벽한 구조보다 작은 테스트 하나가 더 빨리 답을 줍니다.",
+          "오늘은 실험 하나만 제대로 굴려도 충분합니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "experiment_result": "오늘 시도한 실험에서 무엇을 얻었나요?",
+        "friction_signal": "속도를 죽인 제약은 무엇이었나요?",
+        "next_test": "다음에 바로 시험할 질문 하나는 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "각도를 다시 바꾸는 10분",
+        "card_body": "잡무 소음을 줄이고, 문제를 다른 각도로 다시 써본 뒤 작은 테스트 하나를 해보세요.",
+        "step_labels": {
+          "drop_admin_noise": "잡무와 알림을 잠시 치우기",
+          "rewrite_problem_angle": "문제를 다른 각도로 한 줄로 다시 적기",
+          "run_small_test": "지금 가능한 작은 테스트 하나 해보기"
+        }
+      }
+    }
+  }
+}

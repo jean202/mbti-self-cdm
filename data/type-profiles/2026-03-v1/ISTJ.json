@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ISTJ",
+  "cognitive_stack": {
+    "dominant": "Si",
+    "auxiliary": "Te",
+    "tertiary": "Fi",
+    "inferior": "Ne"
+  },
+  "differentiation": {
+    "core_driver": "검증된 기준과 현실적인 순서를 따라 하루를 안정적으로 닫아가려는 경향",
+    "decision_support": "책임과 절차가 분명할수록 실행 저항이 줄어듦",
+    "close_type_contrasts": [
+      {
+        "type_code": "INTJ",
+        "difference_summary": "장기 전략을 넓게 그리기보다 당장 신뢰할 수 있는 기준과 누락 없는 실행 안정성에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "steady_checklist",
+    "default_interaction": "structured",
+    "card_priority": [
+      "today_focus",
+      "priority_tasks",
+      "calendar_summary",
+      "personalized_prompt",
+      "recovery_card"
+    ],
+    "empty_state_route": "task_list_first",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "checklist_first",
+    "default_target_bias": "TASK",
+    "prompt_mode": "structured_first",
+    "suggested_fields": [
+      "title",
+      "deadline_hint",
+      "definition_of_done"
+    ],
+    "idea_to_task_prompt_style": "direct_commitment"
+  },
+  "planning_style": {
+    "style_key": "sequence_then_buffer",
+    "today_strategy": "close_open_loops_in_order",
+    "week_strategy": "frontload_commitments_then_review",
+    "backlog_strategy": "sort_by_obligation_and_due_date",
+    "default_sort": [
+      "due_soon",
+      "today_focus_linked",
+      "oldest_open"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "clear_brief",
+    "intensity_floor": "medium",
+    "intensity_ceiling": "high",
+    "cadence_bias": "steady"
+  },
+  "review_prompts": [
+    {
+      "key": "completion_check",
+      "surface": "reflect",
+      "intent": "오늘 마무리된 일과 남은 일을 분명히 확인"
+    },
+    {
+      "key": "deviation_point",
+      "surface": "reflect",
+      "intent": "계획에서 벗어난 지점이 어디였는지 파악"
+    },
+    {
+      "key": "tomorrow_order",
+      "surface": "reflect",
+      "intent": "내일의 순서를 미리 정해 불확실성을 줄이기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "unclosed_loops",
+      "trigger_hint": "열어둔 일은 많은데 끝난 일이 거의 없음",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "unexpected_change_stack",
+      "trigger_hint": "계획 밖 변경이 한꺼번에 겹침",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "silent_overwork",
+      "trigger_hint": "쉬지 않고 버티지만 피로 신호를 무시함",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "stabilize_and_reset_sequence",
+    "default_duration_minutes": 10,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "review_open_loops",
+        "duration_minutes": 3
+      },
+      {
+        "order": 2,
+        "action_key": "pick_next_clear_step",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "make_small_reset",
+        "duration_minutes": 4
+      }
+    ],
+    "recommended_prompt_keys": [
+      "sequence_reset_3m",
+      "close_one_loop",
+      "desk_reset_short"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "ambiguous_prompting",
+      "rule": "해야 할 행동이 모호한 프롬프트를 첫 화면 핵심 위치에 두지 않는다"
+    },
+    {
+      "key": "last_minute_flood",
+      "rule": "마감 직전에 reminder를 과도하게 몰아 보내지 않는다"
+    },
+    {
+      "key": "emotional_guilt_language",
+      "rule": "감정 압박 위주의 reminder 문구를 사용하지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "medium",
+      "max": "high"
+    },
+    "task_granularity": {
+      "min": "small",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "today_focus"
+      ],
+      "mutable": [
+        "priority_tasks",
+        "calendar_summary",
+        "personalized_prompt",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "practical_direct",
+        "calm_structured"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ISTJ",
+      "type_summary": "기준이 분명하고 순서가 정리될수록 안정적으로 끝까지 밀어갑니다.",
+      "onboarding": {
+        "result_summary": "당신은 예측 가능한 구조와 명확한 기준이 있을 때 가장 꾸준하게 실행합니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 일 처리 방식과 책임감 있는 리듬에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 순서와 마감이 분명한 일부터 닫아가면 됩니다.",
+        "empty_state_prompt": "먼저 오늘 끝내야 할 일과 순서를 정리해보세요.",
+        "overload_prompt": "지금은 새 일을 늘리기보다 열린 루프를 닫는 편이 맞습니다."
+      },
+      "capture": {
+        "placeholder": "해야 할 일을 적어보세요. 가능하면 언제까지, 무엇이 끝의 기준인지 함께요.",
+        "task_hint": "완료 기준이 분명할수록 더 빨리 움직일 수 있습니다.",
+        "idea_hint": "아직 실행 기준이 없다면 잠시 보류해도 괜찮습니다."
+      },
+      "plan": {
+        "today_prompt": "오늘은 중요한 순서대로 닫아가세요.",
+        "week_prompt": "주간 계획은 앞부분에 핵심 책임을 먼저 배치하는 편이 맞습니다.",
+        "backlog_prompt": "미뤄둔 일은 의무도와 마감 기준으로 정리해두세요."
+      },
+      "reminders": {
+        "samples": [
+          "다음 순서로 넘어가기 전에 지금 일의 완료 기준만 다시 확인해볼까요?",
+          "열어둔 일을 하나 닫으면 전체 부담이 줄어듭니다.",
+          "예정된 순서를 유지하는 것만으로도 충분히 잘하고 있습니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "completion_check": "오늘 실제로 닫힌 일은 무엇이었나요?",
+        "deviation_point": "계획에서 벗어난 지점은 어디였나요?",
+        "tomorrow_order": "내일의 순서를 먼저 정하면 무엇부터 시작하겠나요?"
+      },
+      "recovery": {
+        "card_title": "순서를 다시 세우는 10분",
+        "card_body": "열린 일을 다시 확인하고, 다음 가장 분명한 행동 하나를 고르세요.",
+        "step_labels": {
+          "review_open_loops": "열어둔 일과 남은 일을 빠르게 확인하기",
+          "pick_next_clear_step": "다음 가장 분명한 행동 하나 고르기",
+          "make_small_reset": "책상이나 작업 화면을 짧게 정리하기"
+        }
+      }
+    }
+  }
+}

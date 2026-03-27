@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "profile_version": "2026-03-v1",
+  "type_code": "ISTP",
+  "cognitive_stack": {
+    "dominant": "Ti",
+    "auxiliary": "Se",
+    "tertiary": "Ni",
+    "inferior": "Fe"
+  },
+  "differentiation": {
+    "core_driver": "직접 부딪혀 해결 가능한 문제를 간단하게 처리할 때 집중이 붙는 경향",
+    "decision_support": "불필요한 설명 없이 바로 손댈 수 있는 단위가 있을 때 움직임",
+    "close_type_contrasts": [
+      {
+        "type_code": "ISFP",
+        "difference_summary": "감정적 의미보다 작동 여부와 즉시 해결 가능성에 더 빨리 반응한다"
+      }
+    ]
+  },
+  "home_mode": {
+    "mode_key": "action_console",
+    "default_interaction": "minimal",
+    "card_priority": [
+      "priority_tasks",
+      "today_focus",
+      "calendar_summary",
+      "personalized_prompt",
+      "recovery_card"
+    ],
+    "empty_state_route": "task_list_first",
+    "overload_card_priority": "raise_recovery_card"
+  },
+  "task_capture_style": {
+    "style_key": "action_fragment",
+    "default_target_bias": "TASK",
+    "prompt_mode": "blank_first_then_quick_tags",
+    "suggested_fields": [
+      "title",
+      "next_action",
+      "tool_or_place"
+    ],
+    "idea_to_task_prompt_style": "practical_translation"
+  },
+  "planning_style": {
+    "style_key": "fix_then_move",
+    "today_strategy": "pick_one_problem_then_quick_wins",
+    "week_strategy": "keep_schedule_loose_with_hard_edges",
+    "backlog_strategy": "group_by_tools_or_context",
+    "default_sort": [
+      "smallest_restart",
+      "due_soon",
+      "energy_fit"
+    ]
+  },
+  "reminder_tone": {
+    "tone_key": "minimal_ping",
+    "intensity_floor": "low",
+    "intensity_ceiling": "medium",
+    "cadence_bias": "event_based"
+  },
+  "review_prompts": [
+    {
+      "key": "what_worked",
+      "surface": "reflect",
+      "intent": "실제로 잘 작동한 방식 확인"
+    },
+    {
+      "key": "what_was_friction",
+      "surface": "reflect",
+      "intent": "쓸데없이 막힌 지점을 파악"
+    },
+    {
+      "key": "what_is_next_move",
+      "surface": "reflect",
+      "intent": "다음에 바로 손댈 수 있는 행동 하나 정하기"
+    }
+  ],
+  "stress_signals": [
+    {
+      "key": "micromanaged_sequence",
+      "trigger_hint": "자율성 없이 세세하게 통제받는 느낌이 큼",
+      "ui_escalation": "show_recovery_card"
+    },
+    {
+      "key": "talk_without_action",
+      "trigger_hint": "실행 없이 논의만 길어짐",
+      "ui_escalation": "raise_reflection_prompt"
+    },
+    {
+      "key": "too_many_soft_commitments",
+      "trigger_hint": "경계가 모호한 약속이 계속 쌓임",
+      "ui_escalation": "suppress_extra_prompts"
+    }
+  ],
+  "recovery_protocol": {
+    "protocol_key": "step_back_then_reengage",
+    "default_duration_minutes": 8,
+    "steps": [
+      {
+        "order": 1,
+        "action_key": "drop_nonessential_noise",
+        "duration_minutes": 2
+      },
+      {
+        "order": 2,
+        "action_key": "identify_real_problem",
+        "duration_minutes": 3
+      },
+      {
+        "order": 3,
+        "action_key": "start_small_fix",
+        "duration_minutes": 3
+      }
+    ],
+    "recommended_prompt_keys": [
+      "quick_reset_move",
+      "single_fix_focus",
+      "short_walk_reset"
+    ]
+  },
+  "forbidden_patterns": [
+    {
+      "key": "long_reflection_wall",
+      "rule": "길고 추상적인 reflection 문장 묶음을 기본값으로 두지 않는다"
+    },
+    {
+      "key": "dense_copy",
+      "rule": "첫 화면에 설명이 과도하게 많은 카피를 넣지 않는다"
+    },
+    {
+      "key": "guilt_pressure",
+      "rule": "자책을 유도하는 성과 압박 문구를 사용하지 않는다"
+    }
+  ],
+  "micro_adjustment_bounds": {
+    "reminder_intensity": {
+      "min": "low",
+      "max": "medium"
+    },
+    "task_granularity": {
+      "min": "tiny",
+      "max": "medium"
+    },
+    "home_card_order": {
+      "fixed": [
+        "priority_tasks"
+      ],
+      "mutable": [
+        "today_focus",
+        "calendar_summary",
+        "personalized_prompt",
+        "recovery_card"
+      ]
+    },
+    "reflection_tone": {
+      "allowed": [
+        "plain_reflective",
+        "practical_sparse"
+      ]
+    }
+  },
+  "copy": {
+    "ko-KR": {
+      "type_title": "ISTP",
+      "type_summary": "직접 손댈 수 있고 바로 작동 여부를 확인할 수 있을 때 가장 빠르게 움직입니다.",
+      "onboarding": {
+        "result_summary": "당신은 간결한 구조와 즉시 실행 가능한 문제를 다룰 때 집중력이 살아납니다.",
+        "best_fit_confirmation_prompt": "이 유형이 당신의 실전 감각과 문제 해결 방식에 가깝게 느껴지나요?"
+      },
+      "home": {
+        "opening_prompt": "오늘은 바로 손댈 수 있는 핵심 문제부터 시작하세요.",
+        "empty_state_prompt": "먼저 지금 가장 빨리 움직일 수 있는 작업 하나를 골라보세요.",
+        "overload_prompt": "설명을 늘리기보다, 잡음을 줄이고 다시 손에 잡히는 한 가지로 돌아오면 됩니다."
+      },
+      "capture": {
+        "placeholder": "해야 할 일이나 떠오른 문제를 적어보세요. 가능하면 다음 행동도 함께요.",
+        "task_hint": "다음 행동이 보이면 바로 움직이기 쉬워집니다.",
+        "idea_hint": "아직 손댈 단계가 아니라면 메모만 남겨도 충분합니다."
+      },
+      "plan": {
+        "today_prompt": "오늘은 해결할 문제 하나와 빠르게 닫을 일 몇 개면 충분합니다.",
+        "week_prompt": "주간 계획은 너무 촘촘하게 짜기보다 확실한 경계만 두는 편이 맞습니다.",
+        "backlog_prompt": "보류된 일은 도구나 상황 기준으로 묶어두면 다시 보기 쉽습니다."
+      },
+      "reminders": {
+        "samples": [
+          "지금 바로 시작할 수 있는 가장 작은 행동 하나만 잡아볼까요?",
+          "문제를 다시 단순하게 보면 움직이기 쉬워집니다.",
+          "설명보다 실행으로 확인해도 괜찮습니다."
+        ]
+      },
+      "review_prompt_labels": {
+        "what_worked": "오늘 실제로 잘 작동한 방식은 무엇이었나요?",
+        "what_was_friction": "어디서 쓸데없이 막혔나요?",
+        "what_is_next_move": "다음에 바로 손댈 수 있는 행동 하나는 무엇인가요?"
+      },
+      "recovery": {
+        "card_title": "다시 손에 잡히게 만드는 8분",
+        "card_body": "잡음을 줄이고, 진짜 문제 하나와 다음 행동 하나만 다시 잡아보세요.",
+        "step_labels": {
+          "drop_nonessential_noise": "불필요한 탭과 알림 잠시 닫기",
+          "identify_real_problem": "지금 진짜 막힌 지점 한 줄로 적기",
+          "start_small_fix": "바로 시작할 수 있는 작은 수정 하나 하기"
+        }
+      }
+    }
+  }
+}
