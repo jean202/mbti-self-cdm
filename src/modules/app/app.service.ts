@@ -1,10 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  CalendarConnectionStatus,
-  OnboardingStatus,
-  type MbtiProfile,
-} from '@prisma/client';
+import { CalendarConnectionStatus } from '@prisma/client';
 
+import { toMbtiProfileSummary } from '../../common/utils/mbti-profile-summary.util';
+import { toOnboardingState } from '../../common/utils/onboarding-state.util';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 
 @Injectable()
@@ -51,47 +49,11 @@ export class AppService {
         timezone: user.timezone,
         onboarding_status: user.onboardingStatus,
       },
-      onboarding: this.toOnboardingState(user.onboardingStatus),
+      onboarding: toOnboardingState(user.onboardingStatus),
       mbti_profile: user.mbtiProfile
-        ? this.toMbtiProfileSummary(user.mbtiProfile)
+        ? toMbtiProfileSummary(user.mbtiProfile)
         : null,
       has_calendar_connection: user.calendarConnections.length > 0,
-    };
-  }
-
-  private toOnboardingState(status: OnboardingStatus) {
-    switch (status) {
-      case OnboardingStatus.AUTH_ONLY:
-      case OnboardingStatus.MBTI_PENDING:
-        return {
-          status,
-          next_step: 'MBTI_ENTRY',
-          is_completed: false,
-        };
-      case OnboardingStatus.CALENDAR_PENDING:
-        return {
-          status,
-          next_step: 'CALENDAR_CONNECT',
-          is_completed: false,
-        };
-      case OnboardingStatus.COMPLETED:
-        return {
-          status,
-          next_step: 'HOME',
-          is_completed: true,
-        };
-    }
-  }
-
-  private toMbtiProfileSummary(profile: MbtiProfile) {
-    return {
-      type_code: profile.typeCode,
-      source: profile.source,
-      is_user_confirmed: profile.isUserConfirmed,
-      confidence_score: profile.confidenceScore
-        ? Number(profile.confidenceScore)
-        : null,
-      profile_version: profile.profileVersion,
     };
   }
 }

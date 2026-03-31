@@ -1,4 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 
-@Module({})
+import { UsersService } from './users.service';
+
+@Global()
+@Module({
+  providers: [UsersService],
+  exports: [UsersService],
+})
 export class UsersModule {}

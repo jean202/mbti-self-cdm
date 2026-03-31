@@ -29,6 +29,13 @@ interface TypeProfileCopyLocale {
 
 interface TypeProfileDocument {
   copy?: Record<string, TypeProfileCopyLocale>;
+  home_mode?: {
+    mode_key?: string;
+    default_interaction?: string;
+    card_priority?: string[];
+    empty_state_route?: string;
+    overload_card_priority?: string;
+  };
   stress_signals?: Array<{
     key?: string;
   }>;
@@ -152,6 +159,7 @@ export class HomeService {
           : Promise.resolve({
               personalizedPrompt: null,
               recoveryCard: null,
+              homeMode: null,
             }),
       ]);
 
@@ -182,6 +190,7 @@ export class HomeService {
       },
       personalized_prompt: profilePresentation.personalizedPrompt,
       recovery_card: profilePresentation.recoveryCard,
+      home_mode: profilePresentation.homeMode,
     };
   }
 
@@ -251,6 +260,13 @@ export class HomeService {
       title: string;
       body: string;
     } | null;
+    homeMode: {
+      mode_key: string;
+      default_interaction: string;
+      card_priority: string[];
+      empty_state_route: string | null;
+      overload_card_priority: string | null;
+    } | null;
   }> {
     const profile = (await this.typeProfileLoaderService.getProfile(
       typeCode,
@@ -261,6 +277,8 @@ export class HomeService {
     const recoveryTitle = copy?.recovery?.card_title;
     const recoveryBody = copy?.recovery?.card_body;
     const stressSignalKey = profile.stress_signals?.[0]?.key ?? null;
+
+    const hm = profile.home_mode;
 
     return {
       personalizedPrompt: openingPrompt
@@ -275,6 +293,16 @@ export class HomeService {
               stress_signal_key: stressSignalKey,
               title: recoveryTitle,
               body: recoveryBody,
+            }
+          : null,
+      homeMode:
+        hm?.mode_key && hm?.card_priority
+          ? {
+              mode_key: hm.mode_key,
+              default_interaction: hm.default_interaction ?? 'prompted',
+              card_priority: hm.card_priority,
+              empty_state_route: hm.empty_state_route ?? null,
+              overload_card_priority: hm.overload_card_priority ?? null,
             }
           : null,
     };

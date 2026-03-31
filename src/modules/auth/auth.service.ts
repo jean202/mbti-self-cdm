@@ -6,6 +6,7 @@ import {
   Prisma,
 } from '@prisma/client';
 
+import { toOnboardingState } from '../../common/utils/onboarding-state.util';
 import type { RequestUser } from '../../common/types/request-user.type';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { SessionService } from '../session/session.service';
@@ -50,7 +51,7 @@ export class AuthService {
     return {
       tokens,
       user: this.toUserSummary(user),
-      onboarding: this.toOnboardingState(user.onboardingStatus),
+      onboarding: toOnboardingState(user.onboardingStatus),
     };
   }
 
@@ -183,29 +184,5 @@ export class AuthService {
       timezone: user.timezone,
       onboarding_status: user.onboardingStatus,
     };
-  }
-
-  private toOnboardingState(status: OnboardingStatus) {
-    switch (status) {
-      case OnboardingStatus.AUTH_ONLY:
-      case OnboardingStatus.MBTI_PENDING:
-        return {
-          status,
-          next_step: 'MBTI_ENTRY',
-          is_completed: false,
-        };
-      case OnboardingStatus.CALENDAR_PENDING:
-        return {
-          status,
-          next_step: 'CALENDAR_CONNECT',
-          is_completed: false,
-        };
-      case OnboardingStatus.COMPLETED:
-        return {
-          status,
-          next_step: 'HOME',
-          is_completed: true,
-        };
-    }
   }
 }
