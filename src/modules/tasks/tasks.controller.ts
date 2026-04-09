@@ -15,6 +15,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { RequestUser } from '../../common/types/request-user.type';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { ListTasksQueryDto } from './dto/list-tasks-query.dto';
+import { RescheduleTaskDto } from './dto/reschedule-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 
@@ -51,5 +52,22 @@ export class TasksController {
     @Body() body: UpdateTaskDto,
   ) {
     return this.tasksService.updateTask(currentUser.userId, taskId, body);
+  }
+
+  @Post(':task_id/complete')
+  completeTask(
+    @CurrentUser() currentUser: RequestUser,
+    @Param('task_id', new ParseUUIDPipe()) taskId: string,
+  ) {
+    return this.tasksService.completeTask(currentUser.userId, taskId);
+  }
+
+  @Post(':task_id/reschedule')
+  rescheduleTask(
+    @CurrentUser() currentUser: RequestUser,
+    @Param('task_id', new ParseUUIDPipe()) taskId: string,
+    @Body() body: RescheduleTaskDto,
+  ) {
+    return this.tasksService.rescheduleTask(currentUser.userId, taskId, body);
   }
 }

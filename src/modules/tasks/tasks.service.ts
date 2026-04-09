@@ -5,6 +5,7 @@ import { formatLocalDate, parseLocalDate } from '../../common/utils/local-date.u
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { ListTasksQueryDto } from './dto/list-tasks-query.dto';
+import { RescheduleTaskDto } from './dto/reschedule-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
 type TaskResponseSource = Pick<
@@ -157,6 +158,65 @@ export class TasksService {
     });
 
     return this.toTaskResponse(task);
+  }
+
+  async completeTask(userId: string, taskId: string) {
+    const task = await this.prismaService.task.findFirst({
+      where: { id: taskId, userId },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Task was not found.');
+    }
+
+    const updated = await this.prismaService.task.update({
+      where: { id: taskId },
+      data: {
+        status: TaskStatus.DONE,
+        completedAt: task.completedAt ?? new Date(),
+      },
+    });
+
+    return this.toTaskResponse(updated);
+  }
+
+  async rescheduleTask(userId: string, taskId: string, input: RescheduleTaskDto) {
+    const [user, task] = await Promise.all([
+      this.findUserOrThrow(userId),
+      this.prismaService.task.findFirst({
+        where: { id: taskId, userId },
+      }),
+    ]);
+
+    if (!task) {
+      throw new NotFoundException('Task was not found.');
+    }
+
+    const dueAt = input.due_at === undefined
+      ? undefined
+      : input.due_at
+        ? new Date(input.due_at)
+        : null;
+
+    const localDueDate = input.local_due_date === undefined
+      ? dueAt === undefined
+        ? undefined
+        : dueAt
+          ? this.toLocalDateValue(dueAt, user.timezone)
+          : null
+      : input.local_due_date
+        ? parseLocalDate(input.local_due_date)
+        : null;
+
+    const updated = await this.prismaService.task.update({
+      where: { id: taskId },
+      data: {
+        ...(dueAt !== undefined && { dueAt }),
+        ...(localDueDate !== undefined && { localDueDate }),
+      },
+    });
+
+    return this.toTaskResponse(updated);
   }
 
   private async findUserOrThrow(
