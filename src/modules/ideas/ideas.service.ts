@@ -59,13 +59,28 @@ export class IdeasService {
       where.status = { not: IdeaStatus.ARCHIVED };
     }
 
+    const take = (query.limit ?? 50) + 1;
+
+    if (query.cursor) {
+      where.id = { lt: query.cursor };
+    }
+
     const ideas = await this.prismaService.idea.findMany({
       where,
       orderBy: [{ updatedAt: 'desc' }],
-      take: query.limit ?? 50,
+      take,
     });
 
-    return ideas.map((idea) => this.toIdeaResponse(idea));
+    const limit = query.limit ?? 50;
+    const hasMore = ideas.length > limit;
+    const items = hasMore ? ideas.slice(0, limit) : ideas;
+
+    return {
+      items: items.map((idea) => this.toIdeaResponse(idea)),
+      meta: {
+        next_cursor: hasMore ? items[items.length - 1].id : null,
+      },
+    };
   }
 
   async getIdea(userId: string, ideaId: string) {

@@ -24,6 +24,10 @@ export class ListTasksQueryDto {
   today_focus_id?: string;
 
   @IsOptional()
+  @IsUUID()
+  cursor?: string;
+
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)

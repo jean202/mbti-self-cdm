@@ -988,10 +988,20 @@ Base path:
   "data": {
     "suggested_target": "IDEA",
     "reason": "exploratory",
-    "normalized_title": "다음 주 발표 아이디어 정리"
+    "normalized_title": "다음 주 발표 아이디어 정리",
+    "capture_hints": {
+      "placeholder": "무엇을 하시겠어요?",
+      "task_hint": "할 일을 적어주세요",
+      "idea_hint": "떠오르는 생각을 적어주세요"
+    }
   }
 }
 ```
+
+노트:
+
+- `capture_hints`는 사용자의 MBTI 프로필에 따라 개인화된 캡처 안내 문구를 제공한다
+- 프로필이 없는 경우 `capture_hints`는 `null`이다
 
 노트:
 
@@ -1261,11 +1271,12 @@ Base path:
       }
     ],
     "mindfulness_recommendation": {
-      "id": "uuid",
       "title": "짧은 정리 시간",
       "body": "3분 동안 머릿속을 비워보세요",
       "duration_minutes": 3
-    }
+    },
+    "existing_reflection_id": "uuid | null",
+    "already_submitted": false
   }
 }
 ```

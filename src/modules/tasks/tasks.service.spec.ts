@@ -185,11 +185,11 @@ describe('TasksService', () => {
   });
 
   describe('listTasks', () => {
-    it('should exclude ARCHIVED tasks by default', async () => {
+    it('should exclude ARCHIVED tasks by default and return paginated response', async () => {
       const prisma = createMockPrisma();
       const service = new TasksService(prisma);
 
-      await service.listTasks('user-1', {});
+      const result = await service.listTasks('user-1', {});
 
       expect(prisma.task.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -198,13 +198,16 @@ describe('TasksService', () => {
           }),
         }),
       );
+      expect(result).toHaveProperty('items');
+      expect(result).toHaveProperty('meta');
+      expect(result.meta).toHaveProperty('next_cursor');
     });
 
     it('should filter by specific status', async () => {
       const prisma = createMockPrisma();
       const service = new TasksService(prisma);
 
-      await service.listTasks('user-1', { status: TaskStatus.DONE });
+      const result = await service.listTasks('user-1', { status: TaskStatus.DONE });
 
       expect(prisma.task.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -213,6 +216,7 @@ describe('TasksService', () => {
           }),
         }),
       );
+      expect(result.items).toHaveLength(1);
     });
   });
 });

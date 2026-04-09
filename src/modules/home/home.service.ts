@@ -188,6 +188,7 @@ export class HomeService {
           ends_at: item.endsAt.toISOString(),
         })),
       },
+      trajectory_gap_card: null,
       personalized_prompt: profilePresentation.personalizedPrompt,
       recovery_card: profilePresentation.recoveryCard,
       home_mode: profilePresentation.homeMode,

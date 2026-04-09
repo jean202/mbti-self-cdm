@@ -83,6 +83,13 @@ export class TasksService {
       where.localDueDate = parseLocalDate(query.local_date);
     }
 
+    if (query.cursor) {
+      where.id = { lt: query.cursor };
+    }
+
+    const limit = query.limit ?? 50;
+    const take = limit + 1;
+
     const tasks = await this.prismaService.task.findMany({
       where,
       orderBy: [
@@ -90,10 +97,18 @@ export class TasksService {
         { dueAt: 'asc' },
         { updatedAt: 'desc' },
       ],
-      take: query.limit ?? 50,
+      take,
     });
 
-    return tasks.map((task) => this.toTaskResponse(task));
+    const hasMore = tasks.length > limit;
+    const items = hasMore ? tasks.slice(0, limit) : tasks;
+
+    return {
+      items: items.map((task) => this.toTaskResponse(task)),
+      meta: {
+        next_cursor: hasMore ? items[items.length - 1].id : null,
+      },
+    };
   }
 
   async getTask(userId: string, taskId: string) {

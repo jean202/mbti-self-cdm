@@ -155,11 +155,11 @@ describe('IdeasService', () => {
   });
 
   describe('listIdeas', () => {
-    it('should exclude ARCHIVED by default', async () => {
+    it('should exclude ARCHIVED by default and return paginated response', async () => {
       const prisma = createMockPrisma();
       const service = new IdeasService(prisma);
 
-      await service.listIdeas('user-1', {});
+      const result = await service.listIdeas('user-1', {});
 
       expect(prisma.idea.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -168,6 +168,9 @@ describe('IdeasService', () => {
           }),
         }),
       );
+      expect(result).toHaveProperty('items');
+      expect(result).toHaveProperty('meta');
+      expect(result.meta).toHaveProperty('next_cursor');
     });
   });
 

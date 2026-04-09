@@ -97,6 +97,7 @@ describe('HomeService', () => {
       expect(result.calendar_summary.items).toHaveLength(1);
       expect(result.personalized_prompt).not.toBeNull();
       expect(result.personalized_prompt!.body).toContain('한 가지 흐름');
+      expect(result.trajectory_gap_card).toBeNull();
       expect(result.recovery_card).not.toBeNull();
       expect(result.home_mode).not.toBeNull();
       expect(result.home_mode!.mode_key).toBe('guided_focus');
