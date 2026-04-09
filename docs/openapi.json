@@ -309,7 +309,18 @@
     "/v1/home": {
       "get": {
         "operationId": "HomeController_getHome",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "local_date",
+            "required": false,
+            "in": "query",
+            "description": "Local date to query (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-04-09",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -357,7 +368,18 @@
     "/v1/plan/today": {
       "get": {
         "operationId": "PlanController_getToday",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "local_date",
+            "required": false,
+            "in": "query",
+            "description": "Local date to query (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-04-09",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -376,7 +398,18 @@
     "/v1/plan/week": {
       "get": {
         "operationId": "PlanController_getWeek",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "week_start",
+            "required": true,
+            "in": "query",
+            "description": "Start date of the week (YYYY-MM-DD, typically Monday)",
+            "schema": {
+              "example": "2026-04-06",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -395,7 +428,30 @@
     "/v1/plan/backlog": {
       "get": {
         "operationId": "PlanController_getBacklog",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (last item ID)",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -470,7 +526,67 @@
       },
       "get": {
         "operationId": "TasksController_listTasks",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by task status",
+            "schema": {
+              "example": "TODO",
+              "type": "string",
+              "enum": [
+                "INBOX",
+                "PLANNED",
+                "IN_PROGRESS",
+                "DONE",
+                "ARCHIVED"
+              ]
+            }
+          },
+          {
+            "name": "local_date",
+            "required": false,
+            "in": "query",
+            "description": "Local date filter (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-04-09",
+              "type": "string"
+            }
+          },
+          {
+            "name": "today_focus_id",
+            "required": false,
+            "in": "query",
+            "description": "Filter by today focus ID",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (last item ID)",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -646,7 +762,45 @@
       },
       "get": {
         "operationId": "IdeasController_listIdeas",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by idea status",
+            "schema": {
+              "example": "ACTIVE",
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "ARCHIVED",
+                "CONVERTED"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (last item ID)",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -966,7 +1120,38 @@
     "/v1/calendar/events": {
       "get": {
         "operationId": "CalendarController_listEvents",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "description": "Start of date range in ISO 8601 format",
+            "schema": {
+              "example": "2026-04-09T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "description": "End of date range in ISO 8601 format",
+            "schema": {
+              "example": "2026-04-16T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "connection_id",
+            "required": false,
+            "in": "query",
+            "description": "Filter by specific calendar connection ID",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -1005,6 +1190,71 @@
             "required": true,
             "in": "path",
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "required": true,
+            "in": "query",
+            "description": "OAuth state parameter for CSRF verification",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "required": false,
+            "in": "query",
+            "description": "Authorization code from the OAuth provider",
+            "schema": {
+              "maxLength": 4096,
+              "example": "4/0AX4XfWh...",
+              "type": "string"
+            }
+          },
+          {
+            "name": "error",
+            "required": false,
+            "in": "query",
+            "description": "Error code if OAuth flow failed",
+            "schema": {
+              "maxLength": 100,
+              "example": "access_denied",
+              "type": "string"
+            }
+          },
+          {
+            "name": "error_description",
+            "required": false,
+            "in": "query",
+            "description": "Human-readable error description",
+            "schema": {
+              "maxLength": 500,
+              "example": "The user denied the authorization request",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provider_account_id",
+            "required": false,
+            "in": "query",
+            "description": "Provider-specific account identifier",
+            "schema": {
+              "maxLength": 255,
+              "example": "user@gmail.com",
+              "type": "string"
+            }
+          },
+          {
+            "name": "account_label",
+            "required": false,
+            "in": "query",
+            "description": "Display label for the connected account",
+            "schema": {
+              "maxLength": 255,
+              "example": "Work Calendar",
               "type": "string"
             }
           }
@@ -1119,85 +1369,716 @@
       }
     },
     "schemas": {
+      "ProviderPayloadDto": {
+        "type": "object",
+        "properties": {
+          "authorization_code": {
+            "type": "string",
+            "description": "OAuth authorization code from the provider",
+            "example": "4/0AX4XfWh..."
+          },
+          "id_token": {
+            "type": "string",
+            "description": "OIDC id_token from the provider",
+            "example": "eyJhbGciOiJSUzI1NiIs..."
+          },
+          "nonce": {
+            "type": "string",
+            "description": "Nonce used for OIDC verification",
+            "example": "abc123xyz"
+          },
+          "provider_user_id": {
+            "type": "string",
+            "description": "User ID from the OAuth provider",
+            "example": "109876543210"
+          },
+          "provider_email": {
+            "type": "string",
+            "description": "Email from the OAuth provider",
+            "example": "user@example.com"
+          }
+        }
+      },
+      "DeviceDto": {
+        "type": "object",
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "description": "Unique device identifier",
+            "example": "device-uuid-1234"
+          },
+          "platform": {
+            "type": "string",
+            "description": "Device platform",
+            "example": "ios"
+          },
+          "app_version": {
+            "type": "string",
+            "description": "Application version",
+            "example": "1.0.0"
+          }
+        },
+        "required": [
+          "device_id",
+          "platform",
+          "app_version"
+        ]
+      },
       "SocialLoginDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "OAuth provider type",
+            "enum": [
+              "KAKAO",
+              "GOOGLE",
+              "APPLE",
+              "NAVER"
+            ],
+            "example": "GOOGLE"
+          },
+          "provider_payload": {
+            "description": "Provider-specific authentication payload",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProviderPayloadDto"
+              }
+            ]
+          },
+          "device": {
+            "description": "Device information",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DeviceDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "provider",
+          "provider_payload",
+          "device"
+        ]
       },
       "RefreshTokenDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "description": "JWT refresh token",
+            "example": "eyJhbGciOiJIUzI1NiIs..."
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Session identifier",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "device_id": {
+            "type": "string",
+            "description": "Device identifier for session binding",
+            "example": "device-uuid-1234"
+          }
+        },
+        "required": [
+          "refresh_token",
+          "session_id"
+        ]
       },
       "LogoutDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh token to invalidate",
+            "example": "eyJhbGciOiJIUzI1NiIs..."
+          },
+          "logout_all_devices": {
+            "type": "object",
+            "description": "Whether to log out from all devices",
+            "example": false
+          }
+        },
+        "required": [
+          "logout_all_devices"
+        ]
       },
       "SelfSelectMbtiProfileDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "type_code": {
+            "type": "string",
+            "description": "MBTI type code (4 letters)",
+            "example": "INFP"
+          }
+        },
+        "required": [
+          "type_code"
+        ]
       },
       "StartMbtiFinderAttemptDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "question_set_version": {
+            "type": "string",
+            "description": "Version of the question set to use",
+            "example": "v1.0",
+            "maxLength": 32
+          }
+        }
+      },
+      "MbtiFinderAnswerInputDto": {
+        "type": "object",
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "description": "Question identifier",
+            "example": "q_ei_01",
+            "maxLength": 64
+          },
+          "answer_value": {
+            "type": "number",
+            "description": "Answer value on a 1-5 Likert scale",
+            "example": 4,
+            "minimum": 1,
+            "maximum": 5
+          }
+        },
+        "required": [
+          "question_id",
+          "answer_value"
+        ]
       },
       "SubmitMbtiFinderAnswersDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "description": "List of answers to MBTI finder questions",
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/MbtiFinderAnswerInputDto"
+              }
+            }
+          }
+        },
+        "required": [
+          "answers"
+        ]
       },
       "ConfirmMbtiProfileDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "type_code": {
+            "type": "string",
+            "description": "MBTI type code (4 letters)",
+            "example": "ENFJ"
+          },
+          "source": {
+            "type": "string",
+            "description": "Source of the MBTI profile",
+            "enum": [
+              "SELF_SELECTED",
+              "FINDER_RESULT"
+            ],
+            "example": "SELF_SELECTED"
+          }
+        },
+        "required": [
+          "type_code",
+          "source"
+        ]
       },
       "UpsertTodayFocusDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "local_date": {
+            "type": "string",
+            "description": "Local date for the focus (YYYY-MM-DD)",
+            "example": "2026-04-09"
+          },
+          "title": {
+            "type": "string",
+            "description": "Focus title for the day",
+            "example": "Ship the landing page",
+            "maxLength": 255
+          },
+          "note": {
+            "type": "string",
+            "description": "Additional notes for the focus",
+            "example": "Include hero section and CTA",
+            "maxLength": 4000
+          },
+          "linked_task_id": {
+            "type": "string",
+            "description": "Linked task ID",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          }
+        },
+        "required": [
+          "local_date",
+          "title"
+        ]
+      },
+      "ReorderTaskItemDto": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "Task ID to reorder",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "sort_order": {
+            "type": "number",
+            "description": "New sort order position",
+            "example": 1
+          }
+        },
+        "required": [
+          "task_id",
+          "sort_order"
+        ]
       },
       "ReorderTasksDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "local_date": {
+            "type": "string",
+            "description": "Local date for the reorder operation (YYYY-MM-DD)",
+            "example": "2026-04-09"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "description": "List of tasks with their new sort orders",
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ReorderTaskItemDto"
+              }
+            }
+          }
+        },
+        "required": [
+          "local_date",
+          "items"
+        ]
       },
       "CreateTaskDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Task title",
+            "example": "Buy groceries",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "type": "string",
+            "description": "Additional notes for the task",
+            "example": "Remember to buy milk and eggs",
+            "maxLength": 4000
+          },
+          "source_type": {
+            "type": "string",
+            "description": "How the task was created",
+            "enum": [
+              "QUICK_CAPTURE",
+              "IDEA_CONVERSION",
+              "ROUTINE",
+              "MANUAL"
+            ],
+            "example": "MANUAL"
+          },
+          "today_focus_id": {
+            "type": "string",
+            "description": "Associated today focus ID",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "due_at": {
+            "type": "string",
+            "description": "Due date in ISO 8601 format",
+            "example": "2026-04-10T09:00:00.000Z"
+          },
+          "reminder_at": {
+            "type": "string",
+            "description": "Reminder date in ISO 8601 format",
+            "example": "2026-04-10T08:30:00.000Z"
+          },
+          "energy_estimate": {
+            "type": "number",
+            "description": "Estimated energy level required (1-5)",
+            "example": 3
+          },
+          "sort_order": {
+            "type": "number",
+            "description": "Sort order for manual ordering",
+            "example": 1
+          }
+        },
+        "required": [
+          "title",
+          "source_type"
+        ]
       },
       "UpdateTaskDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Updated task title",
+            "example": "Buy groceries and snacks",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "type": "object",
+            "description": "Updated notes for the task",
+            "example": "Add fruits to the list",
+            "nullable": true,
+            "maxLength": 4000
+          },
+          "status": {
+            "type": "string",
+            "description": "Updated task status",
+            "enum": [
+              "INBOX",
+              "PLANNED",
+              "IN_PROGRESS",
+              "DONE",
+              "ARCHIVED"
+            ],
+            "example": "DONE"
+          },
+          "today_focus_id": {
+            "type": "object",
+            "description": "Associated today focus ID",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "nullable": true
+          },
+          "due_at": {
+            "type": "object",
+            "description": "Due date in ISO 8601 format",
+            "example": "2026-04-10T09:00:00.000Z",
+            "nullable": true
+          },
+          "reminder_at": {
+            "type": "object",
+            "description": "Reminder date in ISO 8601 format",
+            "example": "2026-04-10T08:30:00.000Z",
+            "nullable": true
+          },
+          "energy_estimate": {
+            "type": "object",
+            "description": "Estimated energy level required (1-5)",
+            "example": 3,
+            "nullable": true
+          },
+          "sort_order": {
+            "type": "object",
+            "description": "Sort order for manual ordering",
+            "example": 2,
+            "nullable": true
+          }
+        }
       },
       "RescheduleTaskDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "due_at": {
+            "type": "object",
+            "description": "New due date in ISO 8601 format",
+            "example": "2026-04-15T09:00:00.000Z",
+            "nullable": true
+          },
+          "local_due_date": {
+            "type": "object",
+            "description": "New local due date (YYYY-MM-DD)",
+            "example": "2026-04-15",
+            "nullable": true
+          }
+        }
       },
       "CreateIdeaDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Idea title",
+            "example": "Build a habit tracker app",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "type": "string",
+            "description": "Additional notes for the idea",
+            "example": "Focus on simplicity and daily streaks",
+            "maxLength": 4000
+          },
+          "tags": {
+            "description": "Tags for categorizing the idea",
+            "example": [
+              "productivity",
+              "app"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title"
+        ]
       },
       "UpdateIdeaDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Updated idea title",
+            "example": "Build a habit tracker app v2",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "type": "object",
+            "description": "Updated notes for the idea",
+            "example": "Add gamification features",
+            "nullable": true,
+            "maxLength": 4000
+          },
+          "status": {
+            "type": "string",
+            "description": "Updated idea status",
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED",
+              "CONVERTED"
+            ],
+            "example": "ACTIVE"
+          },
+          "tags": {
+            "description": "Updated tags for the idea",
+            "example": [
+              "productivity",
+              "gamification"
+            ],
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "ConvertIdeaToTaskDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "today_focus_id": {
+            "type": "string",
+            "description": "Today focus ID to associate the new task with",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "due_at": {
+            "type": "string",
+            "description": "Due date for the new task in ISO 8601 format",
+            "example": "2026-04-10T09:00:00.000Z"
+          }
+        }
       },
       "CreateMoodEnergyCheckDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "local_date": {
+            "type": "string",
+            "description": "Local date for the check (YYYY-MM-DD)",
+            "example": "2026-04-09"
+          },
+          "context": {
+            "type": "string",
+            "description": "Context of the check (e.g. morning, evening)",
+            "enum": [
+              "MORNING",
+              "EVENING",
+              "ADHOC"
+            ],
+            "example": "MORNING"
+          },
+          "mood_score": {
+            "type": "number",
+            "description": "Mood score from 1 (low) to 5 (high)",
+            "example": 4,
+            "minimum": 1,
+            "maximum": 5
+          },
+          "energy_score": {
+            "type": "number",
+            "description": "Energy score from 1 (low) to 5 (high)",
+            "example": 3,
+            "minimum": 1,
+            "maximum": 5
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note about mood/energy",
+            "example": "Feeling well-rested today",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "local_date",
+          "context",
+          "mood_score",
+          "energy_score"
+        ]
       },
       "UpsertReflectionDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "today_focus_id": {
+            "type": "string",
+            "description": "Associated today focus ID",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "mood_energy_check_id": {
+            "type": "string",
+            "description": "Associated mood-energy check ID",
+            "example": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+          },
+          "mindfulness_prompt_id": {
+            "type": "string",
+            "description": "Associated mindfulness prompt ID",
+            "example": "c3d4e5f6-a7b8-9012-cdef-123456789012"
+          },
+          "completed_summary": {
+            "type": "string",
+            "description": "Summary of what was completed today",
+            "example": "Finished the landing page and wrote tests",
+            "maxLength": 4000
+          },
+          "carry_forward_note": {
+            "type": "string",
+            "description": "Notes on tasks to carry forward",
+            "example": "Need to review PR tomorrow",
+            "maxLength": 4000
+          },
+          "prompt_answers": {
+            "type": "object",
+            "description": "Answers to mindfulness prompts keyed by prompt ID",
+            "example": {
+              "q1": "I felt productive",
+              "q2": "Grateful for team support"
+            }
+          }
+        }
       },
       "StartCalendarOAuthDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "Calendar provider to connect",
+            "enum": [
+              "GOOGLE",
+              "APPLE",
+              "OTHER"
+            ],
+            "example": "GOOGLE"
+          },
+          "redirect_uri": {
+            "type": "string",
+            "description": "OAuth redirect URI",
+            "example": "myapp://oauth/callback"
+          }
+        },
+        "required": [
+          "provider",
+          "redirect_uri"
+        ]
       },
       "AnalyzeCaptureDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "input_text": {
+            "type": "string",
+            "description": "Raw text input to analyze and capture",
+            "example": "Buy milk tomorrow morning",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "local_date": {
+            "type": "string",
+            "description": "Local date for context (YYYY-MM-DD)",
+            "example": "2026-04-09"
+          }
+        },
+        "required": [
+          "input_text"
+        ]
+      },
+      "QuietHoursDto": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "Quiet hours start time (HH:MM)",
+            "example": "22:00"
+          },
+          "end": {
+            "type": "string",
+            "description": "Quiet hours end time (HH:MM)",
+            "example": "08:00"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ]
+      },
+      "NotificationPrefsDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether notifications are enabled",
+            "example": true
+          },
+          "quiet_hours": {
+            "description": "Quiet hours configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/QuietHoursDto"
+              }
+            ]
+          }
+        }
       },
       "UpdatePreferencesDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "notification_prefs": {
+            "description": "Notification preferences",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationPrefsDto"
+              }
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "description": "User locale code",
+            "example": "ko-KR",
+            "maxLength": 16
+          },
+          "timezone": {
+            "type": "string",
+            "description": "User timezone",
+            "example": "Asia/Seoul",
+            "maxLength": 64
+          }
+        }
       }
     }
   }
