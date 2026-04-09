@@ -19,7 +19,9 @@ export class ResponseInterceptor<T>
         if (
           data !== null &&
           typeof data === 'object' &&
-          ('data' in (data as object) || 'error' in (data as object))
+          ('data' in (data as object) ||
+            'error' in (data as object) ||
+            'items' in (data as object))
         ) {
           return data;
         }

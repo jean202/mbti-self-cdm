@@ -44,6 +44,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
     details?: unknown;
   } {
     if (!(exception instanceof HttpException)) {
+      const prismaError = this.tryParsePrismaError(exception);
+      if (prismaError) {
+        return prismaError;
+      }
+
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         code: 'INTERNAL_SERVER_ERROR',
@@ -95,6 +100,43 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     return 'Request failed.';
+  }
+
+  private tryParsePrismaError(
+    exception: unknown,
+  ): { status: number; code: string; message: string } | null {
+    if (
+      typeof exception !== 'object' ||
+      exception === null ||
+      !('code' in exception)
+    ) {
+      return null;
+    }
+
+    const prismaCode = (exception as { code: string }).code;
+
+    switch (prismaCode) {
+      case 'P2002':
+        return {
+          status: HttpStatus.CONFLICT,
+          code: 'CONFLICT',
+          message: 'Resource already exists.',
+        };
+      case 'P2025':
+        return {
+          status: HttpStatus.NOT_FOUND,
+          code: 'NOT_FOUND',
+          message: 'Resource was not found.',
+        };
+      case 'P2003':
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid reference to related resource.',
+        };
+      default:
+        return null;
+    }
   }
 
   private statusToCode(status: number): string {
