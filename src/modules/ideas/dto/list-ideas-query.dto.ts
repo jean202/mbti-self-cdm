@@ -1,16 +1,20 @@
 import { IdeaStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsUUID, Max, Min } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ListIdeasQueryDto {
+  @ApiPropertyOptional({ description: 'Filter by idea status', enum: IdeaStatus, example: 'ACTIVE' })
   @IsOptional()
   @IsEnum(IdeaStatus)
   status?: IdeaStatus;
 
+  @ApiPropertyOptional({ description: 'Cursor for pagination (last item ID)', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
   @IsOptional()
   @IsUUID()
   cursor?: string;
 
+  @ApiPropertyOptional({ description: 'Number of items per page', example: 20, minimum: 1, maximum: 100 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

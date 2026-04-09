@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { validateEnv } from './common/config/env.validation';
 import { AppFeatureModule } from './modules/app/app.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
@@ -26,6 +27,7 @@ import { RedisModule } from './infra/redis/redis.module';
       isGlobal: true,
       envFilePath: ['.env'],
       expandVariables: true,
+      validate: validateEnv,
     }),
     PrismaModule,
     RedisModule,

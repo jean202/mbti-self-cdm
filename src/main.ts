@@ -19,6 +19,10 @@ async function bootstrap(): Promise<void> {
   );
 
   app.setGlobalPrefix('v1');
+  app.enableCors({
+    origin: process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+    credentials: true,
+  });
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('MBTI Self-CDM API')

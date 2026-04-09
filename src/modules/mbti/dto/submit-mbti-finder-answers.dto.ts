@@ -9,12 +9,15 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 class MbtiFinderAnswerInputDto {
+  @ApiProperty({ description: 'Question identifier', example: 'q_ei_01', maxLength: 64 })
   @IsString()
   @MaxLength(64)
   question_id!: string;
 
+  @ApiProperty({ description: 'Answer value on a 1-5 Likert scale', example: 4, minimum: 1, maximum: 5 })
   @IsInt()
   @Min(1)
   @Max(5)
@@ -22,6 +25,7 @@ class MbtiFinderAnswerInputDto {
 }
 
 export class SubmitMbtiFinderAnswersDto {
+  @ApiProperty({ description: 'List of answers to MBTI finder questions', type: () => [MbtiFinderAnswerInputDto], isArray: true })
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
