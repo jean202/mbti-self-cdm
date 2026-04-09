@@ -1,0 +1,1199 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/health": {
+      "get": {
+        "operationId": "HealthController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/v1/app/bootstrap": {
+      "get": {
+        "operationId": "AppController_getBootstrap",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/v1/auth/social/login": {
+      "post": {
+        "operationId": "AuthController_socialLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/mbti/type-catalog": {
+      "get": {
+        "operationId": "MbtiController_getTypeCatalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "MBTI"
+        ]
+      }
+    },
+    "/v1/mbti/profile/self-selection": {
+      "post": {
+        "operationId": "MbtiController_selfSelectProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfSelectMbtiProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "MBTI"
+        ]
+      }
+    },
+    "/v1/mbti/finder/attempts": {
+      "post": {
+        "operationId": "MbtiController_startFinderAttempt",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartMbtiFinderAttemptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "MBTI"
+        ]
+      }
+    },
+    "/v1/mbti/finder/attempts/{attempt_id}": {
+      "get": {
+        "operationId": "MbtiController_getFinderAttempt",
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "MBTI"
+        ]
+      }
+    },
+    "/v1/mbti/finder/attempts/{attempt_id}/answers": {
+      "post": {
+        "operationId": "MbtiController_submitFinderAnswers",
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitMbtiFinderAnswersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "MBTI"
+        ]
+      }
+    },
+    "/v1/mbti/finder/attempts/{attempt_id}/complete": {
+      "post": {
+        "operationId": "MbtiController_completeFinderAttempt",
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "MBTI"
+        ]
+      }
+    },
+    "/v1/mbti/profile/confirm": {
+      "post": {
+        "operationId": "MbtiController_confirmProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmMbtiProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "MBTI"
+        ]
+      }
+    },
+    "/v1/home": {
+      "get": {
+        "operationId": "HomeController_getHome",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Home"
+        ]
+      }
+    },
+    "/v1/today-focus": {
+      "put": {
+        "operationId": "TodayFocusController_upsertTodayFocus",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertTodayFocusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Home"
+        ]
+      }
+    },
+    "/v1/plan/today": {
+      "get": {
+        "operationId": "PlanController_getToday",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Plan"
+        ]
+      }
+    },
+    "/v1/plan/week": {
+      "get": {
+        "operationId": "PlanController_getWeek",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Plan"
+        ]
+      }
+    },
+    "/v1/plan/backlog": {
+      "get": {
+        "operationId": "PlanController_getBacklog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Plan"
+        ]
+      }
+    },
+    "/v1/tasks/reorder": {
+      "post": {
+        "operationId": "PlanController_reorderTasks",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderTasksDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Plan"
+        ]
+      }
+    },
+    "/v1/tasks": {
+      "post": {
+        "operationId": "TasksController_createTask",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Tasks"
+        ]
+      },
+      "get": {
+        "operationId": "TasksController_listTasks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/v1/tasks/{task_id}": {
+      "get": {
+        "operationId": "TasksController_getTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Tasks"
+        ]
+      },
+      "patch": {
+        "operationId": "TasksController_updateTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/v1/tasks/{task_id}/complete": {
+      "post": {
+        "operationId": "TasksController_completeTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/v1/tasks/{task_id}/reschedule": {
+      "post": {
+        "operationId": "TasksController_rescheduleTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RescheduleTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/v1/ideas": {
+      "post": {
+        "operationId": "IdeasController_createIdea",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIdeaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Ideas"
+        ]
+      },
+      "get": {
+        "operationId": "IdeasController_listIdeas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Ideas"
+        ]
+      }
+    },
+    "/v1/ideas/{idea_id}": {
+      "get": {
+        "operationId": "IdeasController_getIdea",
+        "parameters": [
+          {
+            "name": "idea_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Ideas"
+        ]
+      },
+      "patch": {
+        "operationId": "IdeasController_updateIdea",
+        "parameters": [
+          {
+            "name": "idea_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIdeaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Ideas"
+        ]
+      }
+    },
+    "/v1/ideas/{idea_id}/convert-to-task": {
+      "post": {
+        "operationId": "IdeasController_convertToTask",
+        "parameters": [
+          {
+            "name": "idea_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertIdeaToTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Ideas"
+        ]
+      }
+    },
+    "/v1/reflect/daily": {
+      "get": {
+        "operationId": "ReflectController_getDaily",
+        "parameters": [
+          {
+            "name": "local_date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Reflect"
+        ]
+      }
+    },
+    "/v1/mood-energy-checks": {
+      "post": {
+        "operationId": "ReflectController_createMoodEnergyCheck",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMoodEnergyCheckDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Reflect"
+        ]
+      }
+    },
+    "/v1/reflections/{local_date}": {
+      "put": {
+        "operationId": "ReflectController_upsertReflection",
+        "parameters": [
+          {
+            "name": "local_date",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertReflectionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Reflect"
+        ]
+      }
+    },
+    "/v1/calendar/connections/oauth/start": {
+      "post": {
+        "operationId": "CalendarController_startOAuthConnection",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCalendarOAuthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/v1/calendar/connections": {
+      "get": {
+        "operationId": "CalendarController_getConnections",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/v1/calendar/connections/{connection_id}/sync": {
+      "post": {
+        "operationId": "CalendarController_syncConnection",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/v1/calendar/connections/{connection_id}/revoke": {
+      "post": {
+        "operationId": "CalendarController_revokeConnection",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/v1/calendar/events": {
+      "get": {
+        "operationId": "CalendarController_listEvents",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/v1/onboarding/calendar/skip": {
+      "post": {
+        "operationId": "OnboardingCalendarController_skip",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "OnboardingCalendar"
+        ]
+      }
+    },
+    "/v1/internal/calendar/oauth/{provider}/callback": {
+      "get": {
+        "operationId": "InternalCalendarOAuthController_completeOAuthConnection",
+        "parameters": [
+          {
+            "name": "provider",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "InternalCalendarOAuth"
+        ]
+      }
+    },
+    "/v1/capture/analyze": {
+      "post": {
+        "operationId": "CaptureController_analyze",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzeCaptureDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Capture"
+        ]
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "MeController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/v1/me/preferences": {
+      "patch": {
+        "operationId": "MeController_updatePreferences",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePreferencesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Me"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "MBTI Self-CDM API",
+    "description": "MBTI 기반 자기관리 앱 백엔드 API",
+    "version": "0.1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "SocialLoginDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "LogoutDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SelfSelectMbtiProfileDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "StartMbtiFinderAttemptDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SubmitMbtiFinderAnswersDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ConfirmMbtiProfileDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpsertTodayFocusDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ReorderTasksDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateTaskDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateTaskDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "RescheduleTaskDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateIdeaDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateIdeaDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ConvertIdeaToTaskDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateMoodEnergyCheckDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpsertReflectionDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "StartCalendarOAuthDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AnalyzeCaptureDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdatePreferencesDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}
