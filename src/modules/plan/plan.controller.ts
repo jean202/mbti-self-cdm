@@ -6,6 +6,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../../common/auth/auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -16,6 +17,8 @@ import { PlanWeekQueryDto } from './dto/plan-week-query.dto';
 import { ReorderTasksDto } from './dto/reorder-tasks.dto';
 import { PlanService } from './plan.service';
 
+@ApiTags('Plan')
+@ApiBearerAuth()
 @Controller()
 @UseGuards(AuthGuard)
 export class PlanController {

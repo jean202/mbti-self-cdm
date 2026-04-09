@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
   FastifyAdapter,
   type NestFastifyApplication,
@@ -18,6 +19,18 @@ async function bootstrap(): Promise<void> {
   );
 
   app.setGlobalPrefix('v1');
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('MBTI Self-CDM API')
+    .setDescription('MBTI 기반 자기관리 앱 백엔드 API')
+    .setVersion('0.1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, document, {
+    useGlobalPrefix: false,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

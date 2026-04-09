@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../../common/auth/auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -19,6 +20,8 @@ import { RescheduleTaskDto } from './dto/reschedule-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 
+@ApiTags('Tasks')
+@ApiBearerAuth()
 @Controller('tasks')
 @UseGuards(AuthGuard)
 export class TasksController {

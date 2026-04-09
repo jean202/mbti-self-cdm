@@ -8,6 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../../common/auth/auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -16,6 +17,8 @@ import { CreateMoodEnergyCheckDto } from './dto/create-mood-energy-check.dto';
 import { UpsertReflectionDto } from './dto/upsert-reflection.dto';
 import { ReflectService } from './reflect.service';
 
+@ApiTags('Reflect')
+@ApiBearerAuth()
 @Controller()
 @UseGuards(AuthGuard)
 export class ReflectController {

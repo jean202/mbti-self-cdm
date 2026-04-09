@@ -7,6 +7,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../../common/auth/auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -15,6 +16,8 @@ import { ListCalendarEventsQueryDto } from './dto/list-calendar-events-query.dto
 import { StartCalendarOAuthDto } from './dto/start-calendar-oauth.dto';
 import { CalendarService } from './calendar.service';
 
+@ApiTags('Calendar')
+@ApiBearerAuth()
 @Controller('calendar')
 @UseGuards(AuthGuard)
 export class CalendarController {

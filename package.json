@@ -30,10 +30,12 @@
     "verify:vertical-slice": "npm run build && node scripts/verify-vertical-slice.js"
   },
   "dependencies": {
+    "@fastify/static": "^9.1.0",
     "@nestjs/common": "^11.1.17",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.1.17",
     "@nestjs/platform-fastify": "^11.1.17",
+    "@nestjs/swagger": "^11.2.6",
     "@prisma/client": "^6.19.2",
     "bullmq": "^5.71.1",
     "class-transformer": "^0.5.1",

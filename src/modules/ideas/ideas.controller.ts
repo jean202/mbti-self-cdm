@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../../common/auth/auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -19,6 +20,8 @@ import { ListIdeasQueryDto } from './dto/list-ideas-query.dto';
 import { UpdateIdeaDto } from './dto/update-idea.dto';
 import { IdeasService } from './ideas.service';
 
+@ApiTags('Ideas')
+@ApiBearerAuth()
 @Controller('ideas')
 @UseGuards(AuthGuard)
 export class IdeasController {
