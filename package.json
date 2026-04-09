@@ -17,6 +17,8 @@
     "start": "node dist/main.js",
     "start:dev": "tsx watch src/main.ts",
     "test:provider-verifier": "npm run build && node scripts/test-provider-verification.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "verify:auth-flow": "npm run build && node scripts/verify-auth-flow.js",
     "verify:calendar-flow": "npm run build && node scripts/verify-calendar-flow.js",
@@ -43,7 +45,10 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.9",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }

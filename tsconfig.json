@@ -14,7 +14,7 @@
     "incremental": true,
     "resolveJsonModule": true,
     "ignoreDeprecations": "6.0",
-    "types": ["node"]
+    "types": ["node", "jest"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
