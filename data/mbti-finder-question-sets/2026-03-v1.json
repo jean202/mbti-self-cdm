@@ -1,0 +1,202 @@
+{
+  "question_set_version": "2026-03-v1",
+  "scale": [1, 2, 3, 4, 5],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "여러 사람과 아이디어를 주고받을 때 생각이 더 빨리 정리된다.",
+      "order": 1,
+      "axis": "EI",
+      "direction": 1
+    },
+    {
+      "id": "q2",
+      "prompt": "세부 정보보다 전체 패턴과 의미를 먼저 떠올리는 편이다.",
+      "order": 2,
+      "axis": "SN",
+      "direction": -1
+    },
+    {
+      "id": "q3",
+      "prompt": "결정을 내릴 때 관계의 불편함보다 기준의 일관성을 먼저 확인한다.",
+      "order": 3,
+      "axis": "TF",
+      "direction": 1
+    },
+    {
+      "id": "q4",
+      "prompt": "하루를 시작하기 전에 대략적인 순서라도 정해두면 마음이 편하다.",
+      "order": 4,
+      "axis": "JP",
+      "direction": 1
+    },
+    {
+      "id": "q5",
+      "prompt": "중요한 일은 말로 꺼내기 전에 혼자 곱씹는 시간이 필요하다.",
+      "order": 5,
+      "axis": "EI",
+      "direction": -1
+    },
+    {
+      "id": "q6",
+      "prompt": "새로운 일을 배울 때 개념 설명보다 실제 예시가 먼저 있어야 이해가 된다.",
+      "order": 6,
+      "axis": "SN",
+      "direction": 1
+    },
+    {
+      "id": "q7",
+      "prompt": "누군가가 받아들일 감정적 무게를 생각하면 결정을 쉽게 바꾸게 된다.",
+      "order": 7,
+      "axis": "TF",
+      "direction": -1
+    },
+    {
+      "id": "q8",
+      "prompt": "계획이 좋아도 상황에 따라 즉석에서 바꾸는 편이 더 자연스럽다.",
+      "order": 8,
+      "axis": "JP",
+      "direction": -1
+    },
+    {
+      "id": "q9",
+      "prompt": "회의나 대화가 길어질수록 오히려 에너지가 붙는 편이다.",
+      "order": 9,
+      "axis": "EI",
+      "direction": 1
+    },
+    {
+      "id": "q10",
+      "prompt": "현재 보이는 사실보다 앞으로 벌어질 가능성을 더 자주 상상한다.",
+      "order": 10,
+      "axis": "SN",
+      "direction": -1
+    },
+    {
+      "id": "q11",
+      "prompt": "갈등이 있을 때 먼저 따지는 것은 무엇이 더 논리적인지다.",
+      "order": 11,
+      "axis": "TF",
+      "direction": 1
+    },
+    {
+      "id": "q12",
+      "prompt": "마감이 멀어도 중간 체크포인트를 만들어 두는 편이다.",
+      "order": 12,
+      "axis": "JP",
+      "direction": 1
+    },
+    {
+      "id": "q13",
+      "prompt": "하루가 복잡할수록 사람보다 혼자 있는 시간이 회복에 도움이 된다.",
+      "order": 13,
+      "axis": "EI",
+      "direction": -1
+    },
+    {
+      "id": "q14",
+      "prompt": "추상적인 아이디어를 들으면 구체적으로 어떻게 굴러가는지가 먼저 궁금하다.",
+      "order": 14,
+      "axis": "SN",
+      "direction": 1
+    },
+    {
+      "id": "q15",
+      "prompt": "좋은 결정인지 판단할 때 내 가치관과 사람에게 미칠 영향을 크게 본다.",
+      "order": 15,
+      "axis": "TF",
+      "direction": -1
+    },
+    {
+      "id": "q16",
+      "prompt": "선택지를 열어둔 채 마지막 순간에 결정하는 편이 더 잘 맞는다.",
+      "order": 16,
+      "axis": "JP",
+      "direction": -1
+    },
+    {
+      "id": "q17",
+      "prompt": "낯선 환경에서도 먼저 말을 걸며 분위기를 읽는 편이다.",
+      "order": 17,
+      "axis": "EI",
+      "direction": 1
+    },
+    {
+      "id": "q18",
+      "prompt": "반복되는 경험 속에서 숨은 연결점이나 상징을 찾는 일이 익숙하다.",
+      "order": 18,
+      "axis": "SN",
+      "direction": -1
+    },
+    {
+      "id": "q19",
+      "prompt": "피드백을 줄 때 상대의 기분보다 문제를 정확히 짚는 것이 더 중요하다.",
+      "order": 19,
+      "axis": "TF",
+      "direction": 1
+    },
+    {
+      "id": "q20",
+      "prompt": "일이 많을수록 우선순위를 빠르게 정리해 두어야 안심된다.",
+      "order": 20,
+      "axis": "JP",
+      "direction": 1
+    },
+    {
+      "id": "q21",
+      "prompt": "아이디어가 생기면 바로 공유하기보다 안에서 충분히 다듬고 싶다.",
+      "order": 21,
+      "axis": "EI",
+      "direction": -1
+    },
+    {
+      "id": "q22",
+      "prompt": "실행 계획을 세울 때 큰 방향보다 필요한 자원과 단계부터 확인한다.",
+      "order": 22,
+      "axis": "SN",
+      "direction": 1
+    },
+    {
+      "id": "q23",
+      "prompt": "규칙이 맞더라도 사람마다 처한 맥락이 다르면 다르게 적용해야 한다고 느낀다.",
+      "order": 23,
+      "axis": "TF",
+      "direction": -1
+    },
+    {
+      "id": "q24",
+      "prompt": "예상 밖 기회가 생기면 기존 계획을 미루고라도 먼저 붙잡는 편이다.",
+      "order": 24,
+      "axis": "JP",
+      "direction": -1
+    },
+    {
+      "id": "q25",
+      "prompt": "에너지가 떨어질 때 혼자 정리하기보다 누군가와 이야기하면 다시 움직이기 쉽다.",
+      "order": 25,
+      "axis": "EI",
+      "direction": 1
+    },
+    {
+      "id": "q26",
+      "prompt": "명확한 근거가 없어도 어떤 방향이 맞는지 직감적으로 잡히는 순간이 많다.",
+      "order": 26,
+      "axis": "SN",
+      "direction": -1
+    },
+    {
+      "id": "q27",
+      "prompt": "의견이 갈릴 때 합의보다 원칙을 먼저 세우는 편이다.",
+      "order": 27,
+      "axis": "TF",
+      "direction": 1
+    },
+    {
+      "id": "q28",
+      "prompt": "끝내지 않은 일이 남아 있으면 쉬는 중에도 머릿속에서 계속 정리된다.",
+      "order": 28,
+      "axis": "JP",
+      "direction": 1
+    }
+  ]
+}
