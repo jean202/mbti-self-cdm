@@ -113,27 +113,49 @@ async function main(): Promise<void> {
     },
   });
 
-  await prisma.todayFocus.upsert({
+  const existingTodayFocus = await prisma.todayFocus.findUnique({
     where: {
       userId_localDate: {
         userId: USER_ID,
         localDate: localDateValue,
       },
     },
-    create: {
-      id: TODAY_FOCUS_ID,
-      userId: USER_ID,
-      localDate: localDateValue,
-      title: '오늘의 초점 한 가지',
-      note: 'personalized home payload 검증용 today focus',
-      status: TodayFocusStatus.ACTIVE,
-    },
-    update: {
-      title: '오늘의 초점 한 가지',
-      note: 'personalized home payload 검증용 today focus',
-      status: TodayFocusStatus.ACTIVE,
+    select: {
+      id: true,
     },
   });
+
+  const todayFocus = existingTodayFocus
+    ? await prisma.todayFocus.update({
+        where: {
+          id: existingTodayFocus.id,
+        },
+        data: {
+          title: '오늘의 초점 한 가지',
+          note: 'personalized home payload 검증용 today focus',
+          status: TodayFocusStatus.ACTIVE,
+        },
+      })
+    : await prisma.todayFocus.upsert({
+        where: {
+          id: TODAY_FOCUS_ID,
+        },
+        create: {
+          id: TODAY_FOCUS_ID,
+          userId: USER_ID,
+          localDate: localDateValue,
+          title: '오늘의 초점 한 가지',
+          note: 'personalized home payload 검증용 today focus',
+          status: TodayFocusStatus.ACTIVE,
+        },
+        update: {
+          userId: USER_ID,
+          localDate: localDateValue,
+          title: '오늘의 초점 한 가지',
+          note: 'personalized home payload 검증용 today focus',
+          status: TodayFocusStatus.ACTIVE,
+        },
+      });
 
   await prisma.task.upsert({
     where: { id: TASK_ONE_ID },
@@ -144,7 +166,7 @@ async function main(): Promise<void> {
       note: 'home top task 1',
       status: TaskStatus.PLANNED,
       sourceType: TaskSourceType.MANUAL,
-      todayFocusId: TODAY_FOCUS_ID,
+      todayFocusId: todayFocus.id,
       dueAt,
       localDueDate: localDateValue,
       sortOrder: 10,
@@ -154,7 +176,7 @@ async function main(): Promise<void> {
       note: 'home top task 1',
       status: TaskStatus.PLANNED,
       sourceType: TaskSourceType.MANUAL,
-      todayFocusId: TODAY_FOCUS_ID,
+      todayFocusId: todayFocus.id,
       dueAt,
       localDueDate: localDateValue,
       sortOrder: 10,
@@ -260,7 +282,7 @@ async function main(): Promise<void> {
   });
 
   await prisma.todayFocus.update({
-    where: { id: TODAY_FOCUS_ID },
+    where: { id: todayFocus.id },
     data: {
       linkedTaskId: TASK_ONE_ID,
     },
