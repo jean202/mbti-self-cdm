@@ -21,9 +21,13 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY package*.json ./
-RUN npm ci --omit=dev
 
-# Prisma client (generated) + schema (for migrate deploy)
+# builder에서 설치된 node_modules 복사 후 devDeps 제거
+# (runner에서 npm ci 재실행 시 lockfile 버전 충돌 방지)
+COPY --from=builder /app/node_modules ./node_modules
+RUN npm prune --omit=dev
+
+# Prisma client (generate된 것) + schema (migrate deploy용)
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY prisma ./prisma
