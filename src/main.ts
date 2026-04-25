@@ -69,6 +69,7 @@ async function bootstrap(): Promise<void> {
   const host = process.env.HOST ?? '0.0.0.0';
 
   await app.listen(port, host);
+  console.log(`[bootstrap] Listening on http://${host}:${port} (PORT env=${process.env.PORT})`);
 }
 
 void bootstrap();
