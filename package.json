@@ -2,6 +2,9 @@
   "name": "mbti-self-cdm-backend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "bootstrap:local": "bash scripts/bootstrap-local.sh",
     "bootstrap:local:clean": "bash scripts/bootstrap-local.sh --clean",
@@ -42,12 +45,14 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "fastify": "^5.8.4",
+    "googleapis": "^171.4.0",
     "ioredis": "^5.10.1",
     "prisma": "^6.19.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@nestjs/testing": "^11.1.19",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
     "jest": "^30.3.0",
