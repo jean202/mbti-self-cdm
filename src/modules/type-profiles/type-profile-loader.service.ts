@@ -9,16 +9,23 @@ type JsonRecord = Record<string, unknown>;
 export class TypeProfileLoaderService {
   private readonly manifestCache = new Map<string, JsonRecord>();
   private readonly profileCache = new Map<string, JsonRecord>();
+  private cachedVersions: string[] | null = null;
 
   constructor(private readonly configService: ConfigService) {}
 
   async listVersions(): Promise<string[]> {
+    if (this.cachedVersions) {
+      return this.cachedVersions;
+    }
+
     const entries = await readdir(this.getDataRoot(), { withFileTypes: true });
 
-    return entries
+    this.cachedVersions = entries
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
       .sort((left, right) => right.localeCompare(left));
+
+    return this.cachedVersions;
   }
 
   async getManifest(version?: string): Promise<JsonRecord> {
