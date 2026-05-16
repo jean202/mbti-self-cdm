@@ -14,6 +14,7 @@ import { MeModule } from './modules/me/me.module';
 import { PlanModule } from './modules/plan/plan.module';
 import { ReflectModule } from './modules/reflect/reflect.module';
 import { SessionModule } from './modules/session/session.module';
+import { RoutinesModule } from './modules/routines/routines.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { TypeProfilesModule } from './modules/type-profiles/type-profiles.module';
 import { UsersModule } from './modules/users/users.module';
@@ -43,6 +44,7 @@ import { RedisModule } from './infra/redis/redis.module';
     PlanModule,
     TasksModule,
     IdeasModule,
+    RoutinesModule,
     ReflectModule,
     CalendarModule,
     CaptureModule,

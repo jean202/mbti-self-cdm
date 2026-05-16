@@ -918,6 +918,74 @@
         ]
       }
     },
+    "/v1/routines": {
+      "post": {
+        "operationId": "RoutinesController_createRoutine",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoutineDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "새 반복 루틴 생성",
+        "tags": [
+          "Routines"
+        ]
+      },
+      "get": {
+        "operationId": "RoutinesController_getRoutines",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "내 루틴 목록 조회",
+        "tags": [
+          "Routines"
+        ]
+      }
+    },
+    "/v1/routines/generate-today": {
+      "post": {
+        "operationId": "RoutinesController_generateTodayTasks",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "오늘 요일에 맞는 루틴을 기반으로 Task 생성",
+        "tags": [
+          "Routines"
+        ]
+      }
+    },
     "/v1/reflect/daily": {
       "get": {
         "operationId": "ReflectController_getDaily",
@@ -1887,6 +1955,42 @@
             "example": "2026-04-10T09:00:00.000Z"
           }
         }
+      },
+      "CreateRoutineDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "루틴 제목",
+            "example": "아침 10분 명상"
+          },
+          "note": {
+            "type": "string",
+            "description": "설명 및 메모",
+            "example": "호흡에 집중하기"
+          },
+          "daysOfWeek": {
+            "description": "반복할 요일 (0:일 ~ 6:토)",
+            "example": [
+              1,
+              3,
+              5
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "활성화 여부",
+            "default": true
+          }
+        },
+        "required": [
+          "title",
+          "daysOfWeek"
+        ]
       },
       "CreateMoodEnergyCheckDto": {
         "type": "object",
