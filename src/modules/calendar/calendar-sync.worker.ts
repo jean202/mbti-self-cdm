@@ -1,10 +1,14 @@
 import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CalendarConnectionStatus, CalendarEventStatus } from '@prisma/client';
+import { CalendarConnectionStatus, CalendarEventStatus, Prisma } from '@prisma/client';
 import { Worker, type Job } from 'bullmq';
 import Redis from 'ioredis';
+import { randomUUID } from 'node:crypto';
+import { requestContext } from '../../common/logging/request-context';
 
 import { PrismaService } from '../../infra/prisma/prisma.service';
+import { GoogleCalendarAdapter } from './adapters/google-calendar.adapter';
+import { SecretsService } from '../../common/secrets/secrets.service';
 
 export interface CalendarSyncJobData {
   connection_id: string;
@@ -30,6 +34,7 @@ export interface ProviderEvent {
 export interface SyncResult {
   events: ProviderEvent[];
   next_sync_cursor?: unknown;
+  updated_credentials_ref?: string;
 }
 
 export interface CalendarProviderAdapter {
@@ -48,6 +53,8 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
+    private readonly googleAdapter: GoogleCalendarAdapter,
+    private readonly secretsService: SecretsService,
   ) {}
 
   onModuleInit(): void {
@@ -86,6 +93,12 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
   }
 
   private async processJob(job: Job<CalendarSyncJobData>): Promise<void> {
+    // Job ID를 포함한 고유 CID를 발급하여 백그라운드 작업도 추적 가능하게 함
+    const correlationId = `job-${job.id || randomUUID().slice(0, 8)}`;
+    return requestContext.run({ correlationId }, () => this.handleJob(job));
+  }
+
+  private async handleJob(job: Job<CalendarSyncJobData>): Promise<void> {
     const { connection_id, user_id } = job.data;
 
     this.logger.log(
@@ -139,8 +152,11 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
           lastSyncedAt: new Date(),
           lastErrorCode: null,
           syncCursorJson: result.next_sync_cursor
-            ? JSON.parse(JSON.stringify(result.next_sync_cursor))
+            ? (JSON.parse(JSON.stringify(result.next_sync_cursor)) as Prisma.InputJsonValue)
             : undefined,
+          ...(result.updated_credentials_ref ? {
+            credentialsRef: this.secretsService.encrypt(result.updated_credentials_ref),
+          } : {}),
         },
       });
 
@@ -182,14 +198,14 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
           startsAt: new Date(event.starts_at),
           endsAt: new Date(event.ends_at),
           isAllDay: event.is_all_day,
-          eventStatus: CalendarEventStatus[event.event_status],
+          eventStatus: event.event_status as CalendarEventStatus,
           providerUpdatedAt: event.provider_updated_at
             ? new Date(event.provider_updated_at)
             : null,
           lastSyncedAt: now,
           rawPayloadJson: event.raw_payload
-            ? JSON.parse(JSON.stringify(event.raw_payload))
-            : undefined,
+            ? (JSON.parse(JSON.stringify(event.raw_payload)) as Prisma.InputJsonValue)
+            : Prisma.JsonNull,
         },
         update: {
           calendarName: event.calendar_name ?? null,
@@ -199,14 +215,14 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
           startsAt: new Date(event.starts_at),
           endsAt: new Date(event.ends_at),
           isAllDay: event.is_all_day,
-          eventStatus: CalendarEventStatus[event.event_status],
+          eventStatus: event.event_status as CalendarEventStatus,
           providerUpdatedAt: event.provider_updated_at
             ? new Date(event.provider_updated_at)
             : null,
           lastSyncedAt: now,
           rawPayloadJson: event.raw_payload
-            ? JSON.parse(JSON.stringify(event.raw_payload))
-            : undefined,
+            ? (JSON.parse(JSON.stringify(event.raw_payload)) as Prisma.InputJsonValue)
+            : Prisma.JsonNull,
         },
       });
     }
@@ -239,15 +255,8 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
     // In production, this would use googleapis SDK with OAuth2 credentials
     // For now, return stub that can be replaced with real implementation
     const isDevBridge =
-      this.configService.get<string>('CALENDAR_ENABLE_DEV_OAUTH_BRIDGE') ===
-      'true';
-
-    if (isDevBridge) {
-      return this.getStubAdapter();
-    }
-
-    // Real Google adapter would be injected here
-    return this.getStubAdapter();
+      this.configService.get<string>('CALENDAR_ENABLE_DEV_OAUTH_BRIDGE') === 'true';
+    return isDevBridge ? this.getStubAdapter() : this.googleAdapter;
   }
 
   private getStubAdapter(): CalendarProviderAdapter {

@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -13,11 +14,13 @@ import {
 } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { URL } from 'node:url';
+import { google } from 'googleapis';
 
 import { toOnboardingState } from '../../common/utils/onboarding-state.util';
 import { QueueService } from '../../infra/queue/queue.service';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { RedisService } from '../../infra/redis/redis.service';
+import { SecretsService } from '../../common/secrets/secrets.service';
 import { CompleteCalendarOAuthCallbackDto } from './dto/complete-calendar-oauth-callback.dto';
 import { ListCalendarEventsQueryDto } from './dto/list-calendar-events-query.dto';
 import { StartCalendarOAuthDto } from './dto/start-calendar-oauth.dto';
@@ -61,19 +64,24 @@ const CALENDAR_PROVIDER_LABELS: Record<CalendarProvider, string> = {
 
 @Injectable()
 export class CalendarService {
+  private readonly logger = new Logger(CalendarService.name);
+
   constructor(
     private readonly prismaService: PrismaService,
     private readonly queueService: QueueService,
     private readonly redisService: RedisService,
     private readonly configService: ConfigService,
+    private readonly secretsService: SecretsService,
   ) {}
 
   async startOAuthConnection(userId: string, input: StartCalendarOAuthDto) {
+    this.logger.log(`Starting OAuth connection for user ${userId}, provider: ${input.provider}`);
     await this.ensureUserExists(userId);
 
     const providerConfig = OAUTH_PROVIDER_CONFIG[input.provider];
 
     if (!providerConfig) {
+      this.logger.warn(`Provider config not found for ${input.provider}`);
       throw new BadRequestException(
         `${input.provider} calendar OAuth start is not supported yet.`,
       );
@@ -130,11 +138,14 @@ export class CalendarService {
     providerInput: string,
     input: CompleteCalendarOAuthCallbackDto,
   ) {
+    this.logger.log(`Completing OAuth callback for provider: ${providerInput}`);
+
     const provider = this.normalizeProvider(providerInput);
     const stateKey = this.getOAuthStateKey(provider, input.state);
     const rawState = await this.redisService.getClient().get(stateKey);
 
     if (!rawState) {
+      this.logger.warn(`OAuth state not found or expired for key: ${stateKey}`);
       throw new BadRequestException({
         code: 'INVALID_CALENDAR_OAUTH_STATE',
         message: 'Calendar OAuth state was not found or expired.',
@@ -145,6 +156,7 @@ export class CalendarService {
 
     if (state.provider !== provider) {
       await this.redisService.getClient().del(stateKey);
+      this.logger.warn(`Provider mismatch: expected ${state.provider}, got ${provider}`);
 
       throw new BadRequestException({
         code: 'CALENDAR_OAUTH_PROVIDER_MISMATCH',
@@ -154,6 +166,7 @@ export class CalendarService {
 
     if (input.error?.trim()) {
       await this.redisService.getClient().del(stateKey);
+      this.logger.warn(`OAuth provider returned error: ${input.error}`);
 
       return this.buildOAuthRedirectResult(state, provider, {
         success: false,
@@ -168,6 +181,7 @@ export class CalendarService {
 
     if (!providerConfig) {
       await this.redisService.getClient().del(stateKey);
+      this.logger.warn(`OAuth callback not supported for provider: ${provider}`);
 
       return this.buildOAuthRedirectResult(state, provider, {
         success: false,
@@ -188,6 +202,7 @@ export class CalendarService {
 
     if (!user) {
       await this.redisService.getClient().del(stateKey);
+      this.logger.warn(`User ${state.user_id} not found during OAuth callback`);
       throw new NotFoundException('User was not found.');
     }
 
@@ -196,6 +211,7 @@ export class CalendarService {
       user.onboardingStatus === OnboardingStatus.MBTI_PENDING
     ) {
       await this.redisService.getClient().del(stateKey);
+      this.logger.warn(`User ${state.user_id} attempted calendar connection before completing onboarding`);
 
       return this.buildOAuthRedirectResult(state, provider, {
         success: false,
@@ -209,6 +225,7 @@ export class CalendarService {
 
     if (!authorizationCode && !this.isDevOAuthBridgeEnabled()) {
       await this.redisService.getClient().del(stateKey);
+      this.logger.warn(`Authorization code missing in callback for provider: ${provider}`);
 
       return this.buildOAuthRedirectResult(state, provider, {
         success: false,
@@ -216,6 +233,38 @@ export class CalendarService {
         error_description:
           'Provider callback did not include an authorization code.',
       });
+    }
+
+    let credentialsRefToSave: string | null = null;
+    const isDevBridge = this.isDevOAuthBridgeEnabled();
+
+    if (authorizationCode && provider === CalendarProvider.GOOGLE && !isDevBridge) {
+      try {
+        const clientId = this.configService.get<string>(providerConfig.clientIdEnvKey);
+        const clientSecret = this.configService.get<string>('GOOGLE_OAUTH_CLIENT_SECRET');
+
+        if (!clientId || !clientSecret) {
+          throw new Error('Google OAuth credentials are not configured.');
+        }
+
+        const oauth2Client = new google.auth.OAuth2(
+          clientId,
+          clientSecret,
+          state.callback_uri,
+        );
+
+        const { tokens } = await oauth2Client.getToken(authorizationCode);
+        credentialsRefToSave = this.secretsService.encrypt(JSON.stringify(tokens));
+        this.logger.log(`Successfully exchanged authorization code for tokens (User: ${state.user_id})`);
+      } catch (error: any) {
+        this.logger.error(`Token exchange failed for user ${state.user_id}: ${error.message}`, error.stack);
+        await this.redisService.getClient().del(stateKey);
+        return this.buildOAuthRedirectResult(state, provider, {
+          success: false,
+          error_code: 'TOKEN_EXCHANGE_FAILED',
+          error_description: 'Failed to exchange authorization code for tokens.',
+        });
+      }
     }
 
     const now = new Date();
@@ -244,6 +293,7 @@ export class CalendarService {
           providerAccountId,
           accountLabel,
           status: CalendarConnectionStatus.ACTIVE,
+          credentialsRef: credentialsRefToSave,
           scopesJson: providerConfig.scopes,
           syncCursorJson: {
             oauth_flow_id: state.flow_id,
@@ -255,8 +305,7 @@ export class CalendarService {
         update: {
           accountLabel,
           status: CalendarConnectionStatus.ACTIVE,
-          credentialsRef: null,
-          scopesJson: providerConfig.scopes,
+          credentialsRef: credentialsRefToSave,
           syncCursorJson: {
             oauth_flow_id: state.flow_id,
             initial_sync_required: true,
@@ -286,6 +335,8 @@ export class CalendarService {
     });
 
     await this.redisService.getClient().del(stateKey);
+    
+    this.logger.log(`Calendar connection created/updated successfully: ${connection.id} (User: ${state.user_id})`);
 
     return this.buildOAuthRedirectResult(state, provider, {
       success: true,
@@ -321,6 +372,8 @@ export class CalendarService {
   }
 
   async syncConnection(userId: string, connectionId: string) {
+    this.logger.log(`Requesting calendar sync for connection ${connectionId} (User: ${userId})`);
+
     const connection = await this.findConnectionOrThrow(userId, connectionId);
 
     if (connection.status === CalendarConnectionStatus.REVOKED) {
@@ -349,6 +402,8 @@ export class CalendarService {
       provider: connection.provider,
       requested_at: now.toISOString(),
     });
+    
+    this.logger.log(`Sync job successfully enqueued for connection ${connectionId}`);
 
     await this.prismaService.user.update({
       where: {
@@ -367,6 +422,8 @@ export class CalendarService {
   }
 
   async revokeConnection(userId: string, connectionId: string) {
+    this.logger.log(`Revoking calendar connection ${connectionId} (User: ${userId})`);
+
     const connection = await this.findConnectionOrThrow(userId, connectionId);
     const now = new Date();
     const updatedConnection = await this.prismaService.calendarConnection.update({
