@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -359,7 +358,6 @@ export class ProviderVerificationService {
     } catch (error) {
       if (
         error instanceof BadRequestException ||
-        error instanceof InternalServerErrorException ||
         error instanceof ServiceUnavailableException ||
         error instanceof UnauthorizedException
       ) {
@@ -398,7 +396,10 @@ export class ProviderVerificationService {
       .filter((value) => value.length > 0);
 
     if (!clientIds || clientIds.length === 0) {
-      throw new InternalServerErrorException(`${envKey} is not configured.`);
+      throw new ServiceUnavailableException({
+        code: 'SOCIAL_PROVIDER_NOT_CONFIGURED',
+        message: `${envKey} is not configured.`,
+      });
     }
 
     return clientIds;

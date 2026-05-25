@@ -13,6 +13,7 @@ const {
 async function main() {
   await testGoogleIdTokenVerification();
   await testNonceMismatch();
+  await testMissingClientIdsConfiguration();
   await testDevBridgeFallback();
 
   console.log(
@@ -22,6 +23,7 @@ async function main() {
         tests: [
           'google-id-token-verification',
           'nonce-mismatch',
+          'missing-client-ids-configuration',
           'dev-identity-bridge',
         ],
       },
@@ -92,6 +94,70 @@ async function testGoogleIdTokenVerification() {
     assert.equal(result.providerUserId, 'google-user-123');
     assert.equal(result.providerEmail, 'user@example.com');
     assert.equal(result.providerDisplayName, 'Google User');
+  } finally {
+    global.fetch = originalFetch;
+  }
+}
+
+async function testMissingClientIdsConfiguration() {
+  const issuer = 'https://accounts.google.com';
+  const clientId = 'google-client-id';
+  const kid = 'google-test-key-missing-client-id';
+  const { privateKey, publicJwk } = createSigningKey(kid);
+  const idToken = createIdToken({
+    header: { alg: 'RS256', kid },
+    payload: {
+      iss: issuer,
+      aud: clientId,
+      sub: 'google-user-789',
+      exp: Math.floor(Date.now() / 1000) + 60 * 10,
+    },
+    privateKey,
+  });
+
+  const service = createService({
+    AUTH_ENABLE_DEV_IDENTITY_BRIDGE: 'false',
+  });
+  const originalFetch = global.fetch;
+
+  global.fetch = async (url) => {
+    if (url === 'https://accounts.google.com/.well-known/openid-configuration') {
+      return jsonResponse({
+        issuer,
+        jwks_uri: 'https://test.example.com/google/jwks-missing-client-id',
+      });
+    }
+
+    if (url === 'https://test.example.com/google/jwks-missing-client-id') {
+      return jsonResponse({
+        keys: [publicJwk],
+      });
+    }
+
+    throw new Error(`Unexpected fetch URL: ${url}`);
+  };
+
+  try {
+    await assert.rejects(
+      () =>
+        service.verify({
+          provider: 'GOOGLE',
+          provider_payload: {
+            id_token: idToken,
+          },
+          device: {
+            device_id: randomUUID(),
+            platform: 'IOS',
+            app_version: '0.1.0',
+          },
+        }),
+      (error) =>
+        typeof error.getStatus === 'function' &&
+        error.getStatus() === 503 &&
+        JSON.stringify(error.getResponse()).includes(
+          'SOCIAL_PROVIDER_NOT_CONFIGURED',
+        ),
+    );
   } finally {
     global.fetch = originalFetch;
   }

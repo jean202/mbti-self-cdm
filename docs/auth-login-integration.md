@@ -1,6 +1,6 @@
 # Auth Login Integration
 
-마지막 업데이트: 2026-03-27
+마지막 업데이트: 2026-05-26
 
 ## 1. 목적
 
@@ -39,7 +39,7 @@
 AUTH_ENABLE_DEV_IDENTITY_BRIDGE=false
 AUTH_GOOGLE_CLIENT_IDS="google-ios-client-id,google-android-client-id"
 AUTH_APPLE_CLIENT_IDS="com.example.app"
-AUTH_KAKAO_CLIENT_IDS="kakao-native-app-key"
+AUTH_KAKAO_CLIENT_IDS="92b0396972c5416f5bd2b7e8b0815e61"
 AUTH_NAVER_CLIENT_IDS="naver-client-id"
 ```
 
