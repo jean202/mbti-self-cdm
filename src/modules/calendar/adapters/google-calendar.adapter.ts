@@ -9,13 +9,9 @@ import {
 } from '../calendar-sync.worker';
 import { SecretsService } from '../../../common/secrets/secrets.service';
 
-// From Google OAuth2 flow
-interface GoogleCredentials {
-  access_token: string;
-  refresh_token: string;
-  scope: string;
-  token_type: 'Bearer';
-  expiry_date: number;
+interface GoogleCalendarSource {
+  id: string;
+  summary?: string;
 }
 
 @Injectable()
@@ -29,7 +25,7 @@ export class GoogleCalendarAdapter implements CalendarProviderAdapter {
 
   async fetchEvents(
     credentialsRef: string,
-    syncCursor: unknown,
+    _syncCursor: unknown,
   ): Promise<SyncResult> {
     const oauth2Client = this.createOAuth2Client();
     const credentials = this.parseCredentials(credentialsRef);
@@ -38,34 +34,33 @@ export class GoogleCalendarAdapter implements CalendarProviderAdapter {
     let updatedTokens: Auth.Credentials | null = null;
     oauth2Client.on('tokens', (tokens) => {
       // refresh_token은 보통 첫 인증 시에만 받으므로, 기존 값을 유지합니다.
-      if (tokens.refresh_token) {
-        updatedTokens = tokens;
-      } else {
-        updatedTokens = { ...tokens, refresh_token: credentials.refresh_token };
-      }
+      updatedTokens = {
+        ...credentials,
+        ...tokens,
+        refresh_token: tokens.refresh_token ?? credentials.refresh_token,
+      };
     });
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
     try {
-      const params: calendar_v3.Params$Resource$Events$List = {
-        calendarId: 'primary',
-        singleEvents: true,
-        maxResults: 250,
-      };
+      const timeMin = new Date();
+      timeMin.setDate(timeMin.getDate() - 30);
+      const timeMax = new Date();
+      timeMax.setDate(timeMax.getDate() + 365);
+      const calendars = await this.listCalendars(calendar);
+      const events: ProviderEvent[] = [];
 
-      if (typeof syncCursor === 'string' && syncCursor) {
-        params.syncToken = syncCursor;
-      } else {
-        const timeMin = new Date();
-        timeMin.setDate(timeMin.getDate() - 30); // 최초 동기화 시 최근 30일 데이터
-        params.timeMin = timeMin.toISOString();
+      for (const source of calendars) {
+        events.push(
+          ...(await this.fetchCalendarEvents(
+            calendar,
+            source,
+            timeMin,
+            timeMax,
+          )),
+        );
       }
-
-      const response = await calendar.events.list(params);
-
-      const events = response.data.items?.map(this.mapGoogleEvent) ?? [];
-      const nextSyncToken = response.data.nextSyncToken;
 
       let updated_credentials_ref: string | undefined;
       if (updatedTokens) {
@@ -75,16 +70,10 @@ export class GoogleCalendarAdapter implements CalendarProviderAdapter {
 
       return {
         events,
-        next_sync_cursor: nextSyncToken,
+        next_sync_cursor: null,
         updated_credentials_ref,
       };
     } catch (error: any) {
-      if (error.code === 410) {
-        this.logger.warn(
-          'Google Calendar sync token is invalid. Performing a full sync.',
-        );
-        return this.fetchEvents(credentialsRef, null); // Full sync 재시도
-      }
       this.logger.error(
         `Failed to fetch Google Calendar events: ${error.message}`,
         error.stack,
@@ -94,14 +83,18 @@ export class GoogleCalendarAdapter implements CalendarProviderAdapter {
   }
 
   private createOAuth2Client(): Auth.OAuth2Client {
-    const clientId = this.configService.get<string>('GOOGLE_OAUTH_CLIENT_ID');
-    const clientSecret = this.configService.get<string>(
+    const clientId = this.readFirstConfiguredValue([
+      'CALENDAR_GOOGLE_CLIENT_ID',
+      'GOOGLE_OAUTH_CLIENT_ID',
+    ]);
+    const clientSecret = this.readFirstConfiguredValue([
+      'CALENDAR_GOOGLE_CLIENT_SECRET',
       'GOOGLE_OAUTH_CLIENT_SECRET',
-    );
+    ]);
     return new google.auth.OAuth2(clientId, clientSecret);
   }
 
-  private parseCredentials(credentialsRef: string): GoogleCredentials {
+  private parseCredentials(credentialsRef: string): Auth.Credentials {
     try {
       const decrypted = this.secretsService.decrypt(credentialsRef);
       return JSON.parse(decrypted);
@@ -111,17 +104,85 @@ export class GoogleCalendarAdapter implements CalendarProviderAdapter {
     }
   }
 
-  private mapGoogleEvent(item: calendar_v3.Schema$Event): ProviderEvent {
+  private async listCalendars(
+    calendar: calendar_v3.Calendar,
+  ): Promise<GoogleCalendarSource[]> {
+    try {
+      const response = await calendar.calendarList.list({
+        minAccessRole: 'reader',
+        showDeleted: false,
+        showHidden: false,
+      });
+      const sources =
+        response.data.items
+          ?.filter((item) => item.id && !item.deleted)
+          .map((item) => ({
+            id: item.id!,
+            summary: item.summary ?? undefined,
+          })) ?? [];
+
+      return sources.length > 0 ? sources : [{ id: 'primary' }];
+    } catch (error: any) {
+      this.logger.warn(
+        `Failed to list Google calendars. Falling back to primary calendar: ${error.message}`,
+      );
+
+      return [{ id: 'primary' }];
+    }
+  }
+
+  private async fetchCalendarEvents(
+    calendar: calendar_v3.Calendar,
+    source: GoogleCalendarSource,
+    timeMin: Date,
+    timeMax: Date,
+  ): Promise<ProviderEvent[]> {
+    const events: ProviderEvent[] = [];
+    let pageToken: string | undefined;
+
+    do {
+      const response = await calendar.events.list({
+        calendarId: source.id,
+        singleEvents: true,
+        orderBy: 'startTime',
+        maxResults: 250,
+        timeMin: timeMin.toISOString(),
+        timeMax: timeMax.toISOString(),
+        showDeleted: false,
+        pageToken,
+      });
+
+      for (const item of response.data.items ?? []) {
+        try {
+          events.push(this.mapGoogleEvent(item, source));
+        } catch (error: any) {
+          this.logger.warn(
+            `Skipping Google Calendar event from ${source.id}: ${error.message}`,
+          );
+        }
+      }
+
+      pageToken = response.data.nextPageToken ?? undefined;
+    } while (pageToken);
+
+    return events;
+  }
+
+  private mapGoogleEvent(
+    item: calendar_v3.Schema$Event,
+    source: GoogleCalendarSource,
+  ): ProviderEvent {
     const starts_at = item.start?.dateTime ?? item.start?.date;
     const ends_at = item.end?.dateTime ?? item.end?.date;
 
-    if (!starts_at || !ends_at) {
+    if (!item.id || !starts_at || !ends_at) {
       throw new Error(`Event ${item.id} is missing start or end time.`);
     }
 
     return {
-      provider_event_id: item.id!,
-      calendar_name: item.organizer?.displayName ?? undefined,
+      provider_event_id: `${source.id}:${item.id}`,
+      calendar_name:
+        source.summary ?? item.organizer?.displayName ?? undefined,
       title: item.summary ?? 'No Title',
       description: item.description ?? undefined,
       location: item.location ?? undefined,
@@ -132,7 +193,23 @@ export class GoogleCalendarAdapter implements CalendarProviderAdapter {
         (item.status?.toUpperCase() as 'CONFIRMED' | 'TENTATIVE' | 'CANCELLED') ??
         'CONFIRMED',
       provider_updated_at: item.updated!,
-      raw_payload: item,
+      raw_payload: {
+        ...item,
+        calendar_id: source.id,
+        calendar_summary: source.summary,
+      },
     };
+  }
+
+  private readFirstConfiguredValue(keys: string[]): string | undefined {
+    for (const key of keys) {
+      const value = this.configService.get<string>(key)?.trim();
+
+      if (value) {
+        return value;
+      }
+    }
+
+    return undefined;
   }
 }

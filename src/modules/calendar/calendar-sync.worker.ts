@@ -151,9 +151,13 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
           status: CalendarConnectionStatus.ACTIVE,
           lastSyncedAt: new Date(),
           lastErrorCode: null,
-          syncCursorJson: result.next_sync_cursor
-            ? (JSON.parse(JSON.stringify(result.next_sync_cursor)) as Prisma.InputJsonValue)
-            : undefined,
+          syncCursorJson:
+            result.next_sync_cursor === undefined ||
+            result.next_sync_cursor === null
+              ? Prisma.JsonNull
+              : (JSON.parse(
+                  JSON.stringify(result.next_sync_cursor),
+                ) as Prisma.InputJsonValue),
           ...(result.updated_credentials_ref ? {
             credentialsRef: this.secretsService.encrypt(result.updated_credentials_ref),
           } : {}),

@@ -29,6 +29,8 @@ type OAuthProviderConfig = {
   authorizeUrl: string;
   clientIdEnvKey: string;
   clientIdFallbackEnvKeys?: string[];
+  clientSecretEnvKey?: string;
+  clientSecretFallbackEnvKeys?: string[];
   callbackUriEnvKey: string;
   scopes: string[];
   extraParams?: Record<string, string>;
@@ -48,6 +50,8 @@ const OAUTH_PROVIDER_CONFIG: Partial<Record<CalendarProvider, OAuthProviderConfi
     authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     clientIdEnvKey: 'CALENDAR_GOOGLE_CLIENT_ID',
     clientIdFallbackEnvKeys: ['GOOGLE_OAUTH_CLIENT_ID'],
+    clientSecretEnvKey: 'CALENDAR_GOOGLE_CLIENT_SECRET',
+    clientSecretFallbackEnvKeys: ['GOOGLE_OAUTH_CLIENT_SECRET'],
     callbackUriEnvKey: 'CALENDAR_GOOGLE_CALLBACK_URI',
     scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
     extraParams: {
@@ -248,7 +252,10 @@ export class CalendarService {
           providerConfig.clientIdEnvKey,
           ...(providerConfig.clientIdFallbackEnvKeys ?? []),
         ]);
-        const clientSecret = this.configService.get<string>('GOOGLE_OAUTH_CLIENT_SECRET');
+        const clientSecret = this.readFirstConfiguredValue([
+          providerConfig.clientSecretEnvKey,
+          ...(providerConfig.clientSecretFallbackEnvKeys ?? []),
+        ].filter((key): key is string => Boolean(key)));
 
         if (!clientId || !clientSecret) {
           throw new Error('Google OAuth credentials are not configured.');
@@ -656,11 +663,11 @@ export class CalendarService {
   }
 
   private isDevOAuthBridgeEnabled(): boolean {
-    const value =
-      this.configService.get<string>('CALENDAR_ENABLE_DEV_OAUTH_BRIDGE') ??
-      'true';
+    const value = this.configService.get<string>(
+      'CALENDAR_ENABLE_DEV_OAUTH_BRIDGE',
+    );
 
-    return value.toLowerCase() !== 'false';
+    return value?.toLowerCase() === 'true';
   }
 
   private normalizeProvider(providerInput: string): CalendarProvider {

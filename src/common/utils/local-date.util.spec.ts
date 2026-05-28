@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 
 import {
   buildUtcDayRange,
+  buildUtcDayRangeForTimezone,
   formatLocalDate,
   parseLocalDate,
   resolveRequestedLocalDate,
@@ -37,6 +38,22 @@ describe('local-date.util', () => {
 
       expect(range.start.toISOString()).toBe('2026-04-09T00:00:00.000Z');
       expect(range.end.toISOString()).toBe('2026-04-10T00:00:00.000Z');
+    });
+  });
+
+  describe('buildUtcDayRangeForTimezone', () => {
+    it('should return the UTC range for a Seoul local day', () => {
+      const range = buildUtcDayRangeForTimezone('2026-05-28', 'Asia/Seoul');
+
+      expect(range.start.toISOString()).toBe('2026-05-27T15:00:00.000Z');
+      expect(range.end.toISOString()).toBe('2026-05-28T15:00:00.000Z');
+    });
+
+    it('should return the same range as UTC for UTC timezone', () => {
+      const range = buildUtcDayRangeForTimezone('2026-05-28', 'UTC');
+
+      expect(range.start.toISOString()).toBe('2026-05-28T00:00:00.000Z');
+      expect(range.end.toISOString()).toBe('2026-05-29T00:00:00.000Z');
     });
   });
 

@@ -7,7 +7,14 @@ const DEMO_USER = {
   locale: 'ko-KR',
   timezone: 'Asia/Seoul',
   mbtiProfile: { typeCode: 'INFJ', profileVersion: '2026-03-v1' },
-  calendarConnections: [{ id: 'conn-1' }],
+  calendarConnections: [
+    {
+      id: 'conn-1',
+      status: 'ACTIVE',
+      lastSyncedAt: new Date('2026-04-09T00:00:00Z'),
+      lastErrorCode: null,
+    },
+  ],
 };
 
 const DEMO_FOCUS = {
@@ -94,6 +101,8 @@ describe('HomeService', () => {
       expect(result.today_focus!.title).toBe('오늘의 초점');
       expect(result.top_tasks).toHaveLength(1);
       expect(result.calendar_summary.has_connection).toBe(true);
+      expect(result.calendar_summary.connection_id).toBe('conn-1');
+      expect(result.calendar_summary.connection_status).toBe('ACTIVE');
       expect(result.calendar_summary.items).toHaveLength(1);
       expect(result.personalized_prompt).not.toBeNull();
       expect(result.personalized_prompt!.body).toContain('한 가지 흐름');

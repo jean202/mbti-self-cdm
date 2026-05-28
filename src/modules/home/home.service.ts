@@ -7,7 +7,7 @@ import {
 } from '@prisma/client';
 
 import {
-  buildUtcDayRange,
+  buildUtcDayRangeForTimezone,
   formatLocalDate,
   parseLocalDate,
   resolveRequestedLocalDate,
@@ -64,14 +64,17 @@ export class HomeService {
         calendarConnections: {
           where: {
             status: {
-              in: [
-                CalendarConnectionStatus.ACTIVE,
-                CalendarConnectionStatus.SYNCING,
-              ],
+              not: CalendarConnectionStatus.REVOKED,
             },
+          },
+          orderBy: {
+            connectedAt: 'desc',
           },
           select: {
             id: true,
+            status: true,
+            lastSyncedAt: true,
+            lastErrorCode: true,
           },
         },
       },
@@ -86,8 +89,12 @@ export class HomeService {
       user.timezone,
     );
     const localDateValue = parseLocalDate(localDate);
-    const calendarRange = buildUtcDayRange(localDate);
+    const calendarRange = buildUtcDayRangeForTimezone(
+      localDate,
+      user.timezone,
+    );
     const connectionIds = user.calendarConnections.map((connection) => connection.id);
+    const primaryCalendarConnection = user.calendarConnections[0];
 
     const [todayFocus, topTasks, calendarItems, profilePresentation] =
       await Promise.all([
@@ -181,6 +188,11 @@ export class HomeService {
       })),
       calendar_summary: {
         has_connection: connectionIds.length > 0,
+        connection_id: primaryCalendarConnection?.id ?? null,
+        connection_status: primaryCalendarConnection?.status ?? null,
+        last_synced_at:
+          primaryCalendarConnection?.lastSyncedAt?.toISOString() ?? null,
+        last_error_code: primaryCalendarConnection?.lastErrorCode ?? null,
         items: calendarItems.map((item) => ({
           id: item.id,
           title: item.title,
