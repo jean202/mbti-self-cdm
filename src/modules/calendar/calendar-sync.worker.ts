@@ -127,7 +127,7 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
-    if (!connection.credentialsRef) {
+    if (!connection.credentialsRef && !this.isDevOAuthBridgeEnabled()) {
       await this.markConnectionError(connection_id, 'MISSING_CREDENTIALS');
       return;
     }
@@ -135,7 +135,7 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
     try {
       const adapter = this.getProviderAdapter(connection.provider);
       const result = await adapter.fetchEvents(
-        connection.credentialsRef,
+        connection.credentialsRef ?? '',
         connection.syncCursorJson,
       );
 
@@ -254,9 +254,9 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
     // Google Calendar API adapter
     // In production, this would use googleapis SDK with OAuth2 credentials
     // For now, return stub that can be replaced with real implementation
-    const isDevBridge =
-      this.configService.get<string>('CALENDAR_ENABLE_DEV_OAUTH_BRIDGE') === 'true';
-    return isDevBridge ? this.getStubAdapter() : this.googleAdapter;
+    return this.isDevOAuthBridgeEnabled()
+      ? this.getStubAdapter()
+      : this.googleAdapter;
   }
 
   private getStubAdapter(): CalendarProviderAdapter {
@@ -271,6 +271,13 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
     return (
       this.configService.get<string>('REDIS_URL') ??
       'redis://127.0.0.1:6379'
+    );
+  }
+
+  private isDevOAuthBridgeEnabled(): boolean {
+    return (
+      this.configService.get<string>('CALENDAR_ENABLE_DEV_OAUTH_BRIDGE') ===
+      'true'
     );
   }
 }

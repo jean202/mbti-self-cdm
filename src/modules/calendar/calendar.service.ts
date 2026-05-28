@@ -28,6 +28,7 @@ import { StartCalendarOAuthDto } from './dto/start-calendar-oauth.dto';
 type OAuthProviderConfig = {
   authorizeUrl: string;
   clientIdEnvKey: string;
+  clientIdFallbackEnvKeys?: string[];
   callbackUriEnvKey: string;
   scopes: string[];
   extraParams?: Record<string, string>;
@@ -46,6 +47,7 @@ const OAUTH_PROVIDER_CONFIG: Partial<Record<CalendarProvider, OAuthProviderConfi
   [CalendarProvider.GOOGLE]: {
     authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     clientIdEnvKey: 'CALENDAR_GOOGLE_CLIENT_ID',
+    clientIdFallbackEnvKeys: ['GOOGLE_OAUTH_CLIENT_ID'],
     callbackUriEnvKey: 'CALENDAR_GOOGLE_CALLBACK_URI',
     scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
     extraParams: {
@@ -88,8 +90,10 @@ export class CalendarService {
     }
 
     const clientId =
-      this.configService.get<string>(providerConfig.clientIdEnvKey) ??
-      'dev-google-calendar-client-id';
+      this.readFirstConfiguredValue([
+        providerConfig.clientIdEnvKey,
+        ...(providerConfig.clientIdFallbackEnvKeys ?? []),
+      ]) ?? 'dev-google-calendar-client-id';
     const callbackUri =
       this.configService.get<string>(providerConfig.callbackUriEnvKey) ??
       this.buildDefaultCallbackUri(input.provider);
@@ -721,6 +725,18 @@ export class CalendarService {
     }
 
     return CALENDAR_PROVIDER_LABELS[provider];
+  }
+
+  private readFirstConfiguredValue(keys: string[]): string | undefined {
+    for (const key of keys) {
+      const value = this.configService.get<string>(key)?.trim();
+
+      if (value) {
+        return value;
+      }
+    }
+
+    return undefined;
   }
 
   private async ensureUserExists(userId: string) {
