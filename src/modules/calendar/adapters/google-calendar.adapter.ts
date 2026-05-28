@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google, type Auth, type calendar_v3 } from 'googleapis';
+import { createHash } from 'node:crypto';
 
 import {
   type CalendarProviderAdapter,
@@ -180,7 +181,7 @@ export class GoogleCalendarAdapter implements CalendarProviderAdapter {
     }
 
     return {
-      provider_event_id: `${source.id}:${item.id}`,
+      provider_event_id: this.buildProviderEventId(source.id, item.id),
       calendar_name:
         source.summary ?? item.organizer?.displayName ?? undefined,
       title: item.summary ?? 'No Title',
@@ -199,6 +200,12 @@ export class GoogleCalendarAdapter implements CalendarProviderAdapter {
         calendar_summary: source.summary,
       },
     };
+  }
+
+  private buildProviderEventId(calendarId: string, eventId: string): string {
+    return createHash('sha256')
+      .update(`${calendarId}:${eventId}`)
+      .digest('hex');
   }
 
   private readFirstConfiguredValue(keys: string[]): string | undefined {
