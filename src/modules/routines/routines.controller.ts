@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../../common/auth/auth.guard';
@@ -33,5 +41,14 @@ export class RoutinesController {
   @ApiOperation({ summary: '오늘 요일에 맞는 루틴을 기반으로 Task 생성' })
   generateTodayTasks(@CurrentUser() user: RequestUser) {
     return this.routinesService.generateTodayTasks(user.userId);
+  }
+
+  @Post(':routine_id/skip-today')
+  @ApiOperation({ summary: '오늘 루틴 건너뛰기' })
+  skipTodayRoutine(
+    @CurrentUser() user: RequestUser,
+    @Param('routine_id', new ParseUUIDPipe()) routineId: string,
+  ) {
+    return this.routinesService.skipTodayRoutine(user.userId, routineId);
   }
 }
