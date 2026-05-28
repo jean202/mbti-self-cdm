@@ -272,7 +272,7 @@ model CalendarConnection {
   providerAccountId String                   @map("provider_account_id") @db.VarChar(255)
   accountLabel      String?                  @map("account_label") @db.VarChar(255)
   status            CalendarConnectionStatus @default(ACTIVE)
-  credentialsRef    String?                  @map("credentials_ref") @db.VarChar(255)
+  credentialsRef    String?                  @map("credentials_ref") @db.Text
   scopesJson        Json?                    @map("scopes_json")
   syncCursorJson    Json?                    @map("sync_cursor_json")
   lastSyncedAt      DateTime?                @map("last_synced_at") @db.Timestamptz(6)

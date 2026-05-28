@@ -244,7 +244,10 @@ export class CalendarService {
 
     if (authorizationCode && provider === CalendarProvider.GOOGLE && !isDevBridge) {
       try {
-        const clientId = this.configService.get<string>(providerConfig.clientIdEnvKey);
+        const clientId = this.readFirstConfiguredValue([
+          providerConfig.clientIdEnvKey,
+          ...(providerConfig.clientIdFallbackEnvKeys ?? []),
+        ]);
         const clientSecret = this.configService.get<string>('GOOGLE_OAUTH_CLIENT_SECRET');
 
         if (!clientId || !clientSecret) {

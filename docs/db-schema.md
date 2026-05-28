@@ -259,7 +259,7 @@ erDiagram
 | `provider_account_id` | `varchar(255)` | N | provider 계정 식별자 |
 | `account_label` | `varchar(255)` | Y | 표시용 계정명 |
 | `status` | `varchar(16)` | N | `calendar_connection_status` |
-| `credentials_ref` | `varchar(255)` | Y | 안전한 credential 저장소 참조값 |
+| `credentials_ref` | `text` | Y | 암호화된 provider credential payload |
 | `scopes_json` | `json` | Y | 승인된 scope |
 | `sync_cursor_json` | `json` | Y | 증분 동기화 cursor |
 | `last_synced_at` | `timestamp with time zone` | Y | 최근 동기화 시각 |
