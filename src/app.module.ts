@@ -8,6 +8,7 @@ import { CalendarModule } from './modules/calendar/calendar.module';
 import { CaptureModule } from './modules/capture/capture.module';
 import { HealthModule } from './modules/health/health.module';
 import { HomeModule } from './modules/home/home.module';
+import { GoalsModule } from './modules/goals/goals.module';
 import { IdeasModule } from './modules/ideas/ideas.module';
 import { MbtiModule } from './modules/mbti/mbti.module';
 import { MeModule } from './modules/me/me.module';
@@ -41,6 +42,7 @@ import { RedisModule } from './infra/redis/redis.module';
     MbtiModule,
     TypeProfilesModule,
     HomeModule,
+    GoalsModule,
     PlanModule,
     TasksModule,
     IdeasModule,

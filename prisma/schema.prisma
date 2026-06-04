@@ -91,6 +91,18 @@ enum CheckContext {
   ADHOC
 }
 
+enum GoalHorizon {
+  SHORT_TERM
+  MID_TERM
+  LONG_TERM
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
 model User {
   id                    String               @id @default(uuid()) @db.Uuid
   displayName           String?              @map("display_name") @db.VarChar(100)
@@ -109,6 +121,7 @@ model User {
   tasks                 Task[]
   todayFocuses          TodayFocus[]
   routines              Routine[]
+  goals                 Goal[]
   calendarConnections   CalendarConnection[]
   calendarEvents        CalendarEvent[]
   moodEnergyChecks      MoodEnergyCheck[]
@@ -263,6 +276,28 @@ model Routine {
   user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("routines")
+}
+
+model Goal {
+  id           String      @id @default(uuid()) @db.Uuid
+  userId       String      @map("user_id") @db.Uuid
+  title        String      @db.VarChar(255)
+  note         String?     @db.Text
+  horizon      GoalHorizon
+  status       GoalStatus  @default(ACTIVE)
+  targetValue  Decimal     @map("target_value") @db.Decimal(12, 2)
+  currentValue Decimal     @default(0) @map("current_value") @db.Decimal(12, 2)
+  unit         String      @default("개") @db.VarChar(32)
+  startDate    DateTime    @map("start_date") @db.Date
+  targetDate   DateTime?   @map("target_date") @db.Date
+  completedAt  DateTime?   @map("completed_at") @db.Timestamptz(6)
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status, horizon], map: "idx_goals_user_id_status_horizon")
+  @@index([userId, targetDate], map: "idx_goals_user_id_target_date")
+  @@map("goals")
 }
 
 model CalendarConnection {

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'node:crypto';
 
@@ -8,7 +8,7 @@ export class SecretsService {
   private readonly algorithm = 'aes-256-gcm';
   private readonly key: Buffer;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(@Inject(ConfigService) private readonly configService: ConfigService) {
     const rawKey =
       this.configService.get<string>('ENCRYPTION_KEY') ??
       'dev-fallback-secret-key-32bytes!';

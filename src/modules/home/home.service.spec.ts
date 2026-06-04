@@ -62,6 +62,7 @@ function createMockPrisma(userOverride?: unknown) {
   return {
     user: {
       findUnique: jest.fn().mockResolvedValue(userOverride ?? DEMO_USER),
+      update: jest.fn().mockResolvedValue(userOverride ?? DEMO_USER),
     },
     todayFocus: {
       findUnique: jest.fn().mockResolvedValue(DEMO_FOCUS),
@@ -108,8 +109,93 @@ describe('HomeService', () => {
       expect(result.personalized_prompt!.body).toContain('한 가지 흐름');
       expect(result.trajectory_gap_card).toBeNull();
       expect(result.recovery_card).not.toBeNull();
+      expect(result.engagement_nudge).toBeNull();
       expect(result.home_mode).not.toBeNull();
       expect(result.home_mode!.mode_key).toBe('guided_focus');
+    });
+
+    it('should return a soft ESTJ nudge after a long inactive gap', async () => {
+      const staleEstjUser = {
+        ...DEMO_USER,
+        mbtiProfile: { typeCode: 'ESTJ', profileVersion: '2026-03-v1' },
+        lastActiveAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        calendarConnections: [],
+      };
+      const prisma = createMockPrisma(staleEstjUser);
+      prisma.todayFocus.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.task.findMany = jest.fn().mockResolvedValue([]);
+      const service = new HomeService(
+        prisma,
+        createMockProfileLoader({
+          copy: {
+            'ko-KR': {
+              type_title: 'ESTJ',
+              home: {
+                opening_prompt: '오늘은 우선순위부터 잡으세요.',
+                empty_state_prompt: '오늘의 핵심 우선순위 한 가지를 적어보세요.',
+              },
+              reminders: {
+                samples: ['지금 가장 중요한 우선순위로 다시 돌아갈까요?'],
+              },
+            },
+          },
+          reminder_tone: {
+            tone_key: 'direct_command',
+            intensity_floor: 'medium',
+            intensity_ceiling: 'high',
+            cadence_bias: 'steady',
+          },
+        }),
+      );
+
+      const result = await service.getHome('user-1', '2026-04-09');
+
+      expect(result.engagement_nudge).toMatchObject({
+        state: 'RETURNING_AFTER_BREAK',
+        type_code: 'ESTJ',
+        intensity: 'low',
+        title: '재촉보다 재정렬이 먼저입니다',
+        action_label: '부담 큰 일 하나만 적기',
+      });
+    });
+
+    it('should return a concise INTJ nudge for an empty setup', async () => {
+      const intjUser = {
+        ...DEMO_USER,
+        mbtiProfile: { typeCode: 'INTJ', profileVersion: '2026-03-v1' },
+        lastActiveAt: new Date(),
+        calendarConnections: [],
+      };
+      const prisma = createMockPrisma(intjUser);
+      prisma.todayFocus.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.task.findMany = jest.fn().mockResolvedValue([]);
+      const service = new HomeService(
+        prisma,
+        createMockProfileLoader({
+          copy: {
+            'ko-KR': {
+              type_title: 'INTJ',
+              home: {
+                opening_prompt: '오늘의 전략을 정리하세요.',
+                empty_state_prompt: '전략의 기준부터 잡으세요.',
+              },
+            },
+          },
+          reminder_tone: {
+            tone_key: 'precise_direct',
+            intensity_floor: 'low',
+          },
+        }),
+      );
+
+      const result = await service.getHome('user-1', '2026-04-09');
+
+      expect(result.engagement_nudge).toMatchObject({
+        state: 'EMPTY_SETUP',
+        type_code: 'INTJ',
+        title: '빈 상태입니다',
+        action_label: '다음 행동 입력',
+      });
     });
 
     it('should return null personalization when no MBTI profile', async () => {
@@ -123,6 +209,7 @@ describe('HomeService', () => {
 
       expect(result.personalized_prompt).toBeNull();
       expect(result.recovery_card).toBeNull();
+      expect(result.engagement_nudge).toBeNull();
       expect(result.home_mode).toBeNull();
     });
 
