@@ -45,6 +45,20 @@ type RsaJsonWebKey = {
   e?: string;
 };
 
+type KakaoUserResponse = {
+  id?: unknown;
+  properties?: {
+    nickname?: unknown;
+  };
+  kakao_account?: {
+    email?: unknown;
+    name?: unknown;
+    profile?: {
+      nickname?: unknown;
+    };
+  };
+};
+
 type VerifiedSocialIdentity = {
   provider: AuthProvider;
   providerUserId: string;
@@ -91,9 +105,14 @@ export class ProviderVerificationService {
 
   async verify(input: SocialLoginDto): Promise<VerifiedSocialIdentity> {
     const idToken = input.provider_payload.id_token?.trim();
+    const accessToken = input.provider_payload.access_token?.trim();
 
     if (idToken) {
       return this.verifyIdToken(input.provider, idToken, input.provider_payload.nonce);
+    }
+
+    if (accessToken && input.provider === AuthProvider.KAKAO) {
+      return this.verifyKakaoAccessToken(accessToken);
     }
 
     if (input.provider_payload.authorization_code?.trim()) {
@@ -133,6 +152,40 @@ export class ProviderVerificationService {
       code: 'INVALID_PROVIDER_PAYLOAD',
       message: 'provider_payload.id_token is required.',
     });
+  }
+
+  private async verifyKakaoAccessToken(
+    accessToken: string,
+  ): Promise<VerifiedSocialIdentity> {
+    const response = await fetch('https://kapi.kakao.com/v2/user/me', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      throw new UnauthorizedException('Invalid KAKAO access token.');
+    }
+
+    if (!response.ok) {
+      throw new ServiceUnavailableException(
+        'Failed to verify KAKAO access token.',
+      );
+    }
+
+    const body = (await response.json()) as KakaoUserResponse;
+    const providerUserId = this.readKakaoUserId(body.id);
+
+    return {
+      provider: AuthProvider.KAKAO,
+      providerUserId,
+      providerEmail: this.normalizeEmail(body.kakao_account?.email),
+      providerDisplayName: this.readKakaoDisplayName(body),
+      rawProfileJson: {
+        mode: 'kakao-access-token',
+        profile: body,
+      },
+    };
   }
 
   private async verifyIdToken(
@@ -415,6 +468,28 @@ export class ProviderVerificationService {
 
   private readOptionalStringClaim(value: unknown): string | undefined {
     return typeof value === 'string' && value.length > 0 ? value : undefined;
+  }
+
+  private readKakaoUserId(value: unknown): string {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value);
+    }
+
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+
+    throw new UnauthorizedException('Invalid KAKAO user id.');
+  }
+
+  private readKakaoDisplayName(
+    payload: KakaoUserResponse,
+  ): string | undefined {
+    return (
+      this.readOptionalStringClaim(payload.kakao_account?.profile?.nickname) ??
+      this.readOptionalStringClaim(payload.properties?.nickname) ??
+      this.readOptionalStringClaim(payload.kakao_account?.name)
+    );
   }
 
   private readDisplayName(payload: JwtPayload): string | undefined {

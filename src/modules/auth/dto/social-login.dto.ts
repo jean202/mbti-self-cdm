@@ -19,6 +19,11 @@ class ProviderPayloadDto {
   @IsString()
   id_token?: string;
 
+  @ApiPropertyOptional({ description: 'OAuth access token from the provider', example: 'zabc123...' })
+  @IsOptional()
+  @IsString()
+  access_token?: string;
+
   @ApiPropertyOptional({ description: 'Nonce used for OIDC verification', example: 'abc123xyz' })
   @IsOptional()
   @IsString()
