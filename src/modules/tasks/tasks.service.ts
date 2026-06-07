@@ -1,7 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TaskStatus, type Prisma, type Task, type User } from '@prisma/client';
 
-import { formatLocalDate, parseLocalDate } from '../../common/utils/local-date.util';
+import {
+  formatLocalDate,
+  parseLocalDate,
+} from '../../common/utils/local-date.util';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { ListTasksQueryDto } from './dto/list-tasks-query.dto';
@@ -81,6 +88,24 @@ export class TasksService {
 
     if (query.local_date) {
       where.localDueDate = parseLocalDate(query.local_date);
+    } else if (query.local_date_from || query.local_date_to) {
+      const from = query.local_date_from
+        ? parseLocalDate(query.local_date_from)
+        : undefined;
+      const to = query.local_date_to
+        ? parseLocalDate(query.local_date_to)
+        : undefined;
+
+      if (from && to && from > to) {
+        throw new BadRequestException(
+          'local_date_from must be before or equal to local_date_to.',
+        );
+      }
+
+      where.localDueDate = {
+        ...(from && { gte: from }),
+        ...(to && { lte: to }),
+      };
     }
 
     if (query.cursor) {
@@ -92,11 +117,7 @@ export class TasksService {
 
     const tasks = await this.prismaService.task.findMany({
       where,
-      orderBy: [
-        { sortOrder: 'asc' },
-        { dueAt: 'asc' },
-        { updatedAt: 'desc' },
-      ],
+      orderBy: [{ sortOrder: 'asc' }, { dueAt: 'asc' }, { updatedAt: 'desc' }],
       take,
     });
 
@@ -166,9 +187,15 @@ export class TasksService {
               : null,
         reminderAt: this.resolveDateField(input.reminder_at),
         energyEstimate:
-          input.energy_estimate === undefined ? undefined : input.energy_estimate,
-        sortOrder: input.sort_order === undefined ? undefined : input.sort_order,
-        completedAt: this.resolveCompletedAt(existingTask.completedAt, nextStatus),
+          input.energy_estimate === undefined
+            ? undefined
+            : input.energy_estimate,
+        sortOrder:
+          input.sort_order === undefined ? undefined : input.sort_order,
+        completedAt: this.resolveCompletedAt(
+          existingTask.completedAt,
+          nextStatus,
+        ),
       },
     });
 
@@ -195,7 +222,11 @@ export class TasksService {
     return this.toTaskResponse(updated);
   }
 
-  async rescheduleTask(userId: string, taskId: string, input: RescheduleTaskDto) {
+  async rescheduleTask(
+    userId: string,
+    taskId: string,
+    input: RescheduleTaskDto,
+  ) {
     const [user, task] = await Promise.all([
       this.findUserOrThrow(userId),
       this.prismaService.task.findFirst({
@@ -207,21 +238,23 @@ export class TasksService {
       throw new NotFoundException('Task was not found.');
     }
 
-    const dueAt = input.due_at === undefined
-      ? undefined
-      : input.due_at
-        ? new Date(input.due_at)
-        : null;
-
-    const localDueDate = input.local_due_date === undefined
-      ? dueAt === undefined
+    const dueAt =
+      input.due_at === undefined
         ? undefined
-        : dueAt
-          ? this.toLocalDateValue(dueAt, user.timezone)
-          : null
-      : input.local_due_date
-        ? parseLocalDate(input.local_due_date)
-        : null;
+        : input.due_at
+          ? new Date(input.due_at)
+          : null;
+
+    const localDueDate =
+      input.local_due_date === undefined
+        ? dueAt === undefined
+          ? undefined
+          : dueAt
+            ? this.toLocalDateValue(dueAt, user.timezone)
+            : null
+        : input.local_due_date
+          ? parseLocalDate(input.local_due_date)
+          : null;
 
     const updated = await this.prismaService.task.update({
       where: { id: taskId },
@@ -273,7 +306,9 @@ export class TasksService {
     }
   }
 
-  private resolveDateField(value: string | null | undefined): Date | null | undefined {
+  private resolveDateField(
+    value: string | null | undefined,
+  ): Date | null | undefined {
     if (value === undefined) {
       return undefined;
     }

@@ -12,31 +12,65 @@ import {
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ListTasksQueryDto {
-  @ApiPropertyOptional({ description: 'Filter by task status', enum: TaskStatus, example: 'TODO' })
+  @ApiPropertyOptional({
+    description: 'Filter by task status',
+    enum: TaskStatus,
+    example: 'TODO',
+  })
   @IsOptional()
   @IsEnum(TaskStatus)
   status?: TaskStatus;
 
-  @ApiPropertyOptional({ description: 'Local date filter (YYYY-MM-DD)', example: '2026-04-09' })
+  @ApiPropertyOptional({
+    description: 'Local date filter (YYYY-MM-DD)',
+    example: '2026-04-09',
+  })
   @IsOptional()
   @Matches(/^\d{4}-\d{2}-\d{2}$/)
   local_date?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by today focus ID', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
+  @ApiPropertyOptional({
+    description: 'Start of local date range filter (YYYY-MM-DD)',
+    example: '2026-04-01',
+  })
+  @IsOptional()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  local_date_from?: string;
+
+  @ApiPropertyOptional({
+    description: 'End of local date range filter, inclusive (YYYY-MM-DD)',
+    example: '2026-04-30',
+  })
+  @IsOptional()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  local_date_to?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter by today focus ID',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
   @IsOptional()
   @IsUUID()
   today_focus_id?: string;
 
-  @ApiPropertyOptional({ description: 'Cursor for pagination (last item ID)', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
+  @ApiPropertyOptional({
+    description: 'Cursor for pagination (last item ID)',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
   @IsOptional()
   @IsUUID()
   cursor?: string;
 
-  @ApiPropertyOptional({ description: 'Number of items per page', example: 20, minimum: 1, maximum: 100 })
+  @ApiPropertyOptional({
+    description: 'Number of items per page',
+    example: 20,
+    minimum: 1,
+    maximum: 500,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(500)
   limit?: number;
 }

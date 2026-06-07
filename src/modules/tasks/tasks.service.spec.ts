@@ -102,9 +102,9 @@ describe('TasksService', () => {
       });
       const service = new TasksService(prisma);
 
-      await expect(
-        service.getTask('user-1', 'nonexistent'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getTask('user-1', 'nonexistent')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -207,7 +207,9 @@ describe('TasksService', () => {
       const prisma = createMockPrisma();
       const service = new TasksService(prisma);
 
-      const result = await service.listTasks('user-1', { status: TaskStatus.DONE });
+      const result = await service.listTasks('user-1', {
+        status: TaskStatus.DONE,
+      });
 
       expect(prisma.task.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -217,6 +219,27 @@ describe('TasksService', () => {
         }),
       );
       expect(result.items).toHaveLength(1);
+    });
+
+    it('should filter by local date range', async () => {
+      const prisma = createMockPrisma();
+      const service = new TasksService(prisma);
+
+      await service.listTasks('user-1', {
+        local_date_from: '2026-04-01',
+        local_date_to: '2026-04-30',
+      });
+
+      expect(prisma.task.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            localDueDate: {
+              gte: new Date('2026-04-01T00:00:00.000Z'),
+              lte: new Date('2026-04-30T00:00:00.000Z'),
+            },
+          }),
+        }),
+      );
     });
   });
 });
