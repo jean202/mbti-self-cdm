@@ -181,6 +181,7 @@ export class HomeService {
               recoveryCard: null,
               homeMode: null,
               engagementNudge: null,
+              inactivityReminder: null,
             }),
       ]);
     const engagementNudge = this.selectEngagementNudge({
@@ -232,6 +233,7 @@ export class HomeService {
       personalized_prompt: profilePresentation.personalizedPrompt,
       recovery_card: profilePresentation.recoveryCard,
       engagement_nudge: engagementNudge,
+      inactivity_reminder: profilePresentation.inactivityReminder,
       home_mode: profilePresentation.homeMode,
     };
   }
@@ -317,6 +319,16 @@ export class HomeService {
       reminder_samples: string[];
       recovery_prompt: string | null;
     } | null;
+    inactivityReminder: {
+      type_code: string;
+      delay_days: number;
+      tone_key: string | null;
+      intensity: string;
+      cadence_bias: string;
+      title: string;
+      body: string;
+      action_label: string;
+    } | null;
   }> {
     const profile = (await this.typeProfileLoaderService.getProfile(
       typeCode,
@@ -367,6 +379,61 @@ export class HomeService {
               recovery_prompt: copy?.home?.overload_prompt ?? recoveryBody ?? null,
             }
           : null,
+      inactivityReminder: this.buildInactivityReminder({
+        typeCode,
+        reminderTone,
+      }),
+    };
+  }
+
+  private buildInactivityReminder(input: {
+    typeCode: string;
+    reminderTone: TypeProfileDocument['reminder_tone'];
+  }) {
+    const { typeCode, reminderTone } = input;
+    const isJudging = typeCode[3] === 'J';
+    const isPerceiving = typeCode[3] === 'P';
+    const isSensing = typeCode[1] === 'S';
+    const isIntuitive = typeCode[1] === 'N';
+
+    let title = '오늘의 시작점을 다시 잡아볼까요?';
+    let body =
+      '며칠 비워도 괜찮아요. 지금 떠오르는 일 하나만 남기면 다시 이어갈 수 있어요.';
+    let actionLabel = '하나만 남기기';
+
+    if (isSensing && isJudging) {
+      title = '바빴다면 오늘 기준만 다시 정리해요';
+      body =
+        '할 일이 있어서 비어 있었을 수 있어요. 전체 계획 말고 오늘 확인할 일 하나만 다시 체크해보세요.';
+      actionLabel = '오늘 할 일 확인';
+    } else if (isIntuitive && isJudging) {
+      title = '계획이 멈춘 지점만 다시 봐요';
+      body =
+        '바쁜 흐름 때문에 잠깐 끊겼을 수 있어요. 간섭처럼 밀어붙이기보다, 다시 잡을 방향 하나만 확인해볼까요?';
+      actionLabel = '방향 하나 정하기';
+    } else if (isSensing && isPerceiving) {
+      title = '까먹은 일 하나만 다시 챙겨요';
+      body =
+        '흐름이 끊기는 건 자연스러워요. 지금 바로 처리할 수 있는 현실적인 일 하나만 다시 꺼내볼까요?';
+      actionLabel = '잊은 일 확인';
+    } else if (isIntuitive && isPerceiving) {
+      title = '생각이 흩어졌다면 한 줄만 붙잡기';
+      body =
+        '관리받는 느낌보다는 가볍게 다시 여는 쪽이 낫습니다. 지금 머리에 남아 있는 생각 하나만 기록해보세요.';
+      actionLabel = '생각 하나 남기기';
+    }
+
+    return {
+      type_code: typeCode,
+      delay_days: 3,
+      tone_key: reminderTone?.tone_key ?? null,
+      intensity: this.deEscalateIntensity(reminderTone?.intensity_floor ?? null),
+      cadence_bias:
+        reminderTone?.cadence_bias ??
+        (isJudging ? 'steady' : 'adaptive'),
+      title,
+      body,
+      action_label: actionLabel,
     };
   }
 

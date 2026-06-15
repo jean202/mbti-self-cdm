@@ -110,6 +110,12 @@ describe('HomeService', () => {
       expect(result.trajectory_gap_card).toBeNull();
       expect(result.recovery_card).not.toBeNull();
       expect(result.engagement_nudge).toBeNull();
+      expect(result.inactivity_reminder).toMatchObject({
+        type_code: 'INFJ',
+        delay_days: 3,
+        title: '계획이 멈춘 지점만 다시 봐요',
+        action_label: '방향 하나 정하기',
+      });
       expect(result.home_mode).not.toBeNull();
       expect(result.home_mode!.mode_key).toBe('guided_focus');
     });
@@ -157,6 +163,41 @@ describe('HomeService', () => {
         title: '재촉보다 재정렬이 먼저입니다',
         action_label: '부담 큰 일 하나만 적기',
       });
+      expect(result.inactivity_reminder).toMatchObject({
+        type_code: 'ESTJ',
+        tone_key: 'direct_command',
+        cadence_bias: 'steady',
+        title: '바빴다면 오늘 기준만 다시 정리해요',
+        action_label: '오늘 할 일 확인',
+      });
+    });
+
+    it('should return a softer reminder copy for intuitive perceiving types', async () => {
+      const enfpUser = {
+        ...DEMO_USER,
+        mbtiProfile: { typeCode: 'ENFP', profileVersion: '2026-03-v1' },
+      };
+      const service = new HomeService(
+        createMockPrisma(enfpUser),
+        createMockProfileLoader({
+          reminder_tone: {
+            tone_key: 'energizing_invite',
+            intensity_floor: 'low',
+            cadence_bias: 'adaptive',
+          },
+        }),
+      );
+
+      const result = await service.getHome('user-1', '2026-04-09');
+
+      expect(result.inactivity_reminder).toMatchObject({
+        type_code: 'ENFP',
+        intensity: 'low',
+        cadence_bias: 'adaptive',
+        title: '생각이 흩어졌다면 한 줄만 붙잡기',
+        action_label: '생각 하나 남기기',
+      });
+      expect(result.inactivity_reminder!.body).toContain('관리받는 느낌');
     });
 
     it('should return a concise INTJ nudge for an empty setup', async () => {
@@ -210,6 +251,7 @@ describe('HomeService', () => {
       expect(result.personalized_prompt).toBeNull();
       expect(result.recovery_card).toBeNull();
       expect(result.engagement_nudge).toBeNull();
+      expect(result.inactivity_reminder).toBeNull();
       expect(result.home_mode).toBeNull();
     });
 
