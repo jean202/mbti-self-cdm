@@ -10,7 +10,7 @@
   },
   "differentiation": {
     "core_driver": "새로운 가능성과 개인적 의미가 연결될 때 추진력이 크게 살아나는 경향",
-    "decision_support": "확장 가능한 아이디어와 진짜 하고 싶은 이유가 보일 때 실행이 붙음",
+    "decision_support": "확장 가능한 아이디어와 진짜 하고 싶은 이유가 보일 때 실행력이 살아남",
     "close_type_contrasts": [
       {
         "type_code": "INFP",
@@ -175,11 +175,11 @@
       },
       "capture": {
         "placeholder": "떠오른 생각이나 해야 할 일을 적어보세요. 왜 지금 중요한지도 함께 적어보면 좋습니다.",
-        "task_hint": "다음 아주 작은 행동만 붙여도 실행이 쉬워집니다.",
+        "task_hint": "다음 아주 작은 행동 하나만 정해도 실행이 쉬워집니다.",
         "idea_hint": "아직 확장 단계라면 Idea로 두고 연결을 더 살펴보세요."
       },
       "plan": {
-        "today_prompt": "오늘은 설레는 한 가지와 반드시 붙잡을 한 가지면 충분합니다.",
+        "today_prompt": "오늘은 설레는 한 가지와 꼭 지킬 한 가지면 충분합니다.",
         "week_prompt": "주간 계획은 동시에 굴리는 가짓수를 줄이는 편이 좋습니다.",
         "backlog_prompt": "보류한 일은 테마와 에너지 기준으로 묶어두세요."
       },
@@ -197,7 +197,7 @@
       },
       "recovery": {
         "card_title": "다시 불을 붙이는 12분",
-        "card_body": "열린 루프를 빠르게 모으고, 살아 있는 한 가지로 다시 붙어보세요.",
+        "card_body": "벌여둔 일을 빠르게 정리하고, 지금 가장 끌리는 한 가지로 다시 시작해보세요.",
         "step_labels": {
           "capture_all_open_loops": "머릿속 열린 루프를 짧게 모두 적기",
           "pick_alive_priority": "지금 가장 살아 있는 우선순위 하나 고르기",
