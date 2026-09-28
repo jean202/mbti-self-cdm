@@ -57,6 +57,7 @@ erDiagram
     USERS ||--o{ MOOD_ENERGY_CHECKS : logs
     USERS ||--o{ REFLECTIONS : writes
     USERS ||--o{ MINDFULNESS_PROMPTS : receives
+    USERS ||--o{ VIDEO_SUGGESTION_FEEDBACKS : responds
     IDEAS o|--o| TASKS : converts_to
     TODAY_FOCUSES o|--o{ TASKS : groups
     REFLECTIONS o|--o| TODAY_FOCUSES : reviews
@@ -77,6 +78,8 @@ erDiagram
 - `calendar_connection_status`: `ACTIVE`, `SYNCING`, `ERROR`, `REVOKED`
 - `calendar_event_status`: `CONFIRMED`, `TENTATIVE`, `CANCELLED`
 - `check_context`: `MORNING`, `EVENING`, `ADHOC`
+- `video_suggestion_state`: `LOW_MOOD`, `UNRESPONSIVE`, `OVERAROUSED`
+- `video_suggestion_action`: `OPENED`, `DISMISSED`
 
 ## 5. 테이블 초안
 
@@ -356,6 +359,22 @@ erDiagram
 
 - `unique(user_id, local_date)`
 
+### 5.15 `video_suggestion_feedbacks`
+
+| 컬럼 | 타입 | NULL | 제약 / 설명 |
+| --- | --- | --- | --- |
+| `id` | `uuid` | N | PK |
+| `user_id` | `uuid` | N | FK -> `users.id` |
+| `type_code` | `char(4)` | Y | 기록 시점의 MBTI 유형 |
+| `state` | `enum` | N | `video_suggestion_state` |
+| `action` | `enum` | N | `video_suggestion_action` |
+| `video_id` | `varchar(32)` | Y | 연 YouTube 영상 id |
+| `created_at` | `timestamp with time zone` | N | 생성 시각 |
+
+제약 / 인덱스:
+
+- `index(user_id, state, created_at)`: 같은 상태의 재노출 제한 조회용
+
 ## 6. Redis 키 설계 초안
 
 관계형 DB 밖에서 필요한 최소 Redis 구조:
@@ -370,6 +389,8 @@ erDiagram
   - OAuth 콜백 검증용 단기 상태
 - `calendar_sync_lock:{connection_id}`
   - 중복 sync 방지 lock
+- `video-suggestions:v1:{locale}:{search_query}`
+  - YouTube 검색 결과 캐시 (24시간)
 
 ## 7. 남은 설계 메모
 

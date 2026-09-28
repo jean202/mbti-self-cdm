@@ -287,7 +287,17 @@ data/type-profiles/
     "plan": {},
     "reminders": {},
     "review_prompt_labels": {},
-    "recovery": {}
+    "recovery": {},
+    "nudges": {
+      "inactivity_reminder": { "title": "", "body": "", "action_label": "" },
+      "returning_after_break": { "title": "", "body": "", "action_label": "" },
+      "empty_setup": { "title": "", "body": "", "action_label": "" }
+    },
+    "video_suggestions": {
+      "low_mood": { "title": "", "body": "", "search_query": "", "videos": [] },
+      "unresponsive": { "title": "", "body": "", "search_query": "", "videos": [] },
+      "overaroused": { "title": "", "body": "", "search_query": "", "videos": [] }
+    }
   }
 }
 ```
@@ -298,6 +308,13 @@ data/type-profiles/
 - MVP는 `ko-KR`만 있어도 되지만, 구조는 다국어 확장 가능하게 잡는다
 - `trajectory_gap_*` 카피는 각 유형의 `forbidden_patterns`와 충돌하지 않아야 한다
 - 숫자 노출을 약하게 해야 하는 유형도 있으므로, 같은 계산 결과를 요약 문장 중심으로 표현할 수 있게 설계한다
+- `nudges`는 Home의 `inactivity_reminder`(3일 이상 미접속 알림), `engagement_nudge`의 `RETURNING_AFTER_BREAK` / `EMPTY_SETUP` 문구다
+  - 16개 유형이 각자 고유한 문구를 가져야 한다. 코드에서 E/I, S/N, T/F, J/P 축으로 묶어 문구를 분기하지 않는다
+  - 값이 비어 있으면 서버는 유형 구분 없는 중립 기본 문구를 쓴다
+- `video_suggestions`는 Home의 `video_suggestion` 카드 문구와 YouTube 검색어다
+  - 16개 유형 × 3개 상태(`low_mood`, `unresponsive`, `overaroused`) 모두 고유한 문구를 가진다
+  - `search_query`에는 MBTI 유형명을 넣지 않는다. 유형 특징(단점 나열 등)을 다루는 영상이 섞이지 않도록 각 유형의 `recovery_protocol` 방향에 맞는 회복 콘텐츠로 검색한다
+  - `videos`에 `{ "video_id", "title", "channel_title" }`를 직접 넣으면 검색보다 우선한다. 넣기 전에 영상이 공개 상태이고 내용이 적절한지 사람이 확인한다
 
 ## 6. 런타임 사용 방식
 
@@ -335,6 +352,11 @@ Home의 현재 궤적 비교 카드 추가 규칙:
   - `copy.<locale>.plan`
 - `POST /v1/capture/analyze`
   - `task_capture_style`
+- `GET /v1/home`의 `inactivity_reminder`, `engagement_nudge`
+  - `reminder_tone`
+  - `copy.<locale>.nudges`
+- `GET /v1/home`의 `video_suggestion`
+  - `copy.<locale>.video_suggestions`
 - notification 생성
   - `reminder_tone`
   - `copy.<locale>.reminders.samples`

@@ -7,6 +7,9 @@ const {
   ProviderVerificationService,
 } = require('../dist/modules/auth/provider-verification.service');
 const { HomeService } = require('../dist/modules/home/home.service');
+const {
+  VideoSuggestionsService,
+} = require('../dist/modules/video-suggestions/video-suggestions.service');
 const { PrismaService } = require('../dist/infra/prisma/prisma.service');
 const { RedisService } = require('../dist/infra/redis/redis.service');
 const { SessionService } = require('../dist/modules/session/session.service');
@@ -34,7 +37,11 @@ async function main() {
   );
   const appService = new AppService(prismaService);
   const typeProfileLoaderService = new TypeProfileLoaderService(configService);
-  const homeService = new HomeService(prismaService, typeProfileLoaderService);
+  const homeService = new HomeService(
+    prismaService,
+    typeProfileLoaderService,
+    new VideoSuggestionsService(prismaService, redisService, configService),
+  );
 
   try {
     const login = await authService.socialLogin({

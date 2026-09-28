@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
 import { NotFoundException } from '@nestjs/common';
 
 import { HomeService } from './home.service';
@@ -48,6 +51,13 @@ const DEMO_PROFILE = {
         card_title: '흐름을 다시 모으는 10분',
         card_body: '입력을 줄이고, 가장 중요한 한 가지를 다시 잡아보세요.',
       },
+      nudges: {
+        inactivity_reminder: {
+          title: '흐트러진 축을 다시 모아요',
+          body: '지금 가장 마음에 걸리는 한 가지로 초점을 다시 모아보세요.',
+          action_label: '초점 한 줄 정리',
+        },
+      },
     },
   },
   home_mode: {
@@ -88,10 +98,24 @@ function createMockProfileLoader(profile: unknown = DEMO_PROFILE) {
   } as any;
 }
 
+function createMockVideoSuggestions(suggestion: unknown = null) {
+  return {
+    buildSuggestion: jest.fn().mockResolvedValue(suggestion),
+  } as any;
+}
+
+function createHomeService(
+  prisma: any,
+  profileLoader: any,
+  videoSuggestions: any = createMockVideoSuggestions(),
+) {
+  return new HomeService(prisma, profileLoader, videoSuggestions);
+}
+
 describe('HomeService', () => {
   describe('getHome', () => {
     it('should return personalized home payload', async () => {
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(),
         createMockProfileLoader(),
       );
@@ -113,8 +137,8 @@ describe('HomeService', () => {
       expect(result.inactivity_reminder).toMatchObject({
         type_code: 'INFJ',
         delay_days: 3,
-        title: '계획이 멈춘 지점만 다시 봐요',
-        action_label: '방향 하나 정하기',
+        title: '흐트러진 축을 다시 모아요',
+        action_label: '초점 한 줄 정리',
       });
       expect(result.home_mode).not.toBeNull();
       expect(result.home_mode!.mode_key).toBe('guided_focus');
@@ -130,7 +154,7 @@ describe('HomeService', () => {
       const prisma = createMockPrisma(staleEstjUser);
       prisma.todayFocus.findUnique = jest.fn().mockResolvedValue(null);
       prisma.task.findMany = jest.fn().mockResolvedValue([]);
-      const service = new HomeService(
+      const service = createHomeService(
         prisma,
         createMockProfileLoader({
           copy: {
@@ -142,6 +166,18 @@ describe('HomeService', () => {
               },
               reminders: {
                 samples: ['지금 가장 중요한 우선순위로 다시 돌아갈까요?'],
+              },
+              nudges: {
+                inactivity_reminder: {
+                  title: '오늘 기준만 다시 정리하세요',
+                  body: '오늘 닫을 우선순위 하나만 확인하세요.',
+                  action_label: '우선순위 확인',
+                },
+                returning_after_break: {
+                  title: '재촉보다 재정렬이 먼저입니다',
+                  body: '지금 부담이 가장 큰 하나만 확인하세요.',
+                  action_label: '부담 큰 일 하나만 적기',
+                },
               },
             },
           },
@@ -167,17 +203,17 @@ describe('HomeService', () => {
         type_code: 'ESTJ',
         tone_key: 'direct_command',
         cadence_bias: 'steady',
-        title: '바빴다면 오늘 기준만 다시 정리해요',
-        action_label: '오늘 할 일 확인',
+        title: '오늘 기준만 다시 정리하세요',
+        action_label: '우선순위 확인',
       });
     });
 
-    it('should return a softer reminder copy for intuitive perceiving types', async () => {
+    it('should fall back to neutral reminder copy when the profile has no nudge copy', async () => {
       const enfpUser = {
         ...DEMO_USER,
         mbtiProfile: { typeCode: 'ENFP', profileVersion: '2026-03-v1' },
       };
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(enfpUser),
         createMockProfileLoader({
           reminder_tone: {
@@ -194,10 +230,9 @@ describe('HomeService', () => {
         type_code: 'ENFP',
         intensity: 'low',
         cadence_bias: 'adaptive',
-        title: '생각이 흩어졌다면 한 줄만 붙잡기',
-        action_label: '생각 하나 남기기',
+        title: '오늘의 시작점을 다시 잡아볼까요?',
+        action_label: '하나만 남기기',
       });
-      expect(result.inactivity_reminder!.body).toContain('관리받는 느낌');
     });
 
     it('should return a concise INTJ nudge for an empty setup', async () => {
@@ -210,7 +245,7 @@ describe('HomeService', () => {
       const prisma = createMockPrisma(intjUser);
       prisma.todayFocus.findUnique = jest.fn().mockResolvedValue(null);
       prisma.task.findMany = jest.fn().mockResolvedValue([]);
-      const service = new HomeService(
+      const service = createHomeService(
         prisma,
         createMockProfileLoader({
           copy: {
@@ -219,6 +254,13 @@ describe('HomeService', () => {
               home: {
                 opening_prompt: '오늘의 전략을 정리하세요.',
                 empty_state_prompt: '전략의 기준부터 잡으세요.',
+              },
+              nudges: {
+                empty_setup: {
+                  title: '빈 상태입니다',
+                  body: '목표 하나, 제약 하나, 다음 행동 하나만 입력하세요.',
+                  action_label: '다음 행동 입력',
+                },
               },
             },
           },
@@ -239,9 +281,141 @@ describe('HomeService', () => {
       });
     });
 
+    it('should give every one of the 16 types its own nudge copy from the profile pack', async () => {
+      const packDir = join(
+        __dirname,
+        '../../../data/type-profiles/2026-03-v1',
+      );
+      const manifest = JSON.parse(
+        readFileSync(join(packDir, 'manifest.json'), 'utf8'),
+      ) as { available_types: string[] };
+      const seen = {
+        inactivity: new Set<string>(),
+        returning: new Set<string>(),
+        empty: new Set<string>(),
+      };
+
+      expect(manifest.available_types).toHaveLength(16);
+
+      for (const typeCode of manifest.available_types) {
+        const profile = JSON.parse(
+          readFileSync(join(packDir, `${typeCode}.json`), 'utf8'),
+        );
+        const nudges = profile.copy['ko-KR'].nudges;
+        const results: Record<string, any> = {};
+
+        for (const [label, lastActiveAt] of [
+          ['returning', new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)],
+          ['empty', new Date()],
+        ] as const) {
+          const prisma = createMockPrisma({
+            ...DEMO_USER,
+            mbtiProfile: { typeCode, profileVersion: '2026-03-v1' },
+            lastActiveAt,
+            calendarConnections: [],
+          });
+          prisma.todayFocus.findUnique = jest.fn().mockResolvedValue(null);
+          prisma.task.findMany = jest.fn().mockResolvedValue([]);
+          const service = createHomeService(
+            prisma,
+            createMockProfileLoader(profile),
+          );
+
+          results[label] = await service.getHome('user-1', '2026-04-09');
+        }
+
+        expect(results.returning.inactivity_reminder).toMatchObject({
+          type_code: typeCode,
+          ...nudges.inactivity_reminder,
+        });
+        expect(results.returning.engagement_nudge).toMatchObject({
+          state: 'RETURNING_AFTER_BREAK',
+          ...nudges.returning_after_break,
+        });
+        expect(results.empty.engagement_nudge).toMatchObject({
+          state: 'EMPTY_SETUP',
+          ...nudges.empty_setup,
+        });
+
+        seen.inactivity.add(results.returning.inactivity_reminder.title);
+        seen.returning.add(results.returning.engagement_nudge.title);
+        seen.empty.add(results.empty.engagement_nudge.title);
+      }
+
+      expect(seen.inactivity.size).toBe(16);
+      expect(seen.returning.size).toBe(16);
+      expect(seen.empty.size).toBe(16);
+    });
+
+    it('should pass the type video copy to the video suggestion service', async () => {
+      const suggestion = { state: 'LOW_MOOD', type_code: 'INFJ', videos: [] };
+      const videoSuggestions = createMockVideoSuggestions(suggestion);
+      const copySet = {
+        low_mood: {
+          title: '조용히 마음을 모아요',
+          body: '자극을 줄이고 조용히 머무는 시간이 도움이 됩니다.',
+          search_query: '생각 정리 명상 조용한 음악',
+          videos: [],
+        },
+      };
+      const service = createHomeService(
+        createMockPrisma({
+          ...DEMO_USER,
+          lastActiveAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+        }),
+        createMockProfileLoader({
+          ...DEMO_PROFILE,
+          copy: {
+            'ko-KR': {
+              ...DEMO_PROFILE.copy['ko-KR'],
+              video_suggestions: copySet,
+            },
+          },
+        }),
+        videoSuggestions,
+      );
+
+      const result = await service.getHome('user-1', '2026-04-09');
+
+      expect(result.video_suggestion).toBe(suggestion);
+      expect(videoSuggestions.buildSuggestion).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-1',
+          typeCode: 'INFJ',
+          locale: 'ko-KR',
+          copySet,
+          inactiveDays: 4,
+        }),
+      );
+    });
+
+    it('should keep the home payload when the video suggestion fails', async () => {
+      const videoSuggestions = {
+        buildSuggestion: jest.fn().mockRejectedValue(new Error('boom')),
+      } as any;
+      const service = createHomeService(
+        createMockPrisma(),
+        createMockProfileLoader({
+          ...DEMO_PROFILE,
+          copy: {
+            'ko-KR': {
+              ...DEMO_PROFILE.copy['ko-KR'],
+              video_suggestions: { low_mood: {} },
+            },
+          },
+        }),
+        videoSuggestions,
+      );
+
+      const result = await service.getHome('user-1', '2026-04-09');
+
+      expect(result.video_suggestion).toBeNull();
+      expect(result.today_focus).not.toBeNull();
+    });
+
     it('should return null personalization when no MBTI profile', async () => {
       const userWithoutMbti = { ...DEMO_USER, mbtiProfile: null };
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(userWithoutMbti),
         createMockProfileLoader(),
       );
@@ -250,6 +424,7 @@ describe('HomeService', () => {
 
       expect(result.personalized_prompt).toBeNull();
       expect(result.recovery_card).toBeNull();
+      expect(result.video_suggestion).toBeNull();
       expect(result.engagement_nudge).toBeNull();
       expect(result.inactivity_reminder).toBeNull();
       expect(result.home_mode).toBeNull();
@@ -257,7 +432,7 @@ describe('HomeService', () => {
 
     it('should return empty calendar when no connections', async () => {
       const userNoCalendar = { ...DEMO_USER, calendarConnections: [] };
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(userNoCalendar),
         createMockProfileLoader(),
       );
@@ -271,7 +446,7 @@ describe('HomeService', () => {
     it('should throw NotFoundException for missing user', async () => {
       const prisma = createMockPrisma();
       prisma.user.findUnique = jest.fn().mockResolvedValue(null);
-      const service = new HomeService(prisma, createMockProfileLoader());
+      const service = createHomeService(prisma, createMockProfileLoader());
 
       await expect(
         service.getHome('nonexistent', '2026-04-09'),
@@ -281,7 +456,7 @@ describe('HomeService', () => {
 
   describe('upsertTodayFocus', () => {
     it('should create/update today focus', async () => {
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(),
         createMockProfileLoader(),
       );
@@ -298,7 +473,7 @@ describe('HomeService', () => {
     it('should throw when linked task not found', async () => {
       const prisma = createMockPrisma();
       prisma.task.findFirst = jest.fn().mockResolvedValue(null);
-      const service = new HomeService(prisma, createMockProfileLoader());
+      const service = createHomeService(prisma, createMockProfileLoader());
 
       await expect(
         service.upsertTodayFocus('user-1', {

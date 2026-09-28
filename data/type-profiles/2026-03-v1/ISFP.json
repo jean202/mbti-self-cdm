@@ -10,7 +10,7 @@
   },
   "differentiation": {
     "core_driver": "자기 감각과 진짜 중요한 방향이 맞을 때 자연스럽게 움직이는 경향",
-    "decision_support": "억지보다 지금 맞는 행동과 정서적 납득이 있을 때 실행이 붙음",
+    "decision_support": "억지보다 지금 맞는 행동과 정서적 납득이 있을 때 실행으로 이어짐",
     "close_type_contrasts": [
       {
         "type_code": "INFP",
@@ -202,6 +202,43 @@
           "reduce_stimulation": "소리와 알림, 화면 자극 줄이기",
           "check_inner_yes": "지금 진짜 맞는 선택이 무엇인지 짧게 확인하기",
           "start_small_kind_action": "부담 없는 작은 행동 하나 시작하기"
+        }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "천천히 다시 와도 괜찮아요",
+          "body": "며칠 쉬었던 건 필요한 시간이었을 수 있어요. 지금 마음이 가는 작은 일 하나만 가볍게 남겨보세요.",
+          "action_label": "마음 가는 일 남기기"
+        },
+        "returning_after_break": {
+          "title": "지금의 나에게 맞는 속도로",
+          "body": "예전 속도를 되찾으려 애쓰지 않아도 돼요. 오늘 몸과 마음이 허락하는 만큼의 작은 행동 하나면 충분합니다.",
+          "action_label": "작은 행동 하나 적기"
+        },
+        "empty_setup": {
+          "title": "지금 끌리는 것 하나",
+          "body": "정해진 틀이 없어도 괜찮아요. 오늘 내 감각과 맞는 일 하나만 먼저 적어보세요.",
+          "action_label": "끌리는 일 적기"
+        }
+      },
+      "video_suggestions": {
+        "low_mood": {
+          "title": "나에게 다정한 시간",
+          "body": "마음이 가라앉은 날에는 잘하려고 애쓰지 않아도 돼요. 부드러운 영상 하나로 나를 쉬게 해주세요.",
+          "search_query": "자기 위로 명상 잔잔한 음악",
+          "videos": []
+        },
+        "unresponsive": {
+          "title": "천천히 감각 깨우기",
+          "body": "며칠 쉬었다면 좋아하는 소리와 풍경으로 마음을 먼저 깨워보세요.",
+          "search_query": "감성 자연 풍경 힐링 영상",
+          "videos": []
+        },
+        "overaroused": {
+          "title": "자극을 잠깐 줄여요",
+          "body": "마음이 들떠 있을 때는 잔잔한 소리로 몸과 마음의 속도를 맞춰보세요.",
+          "search_query": "잔잔한 빗소리 휴식",
+          "videos": []
         }
       }
     }

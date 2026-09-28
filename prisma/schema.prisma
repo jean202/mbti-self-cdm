@@ -85,6 +85,17 @@ enum CalendarEventStatus {
   CANCELLED
 }
 
+enum VideoSuggestionState {
+  LOW_MOOD
+  UNRESPONSIVE
+  OVERAROUSED
+}
+
+enum VideoSuggestionAction {
+  OPENED
+  DISMISSED
+}
+
 enum CheckContext {
   MORNING
   EVENING
@@ -104,28 +115,29 @@ enum GoalStatus {
 }
 
 model User {
-  id                    String               @id @default(uuid()) @db.Uuid
-  displayName           String?              @map("display_name") @db.VarChar(100)
-  primaryEmail          String?              @map("primary_email") @db.VarChar(255)
-  locale                String               @default("ko-KR") @db.VarChar(16)
-  timezone              String               @default("Asia/Seoul") @db.VarChar(64)
-  onboardingStatus      OnboardingStatus     @default(AUTH_ONLY) @map("onboarding_status")
-  notificationPrefsJson Json?                @map("notification_prefs_json")
-  lastActiveAt          DateTime?            @map("last_active_at") @db.Timestamptz(6)
-  createdAt             DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt             DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
-  authIdentities        AuthIdentity[]
-  mbtiProfile           MbtiProfile?
-  mbtiFinderAttempts    MbtiFinderAttempt[]
-  ideas                 Idea[]
-  tasks                 Task[]
-  todayFocuses          TodayFocus[]
-  routines              Routine[]
-  goals                 Goal[]
-  calendarConnections   CalendarConnection[]
-  calendarEvents        CalendarEvent[]
-  moodEnergyChecks      MoodEnergyCheck[]
-  reflections           Reflection[]
+  id                       String                    @id @default(uuid()) @db.Uuid
+  displayName              String?                   @map("display_name") @db.VarChar(100)
+  primaryEmail             String?                   @map("primary_email") @db.VarChar(255)
+  locale                   String                    @default("ko-KR") @db.VarChar(16)
+  timezone                 String                    @default("Asia/Seoul") @db.VarChar(64)
+  onboardingStatus         OnboardingStatus          @default(AUTH_ONLY) @map("onboarding_status")
+  notificationPrefsJson    Json?                     @map("notification_prefs_json")
+  lastActiveAt             DateTime?                 @map("last_active_at") @db.Timestamptz(6)
+  createdAt                DateTime                  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  authIdentities           AuthIdentity[]
+  mbtiProfile              MbtiProfile?
+  mbtiFinderAttempts       MbtiFinderAttempt[]
+  ideas                    Idea[]
+  tasks                    Task[]
+  todayFocuses             TodayFocus[]
+  routines                 Routine[]
+  goals                    Goal[]
+  calendarConnections      CalendarConnection[]
+  calendarEvents           CalendarEvent[]
+  moodEnergyChecks         MoodEnergyCheck[]
+  reflections              Reflection[]
+  videoSuggestionFeedbacks VideoSuggestionFeedback[]
 
   @@index([onboardingStatus], map: "idx_users_onboarding_status")
   @@map("users")
@@ -363,6 +375,20 @@ model MoodEnergyCheck {
 
   @@unique([userId, localDate, context], map: "mood_energy_checks_user_id_local_date_context_key")
   @@map("mood_energy_checks")
+}
+
+model VideoSuggestionFeedback {
+  id        String                @id @default(uuid()) @db.Uuid
+  userId    String                @map("user_id") @db.Uuid
+  typeCode  String?               @map("type_code") @db.Char(4)
+  state     VideoSuggestionState
+  action    VideoSuggestionAction
+  videoId   String?               @map("video_id") @db.VarChar(32)
+  createdAt DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, state, createdAt], map: "idx_video_suggestion_feedbacks_user_id_state_created_at")
+  @@map("video_suggestion_feedbacks")
 }
 
 model MindfulnessPrompt {

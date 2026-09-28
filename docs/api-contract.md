@@ -841,6 +841,24 @@ Base path:
       "stress_signal_key": "OVERPLANNING",
       "title": "잠깐 정리 시간",
       "body": "회복 제안"
+    },
+    "video_suggestion": {
+      "state": "LOW_MOOD",
+      "type_code": "INFP",
+      "title": "자책은 잠시 내려놓아요",
+      "body": "마음이 무거운 날에는 스스로에게 조금 더 다정해져도 괜찮아요.",
+      "videos": [
+        {
+          "video_id": "abcdEFGH123",
+          "title": "영상 제목",
+          "channel_title": "채널 이름",
+          "thumbnail_url": "https://i.ytimg.com/vi/abcdEFGH123/mqdefault.jpg",
+          "url": "https://www.youtube.com/watch?v=abcdEFGH123"
+        }
+      ],
+      "search_url": "https://www.youtube.com/results?search_query=...",
+      "source": "YOUTUBE_SEARCH",
+      "support_notice": null
     }
   }
 }
@@ -852,6 +870,54 @@ Base path:
 - ETA와 `productivity_ratio`는 최근 행동 데이터 기반 추정치이며, 유형 자체를 계수로 사용해 직접 계산하지 않는다
 - 유형 profile은 이 카드의 카피 톤, 숫자 강조 정도, CTA 문구만 제어한다
 - 특정 유형의 `forbidden_patterns`에 따라 클라이언트는 숫자보다 요약 문장을 더 크게 노출할 수 있다
+- `video_suggestion`은 nullable이며, 아래 상태 중 하나일 때만 내려준다 (위에서부터 우선)
+  - `LOW_MOOD`: 최근 3일 안의 가장 최근 기분 체크가 `mood_score <= 2`
+  - `OVERAROUSED`: 최근 3일 안의 가장 최근 기분 체크가 `energy_score = 5`이고 `mood_score >= 4`
+  - `UNRESPONSIVE`: 마지막 접속 후 3일 이상 지남
+- 문구와 검색어는 16개 유형 각각의 `copy.<locale>.video_suggestions.<state>`에서 온다
+- `source`
+  - `CURATED`: type profile에 직접 넣은 영상
+  - `YOUTUBE_SEARCH`: `YOUTUBE_API_KEY`가 설정되어 YouTube Data API로 찾은 영상 (safeSearch strict, 24시간 캐시)
+  - `SEARCH_LINK`: 영상을 찾지 못했거나 API 키가 없음. `videos`는 비어 있고 클라이언트는 `search_url`을 연다
+- 같은 상태에 대해 사용자가 닫으면 3일, 영상을 열면 1일 동안 다시 내려주지 않는다
+- `support_notice`는 `LOW_MOOD`이면서 최근 7일 안의 최근 3번 체크가 모두 `mood_score <= 2`일 때만 채운다 (상담전화 109, 1577-0199)
+
+### 7.1.1 `POST /v1/home/video-suggestion/feedback`
+
+목적:
+
+- 영상 추천을 열었거나 닫았는지 기록한다. 닫은 기록은 같은 상태의 재노출을 막는 데 쓴다
+
+인증:
+
+- 필요
+
+요청:
+
+```json
+{
+  "state": "LOW_MOOD",
+  "action": "DISMISSED",
+  "video_id": "abcdEFGH123"
+}
+```
+
+- `action`: `OPENED` | `DISMISSED`
+- `video_id`: 선택. `OPENED`일 때 연 영상 id
+
+응답:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "state": "LOW_MOOD",
+    "action": "DISMISSED",
+    "video_id": null,
+    "created_at": "2026-09-28T09:00:00.000Z"
+  }
+}
+```
 
 ### 7.2 `PUT /v1/today-focus`
 

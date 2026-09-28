@@ -9,7 +9,7 @@
     "inferior": "Fe"
   },
   "differentiation": {
-    "core_driver": "직접 부딪혀 해결 가능한 문제를 간단하게 처리할 때 집중이 붙는 경향",
+    "core_driver": "직접 부딪혀 해결 가능한 문제를 간단하게 처리할 때 가장 잘 집중하는 경향",
     "decision_support": "불필요한 설명 없이 바로 손댈 수 있는 단위가 있을 때 움직임",
     "close_type_contrasts": [
       {
@@ -202,6 +202,43 @@
           "drop_nonessential_noise": "불필요한 탭과 알림 잠시 닫기",
           "identify_real_problem": "지금 진짜 막힌 지점 한 줄로 적기",
           "start_small_fix": "바로 시작할 수 있는 작은 수정 하나 하기"
+        }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "손댈 거 하나만",
+          "body": "설명은 필요 없습니다. 지금 바로 손댈 수 있는 작업 하나만 골라두세요.",
+          "action_label": "작업 하나 고르기"
+        },
+        "returning_after_break": {
+          "title": "다시 돌려볼 한 가지",
+          "body": "밀린 걸 다 보지 않아도 됩니다. 가장 빨리 작동 여부를 확인할 수 있는 일 하나만 꺼내세요.",
+          "action_label": "바로 할 일 적기"
+        },
+        "empty_setup": {
+          "title": "지금 할 수 있는 것",
+          "body": "계획보다 실행이 먼저입니다. 지금 바로 시작할 수 있는 작업 하나만 적어보세요.",
+          "action_label": "작업 하나 적기"
+        }
+      },
+      "video_suggestions": {
+        "low_mood": {
+          "title": "잠깐 손 놓고 쉬기",
+          "body": "기운이 없을 때는 억지로 움직이지 않아도 됩니다. 가볍게 볼 수 있는 영상으로 머리를 쉬게 하세요.",
+          "search_query": "멍때리기 자연 영상",
+          "videos": []
+        },
+        "unresponsive": {
+          "title": "가볍게 몸부터 풀기",
+          "body": "다시 시작하기 전에 몸을 가볍게 움직이면 손이 더 쉽게 갑니다.",
+          "search_query": "5분 스트레칭 따라하기",
+          "videos": []
+        },
+        "overaroused": {
+          "title": "에너지 빼고 다시 시작",
+          "body": "에너지가 넘치면 가볍게 몸을 쓰고 나서 차분하게 돌아오는 편이 좋습니다.",
+          "search_query": "10분 가벼운 운동 후 스트레칭",
+          "videos": []
         }
       }
     }

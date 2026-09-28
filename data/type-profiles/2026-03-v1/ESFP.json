@@ -73,7 +73,7 @@
     {
       "key": "tomorrow_fun_entry",
       "surface": "reflect",
-      "intent": "내일 다시 붙기 쉬운 시작점 고르기"
+      "intent": "내일 가볍게 시작할 수 있는 지점 고르기"
     }
   ],
   "stress_signals": [
@@ -169,23 +169,23 @@
         "best_fit_confirmation_prompt": "이 유형이 당신의 현장감과 움직이는 방식에 가깝게 느껴지나요?"
       },
       "home": {
-        "opening_prompt": "오늘은 기운을 붙여줄 시작점 하나를 먼저 잡아보세요.",
+        "opening_prompt": "오늘은 기운을 북돋아 줄 시작점 하나를 먼저 잡아보세요.",
         "empty_state_prompt": "지금 가장 살아 있게 느껴지는 오늘의 초점을 한 줄로 적어보세요.",
-        "overload_prompt": "지금은 더 억지로 밀기보다, 다시 에너지가 붙는 시작점을 찾는 편이 맞습니다."
+        "overload_prompt": "지금은 더 억지로 밀기보다, 다시 힘이 나는 시작점을 찾는 편이 맞습니다."
       },
       "capture": {
         "placeholder": "떠오른 생각이나 해야 할 일을 적어보세요. 누구와 관련 있는지도 함께 적으면 좋습니다.",
-        "task_hint": "바로 움직일 수 있는 시작점이 보이면 더 빨리 붙습니다.",
+        "task_hint": "바로 움직일 수 있는 시작점이 보이면 더 빨리 시작할 수 있습니다.",
         "idea_hint": "아직 재미나 감이 먼저라면 Idea로 남겨도 괜찮습니다."
       },
       "plan": {
-        "today_prompt": "오늘은 탄력 붙는 일로 시작하고, 핵심 일로 이어가세요.",
+        "today_prompt": "오늘은 손이 쉽게 가는 일로 문을 열고, 핵심 일로 이어가세요.",
         "week_prompt": "주간 계획은 사람 일정과 에너지 균형을 함께 봐야 합니다.",
         "backlog_prompt": "보류한 일은 에너지와 상황 기준으로 묶어두세요."
       },
       "reminders": {
         "samples": [
-          "지금 가장 탄력이 붙을 시작점 하나만 잡아볼까요?",
+          "지금 가장 신나게 시작할 수 있는 일 하나만 골라볼까요?",
           "작게 움직이면 다시 리듬이 살아날 수 있습니다.",
           "오늘은 완벽함보다 기세가 중요합니다."
         ]
@@ -193,15 +193,52 @@
       "review_prompt_labels": {
         "what_lit_me_up": "오늘 무엇이 나를 가장 살아 있게 만들었나요?",
         "where_did_i_drop": "어디서 기운이 갑자기 떨어졌나요?",
-        "tomorrow_fun_entry": "내일 다시 붙기 쉬운 시작점은 무엇인가요?"
+        "tomorrow_fun_entry": "내일 가볍게 시작할 수 있는 일은 무엇인가요?"
       },
       "recovery": {
-        "card_title": "다시 탄력을 붙이는 10분",
-        "card_body": "소음을 조금 줄이고, 다시 에너지가 붙는 시작점 하나를 골라보세요.",
+        "card_title": "다시 기운을 차리는 10분",
+        "card_body": "주변 자극을 조금 줄이고, 다시 힘이 나는 시작점 하나를 골라보세요.",
         "step_labels": {
           "step_out_of_noise": "잠깐 시끄러운 환경에서 벗어나기",
           "find_alive_task": "지금 가장 살아 있는 작업 하나 고르기",
           "start_with_easy_momentum": "가볍게 시작할 수 있는 행동 하나 하기"
+        }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "다시 신나게 시작해볼까요?",
+          "body": "며칠 쉬었으면 에너지가 충전됐을 거예요. 오늘 기분 좋게 시작할 수 있는 일 하나만 골라보세요.",
+          "action_label": "시작할 일 고르기"
+        },
+        "returning_after_break": {
+          "title": "가볍게 다시 리듬 타기",
+          "body": "돌아온 것만으로도 좋은 출발이에요. 부담 없이 바로 해볼 수 있는 재미있는 일 하나로 다시 시작해봐요.",
+          "action_label": "가벼운 일 하나 적기"
+        },
+        "empty_setup": {
+          "title": "오늘 제일 끌리는 것",
+          "body": "지금 가장 해보고 싶은 일 하나만 적어보세요. 하나를 시작하면 나머지는 자연스럽게 따라옵니다.",
+          "action_label": "끌리는 일 적기"
+        }
+      },
+      "video_suggestions": {
+        "low_mood": {
+          "title": "기분 좋은 걸로 채워요",
+          "body": "마음이 가라앉은 날에는 좋아하는 음악이나 밝은 영상으로 기분을 조금 올려보세요.",
+          "search_query": "기분 좋아지는 노래 플레이리스트",
+          "videos": []
+        },
+        "unresponsive": {
+          "title": "신나게 다시 시작해요",
+          "body": "며칠 쉬었다면 신나는 영상 하나로 다시 기운을 차려보세요.",
+          "search_query": "신나는 댄스 홈트 10분",
+          "videos": []
+        },
+        "overaroused": {
+          "title": "잠깐 쉬어가요",
+          "body": "에너지가 넘칠 때도 잠깐 쉬어야 오래 즐길 수 있어요. 편안한 영상으로 숨을 골라보세요.",
+          "search_query": "편안한 요가 스트레칭 10분",
+          "videos": []
         }
       }
     }

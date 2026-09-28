@@ -175,7 +175,7 @@
       },
       "capture": {
         "placeholder": "아이디어나 해야 할 일을 적어보세요. 가능하면 가설이나 시험할 점도 함께요.",
-        "task_hint": "실험 형태로 쪼개면 다시 붙기 쉬워집니다.",
+        "task_hint": "실험 형태로 쪼개면 다시 시작하기 쉬워집니다.",
         "idea_hint": "아직 가능성 탐색 단계라면 Idea로 남겨두세요."
       },
       "plan": {
@@ -202,6 +202,43 @@
           "drop_admin_noise": "잡무와 알림을 잠시 치우기",
           "rewrite_problem_angle": "문제를 다른 각도로 한 줄로 다시 적기",
           "run_small_test": "지금 가능한 작은 테스트 하나 해보기"
+        }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "새로운 시각으로 다시 시작해볼까요?",
+          "body": "멈춘 일도 각도를 바꾸면 다시 재밌어집니다. 지금 시험해보고 싶은 가설 하나만 적어두세요.",
+          "action_label": "가설 하나 적기"
+        },
+        "returning_after_break": {
+          "title": "다시 실험 하나 굴리기",
+          "body": "예전 계획을 복구하지 않아도 됩니다. 지금 가장 흥미로운 실험 하나로 새로 시작해보세요.",
+          "action_label": "실험 하나 적기"
+        },
+        "empty_setup": {
+          "title": "가장 흥미로운 질문 하나",
+          "body": "긴 설정은 건너뛰세요. 지금 가장 흥미로운 질문 하나면 시작하기에 충분합니다.",
+          "action_label": "질문 적기"
+        }
+      },
+      "video_suggestions": {
+        "low_mood": {
+          "title": "잠깐 다른 시각으로",
+          "body": "기분이 가라앉을 때는 새로운 관점을 주는 가벼운 영상이 기분 전환에 도움이 됩니다.",
+          "search_query": "재미있는 과학 이야기",
+          "videos": []
+        },
+        "unresponsive": {
+          "title": "흥미로운 질문 하나",
+          "body": "며칠 멈췄다면 생각을 자극하는 짧은 영상으로 다시 시작해보세요.",
+          "search_query": "생각을 바꾸는 짧은 강연",
+          "videos": []
+        },
+        "overaroused": {
+          "title": "속도를 조금 줄여요",
+          "body": "아이디어가 넘칠 때는 잠시 호흡을 고르고 하나에 집중할 준비를 해보세요.",
+          "search_query": "집중력 높이는 명상 5분",
+          "videos": []
         }
       }
     }

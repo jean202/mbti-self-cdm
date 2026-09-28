@@ -203,6 +203,43 @@
           "name_single_priority": "지금 가장 중요한 한 가지 적기",
           "take_small_grounding_action": "2-5분 안에 끝나는 첫 행동 시작하기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "흐트러진 축을 다시 모아요",
+          "body": "며칠의 공백은 흐름이 잠시 멈췄다는 뜻일 뿐입니다. 지금 가장 마음에 걸리는 한 가지로 초점을 다시 모아보세요.",
+          "action_label": "초점 한 줄 정리"
+        },
+        "returning_after_break": {
+          "title": "다시 이어갈 한 줄기",
+          "body": "비어 있던 시간을 되짚기보다, 지금 이어가고 싶은 흐름 하나만 조용히 골라보세요. 나머지는 그 뒤에 따라옵니다.",
+          "action_label": "이어갈 흐름 적기"
+        },
+        "empty_setup": {
+          "title": "오늘의 초점 한 줄",
+          "body": "해야 할 일을 모두 적기 전에, 오늘을 관통하는 초점 하나만 먼저 정리해보세요.",
+          "action_label": "초점 한 줄 적기"
+        }
+      },
+      "video_suggestions": {
+        "low_mood": {
+          "title": "조용히 마음을 모아요",
+          "body": "여러 생각이 한꺼번에 몰려와 무거운 날에는 자극을 줄이고 조용히 머무는 시간이 도움이 됩니다.",
+          "search_query": "생각 정리 명상 조용한 음악",
+          "videos": []
+        },
+        "unresponsive": {
+          "title": "다시 연결되는 작은 시간",
+          "body": "흐름이 멈췄다면 잠깐 내면을 돌아보는 영상으로 다시 중심을 잡아보세요.",
+          "search_query": "마음 챙김 저널링 방법",
+          "videos": []
+        },
+        "overaroused": {
+          "title": "들어오는 자극을 줄여봐요",
+          "body": "에너지가 높을 때 너무 많은 것을 받아들이면 쉽게 지칩니다. 차분한 영상으로 자극을 줄여보세요.",
+          "search_query": "감각 진정 명상 10분",
+          "videos": []
+        }
       }
     }
   }
