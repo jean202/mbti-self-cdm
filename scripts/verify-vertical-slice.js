@@ -1,22 +1,32 @@
 const { AppService } = require('../dist/modules/app/app.service');
 const { HomeService } = require('../dist/modules/home/home.service');
 const { PrismaService } = require('../dist/infra/prisma/prisma.service');
+const { RedisService } = require('../dist/infra/redis/redis.service');
 const {
   TypeProfileLoaderService,
 } = require('../dist/modules/type-profiles/type-profile-loader.service');
+const {
+  VideoSuggestionsService,
+} = require('../dist/modules/video-suggestions/video-suggestions.service');
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 const TASK_ONE_ID = '11111111-1111-4111-8111-111111111115';
 
 async function main() {
-  const prismaService = new PrismaService();
-  const typeProfileLoaderService = new TypeProfileLoaderService({
+  const configService = {
     get(key) {
       return process.env[key];
     },
-  });
+  };
+  const prismaService = new PrismaService();
+  const redisService = new RedisService(configService);
+  const typeProfileLoaderService = new TypeProfileLoaderService(configService);
   const appService = new AppService(prismaService);
-  const homeService = new HomeService(prismaService, typeProfileLoaderService);
+  const homeService = new HomeService(
+    prismaService,
+    typeProfileLoaderService,
+    new VideoSuggestionsService(prismaService, redisService, configService),
+  );
 
   try {
     const bootstrap = await appService.getBootstrap(USER_ID);
@@ -42,6 +52,7 @@ async function main() {
     );
   } finally {
     await prismaService.$disconnect();
+    await redisService.onModuleDestroy();
   }
 }
 

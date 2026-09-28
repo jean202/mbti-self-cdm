@@ -365,6 +365,119 @@
         ]
       }
     },
+    "/v1/home/video-suggestion/feedback": {
+      "post": {
+        "operationId": "VideoSuggestionsController_recordFeedback",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordVideoSuggestionFeedbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Home"
+        ]
+      }
+    },
+    "/v1/goals": {
+      "get": {
+        "operationId": "GoalsController_listGoals",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Goals"
+        ]
+      },
+      "post": {
+        "operationId": "GoalsController_createGoal",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGoalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Goals"
+        ]
+      }
+    },
+    "/v1/goals/{goal_id}": {
+      "patch": {
+        "operationId": "GoalsController_updateGoal",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGoalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Goals"
+        ]
+      }
+    },
     "/v1/plan/today": {
       "get": {
         "operationId": "PlanController_getToday",
@@ -555,6 +668,26 @@
             }
           },
           {
+            "name": "local_date_from",
+            "required": false,
+            "in": "query",
+            "description": "Start of local date range filter (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "local_date_to",
+            "required": false,
+            "in": "query",
+            "description": "End of local date range filter, inclusive (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
             "name": "today_focus_id",
             "required": false,
             "in": "query",
@@ -581,7 +714,7 @@
             "description": "Number of items per page",
             "schema": {
               "minimum": 1,
-              "maximum": 100,
+              "maximum": 500,
               "example": 20,
               "type": "number"
             }
@@ -981,6 +1114,35 @@
           }
         ],
         "summary": "오늘 요일에 맞는 루틴을 기반으로 Task 생성",
+        "tags": [
+          "Routines"
+        ]
+      }
+    },
+    "/v1/routines/{routine_id}/skip-today": {
+      "post": {
+        "operationId": "RoutinesController_skipTodayRoutine",
+        "parameters": [
+          {
+            "name": "routine_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "오늘 루틴 건너뛰기",
         "tags": [
           "Routines"
         ]
@@ -1450,6 +1612,11 @@
             "description": "OIDC id_token from the provider",
             "example": "eyJhbGciOiJSUzI1NiIs..."
           },
+          "access_token": {
+            "type": "string",
+            "description": "OAuth access token from the provider",
+            "example": "zabc123..."
+          },
           "nonce": {
             "type": "string",
             "description": "Nonce used for OIDC verification",
@@ -1688,6 +1855,152 @@
           "local_date",
           "title"
         ]
+      },
+      "RecordVideoSuggestionFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "description": "State the suggestion was shown for",
+            "enum": [
+              "LOW_MOOD",
+              "UNRESPONSIVE",
+              "OVERAROUSED"
+            ],
+            "example": "LOW_MOOD"
+          },
+          "action": {
+            "type": "string",
+            "description": "What the user did with the suggestion",
+            "enum": [
+              "OPENED",
+              "DISMISSED"
+            ],
+            "example": "DISMISSED"
+          },
+          "video_id": {
+            "type": "string",
+            "description": "YouTube video id the user opened",
+            "example": "abcdEFGH123"
+          }
+        },
+        "required": [
+          "state",
+          "action"
+        ]
+      },
+      "CreateGoalDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Goal title",
+            "example": "포트폴리오 3개 완성"
+          },
+          "note": {
+            "type": "string",
+            "description": "Goal note",
+            "example": "웹, 모바일, 데이터 프로젝트 각 1개"
+          },
+          "horizon": {
+            "type": "string",
+            "description": "Goal horizon",
+            "enum": [
+              "SHORT_TERM",
+              "MID_TERM",
+              "LONG_TERM"
+            ],
+            "example": "MID_TERM"
+          },
+          "target_value": {
+            "type": "number",
+            "description": "Target numeric value",
+            "example": 3
+          },
+          "current_value": {
+            "type": "number",
+            "description": "Current numeric value",
+            "example": 1
+          },
+          "unit": {
+            "type": "string",
+            "description": "Goal unit",
+            "example": "개"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "Start date in YYYY-MM-DD",
+            "example": "2026-06-04"
+          },
+          "target_date": {
+            "type": "string",
+            "description": "Target date in YYYY-MM-DD",
+            "example": "2026-09-30"
+          }
+        },
+        "required": [
+          "title",
+          "horizon",
+          "target_value"
+        ]
+      },
+      "UpdateGoalDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Goal title",
+            "example": "포트폴리오 3개 완성"
+          },
+          "note": {
+            "type": "object",
+            "description": "Goal note",
+            "nullable": true
+          },
+          "horizon": {
+            "type": "string",
+            "description": "Goal horizon",
+            "enum": [
+              "SHORT_TERM",
+              "MID_TERM",
+              "LONG_TERM"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Goal status",
+            "enum": [
+              "ACTIVE",
+              "COMPLETED",
+              "ARCHIVED"
+            ]
+          },
+          "target_value": {
+            "type": "number",
+            "description": "Target numeric value",
+            "example": 3
+          },
+          "current_value": {
+            "type": "number",
+            "description": "Current numeric value",
+            "example": 1
+          },
+          "unit": {
+            "type": "string",
+            "description": "Goal unit",
+            "example": "개"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "Start date in YYYY-MM-DD",
+            "example": "2026-06-04"
+          },
+          "target_date": {
+            "type": "object",
+            "description": "Target date in YYYY-MM-DD",
+            "nullable": true
+          }
+        }
       },
       "ReorderTaskItemDto": {
         "type": "object",

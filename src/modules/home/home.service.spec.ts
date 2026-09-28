@@ -98,10 +98,24 @@ function createMockProfileLoader(profile: unknown = DEMO_PROFILE) {
   } as any;
 }
 
+function createMockVideoSuggestions(suggestion: unknown = null) {
+  return {
+    buildSuggestion: jest.fn().mockResolvedValue(suggestion),
+  } as any;
+}
+
+function createHomeService(
+  prisma: any,
+  profileLoader: any,
+  videoSuggestions: any = createMockVideoSuggestions(),
+) {
+  return new HomeService(prisma, profileLoader, videoSuggestions);
+}
+
 describe('HomeService', () => {
   describe('getHome', () => {
     it('should return personalized home payload', async () => {
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(),
         createMockProfileLoader(),
       );
@@ -140,7 +154,7 @@ describe('HomeService', () => {
       const prisma = createMockPrisma(staleEstjUser);
       prisma.todayFocus.findUnique = jest.fn().mockResolvedValue(null);
       prisma.task.findMany = jest.fn().mockResolvedValue([]);
-      const service = new HomeService(
+      const service = createHomeService(
         prisma,
         createMockProfileLoader({
           copy: {
@@ -199,7 +213,7 @@ describe('HomeService', () => {
         ...DEMO_USER,
         mbtiProfile: { typeCode: 'ENFP', profileVersion: '2026-03-v1' },
       };
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(enfpUser),
         createMockProfileLoader({
           reminder_tone: {
@@ -231,7 +245,7 @@ describe('HomeService', () => {
       const prisma = createMockPrisma(intjUser);
       prisma.todayFocus.findUnique = jest.fn().mockResolvedValue(null);
       prisma.task.findMany = jest.fn().mockResolvedValue([]);
-      const service = new HomeService(
+      const service = createHomeService(
         prisma,
         createMockProfileLoader({
           copy: {
@@ -302,7 +316,7 @@ describe('HomeService', () => {
           });
           prisma.todayFocus.findUnique = jest.fn().mockResolvedValue(null);
           prisma.task.findMany = jest.fn().mockResolvedValue([]);
-          const service = new HomeService(
+          const service = createHomeService(
             prisma,
             createMockProfileLoader(profile),
           );
@@ -333,9 +347,75 @@ describe('HomeService', () => {
       expect(seen.empty.size).toBe(16);
     });
 
+    it('should pass the type video copy to the video suggestion service', async () => {
+      const suggestion = { state: 'LOW_MOOD', type_code: 'INFJ', videos: [] };
+      const videoSuggestions = createMockVideoSuggestions(suggestion);
+      const copySet = {
+        low_mood: {
+          title: '조용히 마음을 모아요',
+          body: '자극을 줄이고 조용히 머무는 시간이 도움이 됩니다.',
+          search_query: '생각 정리 명상 조용한 음악',
+          videos: [],
+        },
+      };
+      const service = createHomeService(
+        createMockPrisma({
+          ...DEMO_USER,
+          lastActiveAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+        }),
+        createMockProfileLoader({
+          ...DEMO_PROFILE,
+          copy: {
+            'ko-KR': {
+              ...DEMO_PROFILE.copy['ko-KR'],
+              video_suggestions: copySet,
+            },
+          },
+        }),
+        videoSuggestions,
+      );
+
+      const result = await service.getHome('user-1', '2026-04-09');
+
+      expect(result.video_suggestion).toBe(suggestion);
+      expect(videoSuggestions.buildSuggestion).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-1',
+          typeCode: 'INFJ',
+          locale: 'ko-KR',
+          copySet,
+          inactiveDays: 4,
+        }),
+      );
+    });
+
+    it('should keep the home payload when the video suggestion fails', async () => {
+      const videoSuggestions = {
+        buildSuggestion: jest.fn().mockRejectedValue(new Error('boom')),
+      } as any;
+      const service = createHomeService(
+        createMockPrisma(),
+        createMockProfileLoader({
+          ...DEMO_PROFILE,
+          copy: {
+            'ko-KR': {
+              ...DEMO_PROFILE.copy['ko-KR'],
+              video_suggestions: { low_mood: {} },
+            },
+          },
+        }),
+        videoSuggestions,
+      );
+
+      const result = await service.getHome('user-1', '2026-04-09');
+
+      expect(result.video_suggestion).toBeNull();
+      expect(result.today_focus).not.toBeNull();
+    });
+
     it('should return null personalization when no MBTI profile', async () => {
       const userWithoutMbti = { ...DEMO_USER, mbtiProfile: null };
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(userWithoutMbti),
         createMockProfileLoader(),
       );
@@ -344,6 +424,7 @@ describe('HomeService', () => {
 
       expect(result.personalized_prompt).toBeNull();
       expect(result.recovery_card).toBeNull();
+      expect(result.video_suggestion).toBeNull();
       expect(result.engagement_nudge).toBeNull();
       expect(result.inactivity_reminder).toBeNull();
       expect(result.home_mode).toBeNull();
@@ -351,7 +432,7 @@ describe('HomeService', () => {
 
     it('should return empty calendar when no connections', async () => {
       const userNoCalendar = { ...DEMO_USER, calendarConnections: [] };
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(userNoCalendar),
         createMockProfileLoader(),
       );
@@ -365,7 +446,7 @@ describe('HomeService', () => {
     it('should throw NotFoundException for missing user', async () => {
       const prisma = createMockPrisma();
       prisma.user.findUnique = jest.fn().mockResolvedValue(null);
-      const service = new HomeService(prisma, createMockProfileLoader());
+      const service = createHomeService(prisma, createMockProfileLoader());
 
       await expect(
         service.getHome('nonexistent', '2026-04-09'),
@@ -375,7 +456,7 @@ describe('HomeService', () => {
 
   describe('upsertTodayFocus', () => {
     it('should create/update today focus', async () => {
-      const service = new HomeService(
+      const service = createHomeService(
         createMockPrisma(),
         createMockProfileLoader(),
       );
@@ -392,7 +473,7 @@ describe('HomeService', () => {
     it('should throw when linked task not found', async () => {
       const prisma = createMockPrisma();
       prisma.task.findFirst = jest.fn().mockResolvedValue(null);
-      const service = new HomeService(prisma, createMockProfileLoader());
+      const service = createHomeService(prisma, createMockProfileLoader());
 
       await expect(
         service.upsertTodayFocus('user-1', {

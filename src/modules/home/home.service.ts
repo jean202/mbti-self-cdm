@@ -14,6 +14,10 @@ import {
 } from '../../common/utils/local-date.util';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { TypeProfileLoaderService } from '../type-profiles/type-profile-loader.service';
+import {
+  type VideoSuggestionCopySet,
+  VideoSuggestionsService,
+} from '../video-suggestions/video-suggestions.service';
 import { UpsertTodayFocusDto } from './dto/upsert-today-focus.dto';
 
 interface TypeProfileCopyLocale {
@@ -35,6 +39,7 @@ interface TypeProfileCopyLocale {
     returning_after_break?: TypeNudgeCopy;
     empty_setup?: TypeNudgeCopy;
   };
+  video_suggestions?: VideoSuggestionCopySet;
 }
 
 interface TypeNudgeCopy {
@@ -68,6 +73,7 @@ export class HomeService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly typeProfileLoaderService: TypeProfileLoaderService,
+    private readonly videoSuggestionsService: VideoSuggestionsService,
   ) {}
 
   async getHome(userId: string, requestedLocalDate?: string) {
@@ -193,16 +199,25 @@ export class HomeService {
               homeMode: null,
               engagementNudge: null,
               inactivityReminder: null,
+              videoSuggestionCopy: null,
             }),
       ]);
+    const inactiveDays = this.countInactiveDays(user.lastActiveAt, now);
     const engagementNudge = this.selectEngagementNudge({
       profilePresentation,
       typeCode: user.mbtiProfile?.typeCode ?? null,
-      previousLastActiveAt: user.lastActiveAt,
-      now,
+      inactiveDays,
       hasTodayFocus: Boolean(todayFocus),
       topTaskCount: topTasks.length,
       hasCalendarConnection: connectionIds.length > 0,
+    });
+    const videoSuggestion = await this.buildVideoSuggestion({
+      userId,
+      typeCode: user.mbtiProfile?.typeCode ?? null,
+      locale: user.locale,
+      copySet: profilePresentation.videoSuggestionCopy,
+      inactiveDays,
+      now,
     });
 
     await this.prismaService.user.update({
@@ -245,6 +260,7 @@ export class HomeService {
       recovery_card: profilePresentation.recoveryCard,
       engagement_nudge: engagementNudge,
       inactivity_reminder: profilePresentation.inactivityReminder,
+      video_suggestion: videoSuggestion,
       home_mode: profilePresentation.homeMode,
     };
   }
@@ -342,6 +358,7 @@ export class HomeService {
       body: string;
       action_label: string;
     } | null;
+    videoSuggestionCopy: VideoSuggestionCopySet | null;
   }> {
     const profile = (await this.typeProfileLoaderService.getProfile(
       typeCode,
@@ -399,7 +416,43 @@ export class HomeService {
         reminderTone,
         nudgeCopy: copy?.nudges?.inactivity_reminder,
       }),
+      videoSuggestionCopy: copy?.video_suggestions ?? null,
     };
+  }
+
+  private async buildVideoSuggestion(input: {
+    userId: string;
+    typeCode: string | null;
+    locale: string;
+    copySet: VideoSuggestionCopySet | null;
+    inactiveDays: number;
+    now: Date;
+  }) {
+    const { typeCode, copySet } = input;
+
+    if (!typeCode || !copySet) {
+      return null;
+    }
+
+    try {
+      return await this.videoSuggestionsService.buildSuggestion({
+        ...input,
+        typeCode,
+        copySet,
+      });
+    } catch {
+      // 영상 추천 실패가 Home 응답 전체를 막지 않는다.
+      return null;
+    }
+  }
+
+  private countInactiveDays(previousLastActiveAt: Date | null, now: Date) {
+    return previousLastActiveAt
+      ? Math.floor(
+          (now.getTime() - previousLastActiveAt.getTime()) /
+            (24 * 60 * 60 * 1000),
+        )
+      : 0;
   }
 
   private buildInactivityReminder(input: {
@@ -428,8 +481,7 @@ export class HomeService {
       ReturnType<HomeService['buildProfilePresentation']>
     >;
     typeCode: string | null;
-    previousLastActiveAt: Date | null;
-    now: Date;
+    inactiveDays: number;
     hasTodayFocus: boolean;
     topTaskCount: number;
     hasCalendarConnection: boolean;
@@ -437,8 +489,7 @@ export class HomeService {
     const {
       profilePresentation,
       typeCode,
-      previousLastActiveAt,
-      now,
+      inactiveDays,
       hasTodayFocus,
       topTaskCount,
       hasCalendarConnection,
@@ -449,12 +500,6 @@ export class HomeService {
       return null;
     }
 
-    const inactiveDays = previousLastActiveAt
-      ? Math.floor(
-          (now.getTime() - previousLastActiveAt.getTime()) /
-            (24 * 60 * 60 * 1000),
-        )
-      : 0;
     const isEmptySetup =
       !hasTodayFocus && topTaskCount === 0 && !hasCalendarConnection;
     const isReturningAfterBreak = inactiveDays >= 3;
