@@ -203,6 +203,23 @@
           "find_alive_task": "지금 가장 살아 있는 작업 하나 고르기",
           "start_with_easy_momentum": "가볍게 시작할 수 있는 행동 하나 하기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "다시 신나게 시작해볼까요?",
+          "body": "며칠 쉬었으면 에너지가 충전됐을 거예요. 오늘 기분 좋게 시작할 수 있는 일 하나만 골라보세요.",
+          "action_label": "시작할 일 고르기"
+        },
+        "returning_after_break": {
+          "title": "가볍게 다시 리듬 타기",
+          "body": "돌아온 것만으로도 좋은 출발이에요. 부담 없이 바로 해볼 수 있는 재미있는 일 하나로 다시 시작해봐요.",
+          "action_label": "가벼운 일 하나 적기"
+        },
+        "empty_setup": {
+          "title": "오늘 제일 끌리는 것",
+          "body": "지금 가장 해보고 싶은 일 하나만 적어보세요. 기세가 붙으면 나머지는 따라옵니다.",
+          "action_label": "끌리는 일 적기"
+        }
       }
     }
   }

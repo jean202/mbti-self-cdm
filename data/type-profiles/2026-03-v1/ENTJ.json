@@ -203,6 +203,23 @@
           "cut_to_primary_outcome": "핵심 결과 하나만 남기기",
           "define_high_leverage_step": "가장 효과 큰 다음 행동 정하기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "핵심 결과로 다시 복귀하세요",
+          "body": "며칠의 공백은 범위를 다시 줄일 기회입니다. 가장 레버리지가 큰 결과 하나와 다음 행동만 확인하세요.",
+          "action_label": "핵심 결과 확인"
+        },
+        "returning_after_break": {
+          "title": "범위를 줄이고 재가동",
+          "body": "밀린 목표를 모두 되살리지 마세요. 이번 주 반드시 밀어야 할 결과 하나만 남기고 다시 시작하세요.",
+          "action_label": "결과 하나 정하기"
+        },
+        "empty_setup": {
+          "title": "오늘 밀어야 할 결과",
+          "body": "오늘 가장 큰 결과 하나를 정의하세요. 실행 계획은 그 결과에서 역산하면 됩니다.",
+          "action_label": "결과 하나 정의"
+        }
       }
     }
   }

@@ -203,6 +203,23 @@
           "name_primary_outcome": "오늘의 핵심 결과 한 줄로 적기",
           "define_next_leverage_step": "가장 효과 큰 다음 행동 하나 정하기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "계획이 멈춘 지점만 확인",
+          "body": "공백이 생겼다면 전략보다 실행 경로가 끊긴 것입니다. 멈춘 지점과 다음 행동 하나만 확인하세요.",
+          "action_label": "멈춘 지점 확인"
+        },
+        "returning_after_break": {
+          "title": "공백이 길었습니다",
+          "body": "감정 판단은 빼고 현재 병목 하나와 다음 행동 하나만 정리하세요. 계획은 그다음에 다시 세우면 됩니다.",
+          "action_label": "병목 하나 정리하기"
+        },
+        "empty_setup": {
+          "title": "빈 상태입니다",
+          "body": "목표 하나, 제약 하나, 다음 행동 하나만 입력하세요.",
+          "action_label": "다음 행동 입력"
+        }
       }
     }
   }

@@ -203,6 +203,23 @@
           "name_single_priority": "지금 가장 중요한 한 가지 적기",
           "take_small_grounding_action": "2-5분 안에 끝나는 첫 행동 시작하기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "흐트러진 축을 다시 모아요",
+          "body": "며칠의 공백은 흐름이 잠시 멈췄다는 뜻일 뿐입니다. 지금 가장 마음에 걸리는 한 가지로 초점을 다시 모아보세요.",
+          "action_label": "초점 한 줄 정리"
+        },
+        "returning_after_break": {
+          "title": "다시 이어갈 한 줄기",
+          "body": "비어 있던 시간을 되짚기보다, 지금 이어가고 싶은 흐름 하나만 조용히 골라보세요. 나머지는 그 뒤에 따라옵니다.",
+          "action_label": "이어갈 흐름 적기"
+        },
+        "empty_setup": {
+          "title": "오늘의 초점 한 줄",
+          "body": "해야 할 일을 모두 적기 전에, 오늘을 관통하는 초점 하나만 먼저 정리해보세요.",
+          "action_label": "초점 한 줄 적기"
+        }
       }
     }
   }

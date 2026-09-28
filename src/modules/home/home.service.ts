@@ -30,6 +30,17 @@ interface TypeProfileCopyLocale {
     card_title?: string;
     card_body?: string;
   };
+  nudges?: {
+    inactivity_reminder?: TypeNudgeCopy;
+    returning_after_break?: TypeNudgeCopy;
+    empty_setup?: TypeNudgeCopy;
+  };
+}
+
+interface TypeNudgeCopy {
+  title?: string;
+  body?: string;
+  action_label?: string;
 }
 
 interface TypeProfileDocument {
@@ -318,6 +329,8 @@ export class HomeService {
       empty_state_prompt: string | null;
       reminder_samples: string[];
       recovery_prompt: string | null;
+      returning_after_break: TypeNudgeCopy | null;
+      empty_setup: TypeNudgeCopy | null;
     } | null;
     inactivityReminder: {
       type_code: string;
@@ -377,11 +390,14 @@ export class HomeService {
               empty_state_prompt: copy?.home?.empty_state_prompt ?? null,
               reminder_samples: copy?.reminders?.samples ?? [],
               recovery_prompt: copy?.home?.overload_prompt ?? recoveryBody ?? null,
+              returning_after_break: copy?.nudges?.returning_after_break ?? null,
+              empty_setup: copy?.nudges?.empty_setup ?? null,
             }
           : null,
       inactivityReminder: this.buildInactivityReminder({
         typeCode,
         reminderTone,
+        nudgeCopy: copy?.nudges?.inactivity_reminder,
       }),
     };
   }
@@ -389,51 +405,21 @@ export class HomeService {
   private buildInactivityReminder(input: {
     typeCode: string;
     reminderTone: TypeProfileDocument['reminder_tone'];
+    nudgeCopy: TypeNudgeCopy | undefined;
   }) {
-    const { typeCode, reminderTone } = input;
-    const isJudging = typeCode[3] === 'J';
-    const isPerceiving = typeCode[3] === 'P';
-    const isSensing = typeCode[1] === 'S';
-    const isIntuitive = typeCode[1] === 'N';
-
-    let title = '오늘의 시작점을 다시 잡아볼까요?';
-    let body =
-      '며칠 비워도 괜찮아요. 지금 떠오르는 일 하나만 남기면 다시 이어갈 수 있어요.';
-    let actionLabel = '하나만 남기기';
-
-    if (isSensing && isJudging) {
-      title = '바빴다면 오늘 기준만 다시 정리해요';
-      body =
-        '할 일이 있어서 비어 있었을 수 있어요. 전체 계획 말고 오늘 확인할 일 하나만 다시 체크해보세요.';
-      actionLabel = '오늘 할 일 확인';
-    } else if (isIntuitive && isJudging) {
-      title = '계획이 멈춘 지점만 다시 봐요';
-      body =
-        '바쁜 흐름 때문에 잠깐 끊겼을 수 있어요. 간섭처럼 밀어붙이기보다, 다시 잡을 방향 하나만 확인해볼까요?';
-      actionLabel = '방향 하나 정하기';
-    } else if (isSensing && isPerceiving) {
-      title = '까먹은 일 하나만 다시 챙겨요';
-      body =
-        '흐름이 끊기는 건 자연스러워요. 지금 바로 처리할 수 있는 현실적인 일 하나만 다시 꺼내볼까요?';
-      actionLabel = '잊은 일 확인';
-    } else if (isIntuitive && isPerceiving) {
-      title = '생각이 흩어졌다면 한 줄만 붙잡기';
-      body =
-        '관리받는 느낌보다는 가볍게 다시 여는 쪽이 낫습니다. 지금 머리에 남아 있는 생각 하나만 기록해보세요.';
-      actionLabel = '생각 하나 남기기';
-    }
+    const { typeCode, reminderTone, nudgeCopy } = input;
 
     return {
       type_code: typeCode,
       delay_days: 3,
       tone_key: reminderTone?.tone_key ?? null,
       intensity: this.deEscalateIntensity(reminderTone?.intensity_floor ?? null),
-      cadence_bias:
-        reminderTone?.cadence_bias ??
-        (isJudging ? 'steady' : 'adaptive'),
-      title,
-      body,
-      action_label: actionLabel,
+      cadence_bias: reminderTone?.cadence_bias ?? 'adaptive',
+      title: nudgeCopy?.title ?? '오늘의 시작점을 다시 잡아볼까요?',
+      body:
+        nudgeCopy?.body ??
+        '며칠 비워도 괜찮아요. 지금 떠오르는 일 하나만 남기면 다시 이어갈 수 있어요.',
+      action_label: nudgeCopy?.action_label ?? '하나만 남기기',
     };
   }
 
@@ -480,13 +466,7 @@ export class HomeService {
     const state = isReturningAfterBreak
       ? 'RETURNING_AFTER_BREAK'
       : 'EMPTY_SETUP';
-    const typeNudge = this.typeSpecificNudge(
-      typeCode,
-      state,
-      nudgeSource.empty_state_prompt,
-      nudgeSource.reminder_samples,
-      nudgeSource.recovery_prompt,
-    );
+    const typeNudge = this.typeSpecificNudge(state, nudgeSource);
 
     return {
       state,
@@ -506,91 +486,38 @@ export class HomeService {
   }
 
   private typeSpecificNudge(
-    typeCode: string,
     state: 'EMPTY_SETUP' | 'RETURNING_AFTER_BREAK',
-    emptyStatePrompt: string | null,
-    reminderSamples: string[],
-    recoveryPrompt: string | null,
+    nudgeSource: NonNullable<
+      Awaited<
+        ReturnType<HomeService['buildProfilePresentation']>
+      >['engagementNudge']
+    >,
   ) {
     if (state === 'RETURNING_AFTER_BREAK') {
-      if (typeCode === 'ESTJ') {
-        return {
-          title: '재촉보다 재정렬이 먼저입니다',
-          body:
-            '평소처럼 정리하지 못할 정도였다면 무슨 일이 있었을 가능성이 큽니다. 새 계획을 더 얹지 말고, 지금 부담이 가장 큰 하나만 확인하세요.',
-          actionLabel: '부담 큰 일 하나만 적기',
-          suggestedEntry: 'quick_capture',
-        };
-      }
-
-      if (typeCode === 'INFP') {
-        return {
-          title: '작게 다시 시작해도 됩니다',
-          body:
-            '오래 비어 있어도 괜찮아요. 완벽한 계획보다 지금 마음에 남아 있는 한 줄이면 다시 이어갈 수 있습니다.',
-          actionLabel: '작은 한 줄 남기기',
-          suggestedEntry: 'quick_capture',
-        };
-      }
-
-      if (typeCode === 'INTJ') {
-        return {
-          title: '공백이 길었습니다',
-          body:
-            '감정 판단은 빼고 현재 병목 하나와 다음 행동 하나만 정리하세요. 계획은 그다음에 다시 세우면 됩니다.',
-          actionLabel: '병목 하나 정리하기',
-          suggestedEntry: 'quick_capture',
-        };
-      }
-
-      if (this.isThinkingType(typeCode)) {
-        return {
-          title: '현재 상태만 다시 잡으세요',
-          body:
-            reminderSamples[0] ??
-            '긴 공백 뒤에는 큰 계획보다 현재 제약과 다음 행동 하나를 확인하는 편이 낫습니다.',
-          actionLabel: '다음 행동 하나 적기',
-          suggestedEntry: 'quick_capture',
-        };
-      }
-
-      if (this.isFeelingType(typeCode)) {
-        return {
-          title: '다시 이어갈 작은 단서',
-          body:
-            reminderSamples[0] ??
-            '비어 있던 시간을 자책하지 말고, 지금 신경 쓰이는 일 하나부터 가볍게 남겨보세요.',
-          actionLabel: '가볍게 남기기',
-          suggestedEntry: 'quick_capture',
-        };
-      }
+      const copy = nudgeSource.returning_after_break;
 
       return {
-        title: '다시 시작할 작은 기준',
+        title: copy?.title ?? '다시 시작할 작은 기준',
         body:
-          recoveryPrompt ??
+          copy?.body ??
+          nudgeSource.reminder_samples[0] ??
+          nudgeSource.recovery_prompt ??
           '오래 비어 있었다면 오늘은 크게 밀지 말고 가장 작은 다음 행동 하나만 정리해보세요.',
-        actionLabel: '하나만 적기',
+        actionLabel: copy?.action_label ?? '하나만 적기',
         suggestedEntry: 'quick_capture',
       };
     }
 
-    if (typeCode === 'INTJ') {
-      return {
-        title: '빈 상태입니다',
-        body: '목표 하나, 제약 하나, 다음 행동 하나만 입력하세요.',
-        actionLabel: '다음 행동 입력',
-        suggestedEntry: 'quick_capture',
-      };
-    }
+    const copy = nudgeSource.empty_setup;
 
     return {
-      title: '오늘의 시작점을 잡아보세요',
+      title: copy?.title ?? '오늘의 시작점을 잡아보세요',
       body:
-        emptyStatePrompt ??
-        reminderSamples[0] ??
+        copy?.body ??
+        nudgeSource.empty_state_prompt ??
+        nudgeSource.reminder_samples[0] ??
         '아직 설정된 내용이 없습니다. 지금 떠오르는 일 하나만 남겨도 홈이 맞춰지기 시작합니다.',
-      actionLabel: '첫 항목 남기기',
+      actionLabel: copy?.action_label ?? '첫 항목 남기기',
       suggestedEntry: 'quick_capture',
     };
   }
@@ -601,14 +528,6 @@ export class HomeService {
     }
 
     return intensity ?? 'low';
-  }
-
-  private isThinkingType(typeCode: string) {
-    return typeCode[2] === 'T';
-  }
-
-  private isFeelingType(typeCode: string) {
-    return typeCode[2] === 'F';
   }
 
   private pickLocaleCopy(

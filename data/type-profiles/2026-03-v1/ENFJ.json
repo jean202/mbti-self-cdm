@@ -203,6 +203,23 @@
           "name_my_direction": "지금 내 방향 한 줄로 적기",
           "pick_one_aligned_action": "그 방향과 맞는 행동 하나 고르기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "내 방향부터 다시 붙잡아요",
+          "body": "다른 사람을 챙기다 내 흐름이 멈췄을 수 있어요. 오늘 나에게 의미 있는 한 가지만 다시 적어보세요.",
+          "action_label": "의미 있는 일 적기"
+        },
+        "returning_after_break": {
+          "title": "다시 이끌 한 가지",
+          "body": "공백이 있었다고 흐름이 사라진 건 아닙니다. 지금 가장 영향력 있는 일 하나를 정하면 다시 추진력이 붙습니다.",
+          "action_label": "이끌 일 하나 정하기"
+        },
+        "empty_setup": {
+          "title": "오늘의 방향 한 줄",
+          "body": "누구에게 어떤 의미가 있는 하루가 될지, 방향 한 줄만 먼저 적어보세요.",
+          "action_label": "방향 한 줄 적기"
+        }
       }
     }
   }

@@ -203,6 +203,23 @@
           "rewrite_problem_angle": "문제를 다른 각도로 한 줄로 다시 적기",
           "run_small_test": "지금 가능한 작은 테스트 하나 해보기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "새 각도로 다시 붙어볼까요?",
+          "body": "멈춘 일도 각도를 바꾸면 다시 재밌어집니다. 지금 시험해보고 싶은 가설 하나만 적어두세요.",
+          "action_label": "가설 하나 적기"
+        },
+        "returning_after_break": {
+          "title": "다시 실험 하나 굴리기",
+          "body": "예전 계획을 복구하지 않아도 됩니다. 지금 가장 흥미로운 실험 하나로 새로 시작해보세요.",
+          "action_label": "실험 하나 적기"
+        },
+        "empty_setup": {
+          "title": "가장 흥미로운 질문 하나",
+          "body": "긴 설정은 건너뛰세요. 지금 가장 흥미로운 질문 하나면 시작하기에 충분합니다.",
+          "action_label": "질문 적기"
+        }
       }
     }
   }

@@ -203,6 +203,23 @@
           "name_personal_priority": "오늘 나에게 중요한 한 가지 적기",
           "prepare_one_supportive_step": "내일을 편하게 할 준비 한 가지 하기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "잠시 쉬어가도 괜찮았어요",
+          "body": "다른 일을 챙기느라 여기까지 올 틈이 없었을 수 있어요. 오늘 꼭 챙길 한 가지만 편하게 적어두세요.",
+          "action_label": "챙길 일 하나 적기"
+        },
+        "returning_after_break": {
+          "title": "익숙한 한 가지부터 다시",
+          "body": "비어 있던 시간을 메우려고 무리하지 않아도 됩니다. 원래 해오던 일 중 가장 익숙한 하나로 흐름을 다시 이어보세요.",
+          "action_label": "익숙한 일 하나 남기기"
+        },
+        "empty_setup": {
+          "title": "오늘 꼭 챙길 한 가지",
+          "body": "많이 적지 않아도 괜찮아요. 오늘 놓치고 싶지 않은 한 가지만 먼저 남겨두세요.",
+          "action_label": "챙길 일 적기"
+        }
       }
     }
   }

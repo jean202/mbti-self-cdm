@@ -203,6 +203,23 @@
           "check_inner_yes": "지금 진짜 맞는 선택이 무엇인지 짧게 확인하기",
           "start_small_kind_action": "부담 없는 작은 행동 하나 시작하기"
         }
+      },
+      "nudges": {
+        "inactivity_reminder": {
+          "title": "천천히 다시 와도 괜찮아요",
+          "body": "며칠 쉬었던 건 필요한 시간이었을 수 있어요. 지금 마음이 가는 작은 일 하나만 가볍게 남겨보세요.",
+          "action_label": "마음 가는 일 남기기"
+        },
+        "returning_after_break": {
+          "title": "지금의 나에게 맞는 속도로",
+          "body": "예전 속도를 되찾으려 애쓰지 않아도 돼요. 오늘 몸과 마음이 허락하는 만큼의 작은 행동 하나면 충분합니다.",
+          "action_label": "작은 행동 하나 적기"
+        },
+        "empty_setup": {
+          "title": "지금 끌리는 것 하나",
+          "body": "정해진 틀이 없어도 괜찮아요. 오늘 내 감각과 맞는 일 하나만 먼저 적어보세요.",
+          "action_label": "끌리는 일 적기"
+        }
       }
     }
   }
