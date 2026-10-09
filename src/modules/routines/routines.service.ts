@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   Prisma,
   RoutineCadenceType,
@@ -30,6 +35,14 @@ type RoutineTaskSource = Pick<
   | 'createdAt'
 >;
 
+type RoutineCadenceRule = { daysOfWeek?: number[]; timesPerWeek?: number };
+
+type WeeklyProgress = {
+  doneCount: number;
+  achieved: boolean;
+  streak: number;
+};
+
 @Injectable()
 export class RoutinesService {
   private readonly logger = new Logger(RoutinesService.name);
@@ -38,14 +51,27 @@ export class RoutinesService {
 
   async createRoutine(userId: string, dto: CreateRoutineDto) {
     this.logger.log(`Creating routine for user: ${userId}`);
+    const hasDays = Array.isArray(dto.daysOfWeek) && dto.daysOfWeek.length > 0;
+    const hasTimesPerWeek = dto.timesPerWeek !== undefined;
+
+    if (hasDays === hasTimesPerWeek) {
+      throw new BadRequestException(
+        'Provide exactly one of daysOfWeek or timesPerWeek.',
+      );
+    }
+
     return this.prisma.routine.create({
       data: {
         userId,
         name: dto.title,
         note: dto.note,
-        cadenceType: RoutineCadenceType.WEEKLY,
+        cadenceType: hasTimesPerWeek
+          ? RoutineCadenceType.CUSTOM
+          : RoutineCadenceType.WEEKLY,
         isActive: dto.isActive ?? true,
-        cadencePayloadJson: { daysOfWeek: dto.daysOfWeek } as Prisma.InputJsonValue,
+        cadencePayloadJson: (hasTimesPerWeek
+          ? { timesPerWeek: dto.timesPerWeek }
+          : { daysOfWeek: dto.daysOfWeek }) as Prisma.InputJsonValue,
       },
     });
   }
@@ -122,6 +148,49 @@ export class RoutinesService {
       task_id: skippedTask.id,
       local_date: localDate,
       skipped: true,
+    };
+  }
+
+  async checkTodayRoutine(userId: string, routineId: string) {
+    const user = await this.findUserOrThrow(userId);
+    const localDate = resolveRequestedLocalDate(undefined, user.timezone);
+    const routine = await this.prisma.routine.findFirst({
+      where: { id: routineId, userId },
+    });
+
+    if (!routine) {
+      throw new NotFoundException('Routine was not found.');
+    }
+
+    if (this.timesPerWeekOf(routine) === null) {
+      throw new BadRequestException(
+        'check-today is only available for times-per-week routines.',
+      );
+    }
+
+    const existingTask = await this.findRoutineTaskForDate(
+      userId,
+      routine.name,
+      localDate,
+    );
+    let task = existingTask;
+
+    if (!task) {
+      task = await this.createRoutineTask(userId, routine, localDate, user.timezone, {
+        status: TaskStatus.DONE,
+        completedAt: new Date(),
+      });
+    } else if (task.status !== TaskStatus.DONE) {
+      task = await this.prisma.task.update({
+        where: { id: task.id },
+        data: { status: TaskStatus.DONE, completedAt: new Date() },
+      });
+    }
+
+    return {
+      routine_id: routineId,
+      task_id: task.id,
+      local_date: localDate,
     };
   }
 
@@ -208,6 +277,11 @@ export class RoutinesService {
           timezone,
         )
       : null;
+    const timesPerWeek = this.timesPerWeekOf(routine);
+    const weekly =
+      timesPerWeek === null
+        ? null
+        : this.summarizeWeeks(routine, routineTasks, localDate, timezone, timesPerWeek);
 
     return {
       id: routine.id,
@@ -220,18 +294,88 @@ export class RoutinesService {
       updatedAt: routine.updatedAt.toISOString(),
       last_completed_at: lastCompletedTask?.completedAt?.toISOString() ?? null,
       last_completed_local_date: lastCompletedLocalDate,
-      streak_count: this.calculateStreak(
-        routine,
-        routineTasks,
-        localDate,
-        timezone,
-      ),
+      streak_count:
+        weekly?.streak ??
+        this.calculateStreak(routine, routineTasks, localDate, timezone),
+      times_per_week: timesPerWeek,
+      week_done_count: weekly?.doneCount ?? null,
+      week_achieved: weekly?.achieved ?? null,
       today_task_id: todayTask?.id ?? null,
       today_task_status: todayTask?.status ?? null,
       is_due_today: this.isRoutineDueOn(routine, localDate),
       is_today_generated: Boolean(todayTask),
       is_today_skipped: todayTask?.status === TaskStatus.ARCHIVED,
     };
+  }
+
+  private timesPerWeekOf(routine: Routine): number | null {
+    const rule = routine.cadencePayloadJson as RoutineCadenceRule | null;
+    const value = rule?.timesPerWeek;
+
+    return typeof value === 'number' && value > 0 ? value : null;
+  }
+
+  // 이번 주(월~일) 수행 일수와, 진행 중인 이번 주를 제외하면 끊기지 않는 연속 달성 주 수.
+  private summarizeWeeks(
+    routine: Routine,
+    tasks: RoutineTaskSource[],
+    localDate: string,
+    timezone: string,
+    timesPerWeek: number,
+  ): WeeklyProgress {
+    const doneDates = new Set<string>();
+
+    for (const task of tasks) {
+      const taskDate = task.status === TaskStatus.DONE
+        ? this.taskLocalDate(task, timezone)
+        : null;
+
+      if (taskDate) {
+        doneDates.add(taskDate);
+      }
+    }
+
+    const countWeek = (weekStart: string) => {
+      let count = 0;
+
+      for (let offset = 0; offset < 7; offset++) {
+        if (doneDates.has(this.shiftLocalDate(weekStart, offset))) {
+          count++;
+        }
+      }
+
+      return count;
+    };
+
+    const firstWeek = this.startOfWeek(
+      this.formatDateInTimezone(routine.createdAt, timezone),
+    );
+    const thisWeek = this.startOfWeek(localDate);
+    const doneCount = countWeek(thisWeek);
+    const achieved = doneCount >= timesPerWeek;
+    let streak = achieved ? 1 : 0;
+
+    for (
+      let weekStart = this.shiftLocalDate(thisWeek, -7);
+      weekStart >= firstWeek && countWeek(weekStart) >= timesPerWeek;
+      weekStart = this.shiftLocalDate(weekStart, -7)
+    ) {
+      streak++;
+    }
+
+    return { doneCount, achieved, streak };
+  }
+
+  private startOfWeek(localDate: string): string {
+    const mondayOffset = (parseLocalDate(localDate).getUTCDay() + 6) % 7;
+
+    return this.shiftLocalDate(localDate, -mondayOffset);
+  }
+
+  private shiftLocalDate(localDate: string, days: number): string {
+    const date = parseLocalDate(localDate);
+    date.setUTCDate(date.getUTCDate() + days);
+    return formatLocalDate(date);
   }
 
   private calculateStreak(
@@ -319,6 +463,7 @@ export class RoutinesService {
     routine: Routine,
     localDate: string,
     timezone: string,
+    completion: Pick<Prisma.TaskUncheckedCreateInput, 'status' | 'completedAt'> = {},
   ) {
     const range = buildUtcDayRangeForTimezone(localDate, timezone);
 
@@ -330,6 +475,7 @@ export class RoutinesService {
         sourceType: TaskSourceType.ROUTINE,
         dueAt: range.start,
         localDueDate: parseLocalDate(localDate),
+        ...completion,
       },
     });
   }

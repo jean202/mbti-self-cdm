@@ -51,4 +51,13 @@ export class RoutinesController {
   ) {
     return this.routinesService.skipTodayRoutine(user.userId, routineId);
   }
+
+  @Post(':routine_id/check-today')
+  @ApiOperation({ summary: '주 N회 루틴 오늘 수행 기록' })
+  checkTodayRoutine(
+    @CurrentUser() user: RequestUser,
+    @Param('routine_id', new ParseUUIDPipe()) routineId: string,
+  ) {
+    return this.routinesService.checkTodayRoutine(user.userId, routineId);
+  }
 }
