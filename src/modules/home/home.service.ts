@@ -169,9 +169,9 @@ export class HomeService {
                   in: connectionIds,
                 },
                 startsAt: {
-                  gte: calendarRange.start,
                   lt: calendarRange.end,
                 },
+                endsAt: { gt: calendarRange.start },
                 eventStatus: {
                   not: CalendarEventStatus.CANCELLED,
                 },
@@ -179,10 +179,10 @@ export class HomeService {
               orderBy: {
                 startsAt: 'asc',
               },
-              take: 3,
               select: {
                 id: true,
                 title: true,
+                isAllDay: true,
                 startsAt: true,
                 endsAt: true,
               },
@@ -248,7 +248,10 @@ export class HomeService {
         last_synced_at:
           primaryCalendarConnection?.lastSyncedAt?.toISOString() ?? null,
         last_error_code: primaryCalendarConnection?.lastErrorCode ?? null,
-        items: calendarItems.map((item) => ({
+        all_day_items: calendarItems.filter((item) => item.isAllDay).map((item) => ({
+          id: item.id, title: item.title,
+        })),
+        items: calendarItems.filter((item) => !item.isAllDay).slice(0, 3).map((item) => ({
           id: item.id,
           title: item.title,
           starts_at: item.startsAt.toISOString(),

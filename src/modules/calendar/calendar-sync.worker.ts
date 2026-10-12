@@ -1,3 +1,4 @@
+import { calendarEventBoundary } from '../../common/utils/all-day-event';
 import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CalendarConnectionStatus, CalendarEventStatus, Prisma } from '@prisma/client';
@@ -182,6 +183,9 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
     events: ProviderEvent[],
   ): Promise<void> {
     const now = new Date();
+    const user = await this.prismaService.user.findUniqueOrThrow({
+      where: { id: userId }, select: { timezone: true },
+    });
 
     for (const event of events) {
       await this.prismaService.calendarEvent.upsert({
@@ -199,8 +203,8 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
           title: event.title,
           description: event.description ?? null,
           location: event.location ?? null,
-          startsAt: new Date(event.starts_at),
-          endsAt: new Date(event.ends_at),
+          startsAt: calendarEventBoundary(event.starts_at, event.is_all_day, user.timezone),
+          endsAt: calendarEventBoundary(event.ends_at, event.is_all_day, user.timezone),
           isAllDay: event.is_all_day,
           eventStatus: event.event_status as CalendarEventStatus,
           providerUpdatedAt: event.provider_updated_at
@@ -216,8 +220,8 @@ export class CalendarSyncWorker implements OnModuleInit, OnModuleDestroy {
           title: event.title,
           description: event.description ?? null,
           location: event.location ?? null,
-          startsAt: new Date(event.starts_at),
-          endsAt: new Date(event.ends_at),
+          startsAt: calendarEventBoundary(event.starts_at, event.is_all_day, user.timezone),
+          endsAt: calendarEventBoundary(event.ends_at, event.is_all_day, user.timezone),
           isAllDay: event.is_all_day,
           eventStatus: event.event_status as CalendarEventStatus,
           providerUpdatedAt: event.provider_updated_at

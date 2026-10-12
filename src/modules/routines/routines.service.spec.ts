@@ -93,6 +93,39 @@ describe('RoutinesService', () => {
     jest.useRealTimers();
   });
 
+  it('loads the selected date without changing the other day', async () => {
+    const prisma = createMockPrisma();
+    prisma.task.findMany.mockResolvedValue([
+      { ...routineTask('2026-05-28'), title: FRIDAY_ROUTINE.name },
+      { ...routineTask('2026-05-29', TaskStatus.INBOX), title: FRIDAY_ROUTINE.name },
+    ]);
+    const service = new RoutinesService(prisma);
+    const yesterday = await service.getRoutines('user-1', '2026-05-28');
+    const today = await service.getRoutines('user-1', '2026-05-29');
+    expect(yesterday[0].today_task_id).toBe('task-2026-05-28');
+    expect(yesterday[0].today_task_status).toBe(TaskStatus.DONE);
+    expect(today[0].today_task_id).toBe('task-2026-05-29');
+    expect(today[0].today_task_status).toBe(TaskStatus.INBOX);
+    expect(prisma.task.update).not.toHaveBeenCalled();
+  });
+
+  it('checks only the selected past frequency record and leaves today untouched', async () => {
+    const prisma = createMockPrisma();
+    prisma.routine.findFirst.mockResolvedValue(TIMES_PER_WEEK_ROUTINE);
+    prisma.task.findFirst.mockResolvedValue(routineTask('2026-05-28', TaskStatus.INBOX));
+    prisma.task.update.mockImplementation(({ where, data }: { where: { id: string }; data: Record<string, unknown> }) => ({ id: where.id, ...data }));
+    const result = await new RoutinesService(prisma).checkTodayRoutine('user-1', 'routine-2', '2026-05-28');
+    expect(result.local_date).toBe('2026-05-28');
+    expect(prisma.task.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ localDueDate: new Date('2026-05-28T00:00:00Z') }),
+    }));
+    expect(prisma.task.update).toHaveBeenCalledTimes(1);
+    expect(prisma.task.update).toHaveBeenCalledWith({
+      where: { id: 'task-2026-05-28' },
+      data: { status: TaskStatus.DONE, completedAt: new Date('2026-05-27T15:00:00Z') },
+    });
+  });
+
   describe('createRoutine', () => {
     it('stores times-per-week routines as CUSTOM cadence', async () => {
       const prisma = createMockPrisma();

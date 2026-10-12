@@ -5,9 +5,10 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../../common/auth/auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -33,31 +34,37 @@ export class RoutinesController {
 
   @Get()
   @ApiOperation({ summary: '내 루틴 목록 조회' })
-  getRoutines(@CurrentUser() user: RequestUser) {
-    return this.routinesService.getRoutines(user.userId);
+  @ApiQuery({ name: 'local_date', required: false, example: '2026-10-11' })
+  getRoutines(@CurrentUser() user: RequestUser, @Query('local_date') localDate?: string) {
+    return this.routinesService.getRoutines(user.userId, localDate);
   }
 
   @Post('generate-today')
   @ApiOperation({ summary: '오늘 요일에 맞는 루틴을 기반으로 Task 생성' })
-  generateTodayTasks(@CurrentUser() user: RequestUser) {
-    return this.routinesService.generateTodayTasks(user.userId);
+  @ApiQuery({ name: 'local_date', required: false, example: '2026-10-11' })
+  generateTodayTasks(@CurrentUser() user: RequestUser, @Query('local_date') localDate?: string) {
+    return this.routinesService.generateTodayTasks(user.userId, localDate);
   }
 
   @Post(':routine_id/skip-today')
   @ApiOperation({ summary: '오늘 루틴 건너뛰기' })
+  @ApiQuery({ name: 'local_date', required: false, example: '2026-10-11' })
   skipTodayRoutine(
     @CurrentUser() user: RequestUser,
     @Param('routine_id', new ParseUUIDPipe()) routineId: string,
+    @Query('local_date') localDate?: string,
   ) {
-    return this.routinesService.skipTodayRoutine(user.userId, routineId);
+    return this.routinesService.skipTodayRoutine(user.userId, routineId, localDate);
   }
 
   @Post(':routine_id/check-today')
   @ApiOperation({ summary: '주 N회 루틴 오늘 수행 기록' })
+  @ApiQuery({ name: 'local_date', required: false, example: '2026-10-11' })
   checkTodayRoutine(
     @CurrentUser() user: RequestUser,
     @Param('routine_id', new ParseUUIDPipe()) routineId: string,
+    @Query('local_date') localDate?: string,
   ) {
-    return this.routinesService.checkTodayRoutine(user.userId, routineId);
+    return this.routinesService.checkTodayRoutine(user.userId, routineId, localDate);
   }
 }

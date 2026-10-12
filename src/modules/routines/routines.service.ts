@@ -76,9 +76,9 @@ export class RoutinesService {
     });
   }
 
-  async getRoutines(userId: string) {
+  async getRoutines(userId: string, requestedDate?: string) {
     const user = await this.findUserOrThrow(userId);
-    const localDate = resolveRequestedLocalDate(undefined, user.timezone);
+    const localDate = resolveRequestedLocalDate(requestedDate, user.timezone);
 
     await this.ensureTodayTasks(userId, localDate, user.timezone);
 
@@ -90,19 +90,19 @@ export class RoutinesService {
     return this.buildRoutineResponses(userId, user.timezone, localDate, routines);
   }
 
-  async generateTodayTasks(userId: string) {
+  async generateTodayTasks(userId: string, requestedDate?: string) {
     this.logger.log(`Checking routines to generate today's tasks for user: ${userId}`);
     const user = await this.findUserOrThrow(userId);
-    const localDate = resolveRequestedLocalDate(undefined, user.timezone);
+    const localDate = resolveRequestedLocalDate(requestedDate, user.timezone);
 
     const result = await this.ensureTodayTasks(userId, localDate, user.timezone);
 
     return { generated_count: result.generatedCount };
   }
 
-  async skipTodayRoutine(userId: string, routineId: string) {
+  async skipTodayRoutine(userId: string, routineId: string, requestedDate?: string) {
     const user = await this.findUserOrThrow(userId);
-    const localDate = resolveRequestedLocalDate(undefined, user.timezone);
+    const localDate = resolveRequestedLocalDate(requestedDate, user.timezone);
     const routine = await this.prisma.routine.findFirst({
       where: { id: routineId, userId },
     });
@@ -151,9 +151,9 @@ export class RoutinesService {
     };
   }
 
-  async checkTodayRoutine(userId: string, routineId: string) {
+  async checkTodayRoutine(userId: string, routineId: string, requestedDate?: string) {
     const user = await this.findUserOrThrow(userId);
-    const localDate = resolveRequestedLocalDate(undefined, user.timezone);
+    const localDate = resolveRequestedLocalDate(requestedDate, user.timezone);
     const routine = await this.prisma.routine.findFirst({
       where: { id: routineId, userId },
     });
@@ -178,12 +178,14 @@ export class RoutinesService {
     if (!task) {
       task = await this.createRoutineTask(userId, routine, localDate, user.timezone, {
         status: TaskStatus.DONE,
-        completedAt: new Date(),
+        completedAt: localDate === resolveRequestedLocalDate(undefined, user.timezone)
+          ? new Date() : buildUtcDayRangeForTimezone(localDate, user.timezone).start,
       });
     } else if (task.status !== TaskStatus.DONE) {
       task = await this.prisma.task.update({
         where: { id: task.id },
-        data: { status: TaskStatus.DONE, completedAt: new Date() },
+        data: { status: TaskStatus.DONE, completedAt: localDate === resolveRequestedLocalDate(undefined, user.timezone)
+          ? new Date() : buildUtcDayRangeForTimezone(localDate, user.timezone).start },
       });
     }
 

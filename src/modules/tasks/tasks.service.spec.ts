@@ -108,6 +108,30 @@ describe('TasksService', () => {
     });
   });
 
+  it('attributes a past routine completion to its scheduled local day and updates only its ID', async () => {
+    const prisma = createMockPrisma();
+    prisma.task.findFirst.mockResolvedValue({ ...DEMO_TASK, sourceType: 'ROUTINE',
+      localDueDate: new Date('2026-04-01T00:00:00Z') });
+    await new TasksService(prisma).completeTask('user-1', 'task-1');
+    expect(prisma.task.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'task-1' }, data: expect.objectContaining({
+        completedAt: new Date('2026-03-31T15:00:00Z'),
+      }),
+    }));
+  });
+
+  it('undoes completion for only the requested record and clears completedAt', async () => {
+    const prisma = createMockPrisma();
+    prisma.task.findFirst.mockResolvedValue({ ...DEMO_TASK, status: TaskStatus.DONE,
+      completedAt: new Date() });
+    await new TasksService(prisma).updateTask('user-1', 'task-1', { status: TaskStatus.INBOX });
+    expect(prisma.task.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'task-1' }, data: expect.objectContaining({
+        status: TaskStatus.INBOX, completedAt: null,
+      }),
+    }));
+  });
+
   describe('completeTask', () => {
     it('should mark task as DONE with completedAt', async () => {
       const prisma = createMockPrisma();

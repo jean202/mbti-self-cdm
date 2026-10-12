@@ -6,6 +6,8 @@ import {
 import { TaskStatus, type Prisma, type Task, type User } from '@prisma/client';
 
 import {
+  buildUtcDayRangeForTimezone,
+  resolveRequestedLocalDate,
   formatLocalDate,
   parseLocalDate,
 } from '../../common/utils/local-date.util';
@@ -211,11 +213,16 @@ export class TasksService {
       throw new NotFoundException('Task was not found.');
     }
 
+    const user = await this.findUserOrThrow(userId);
+    const routineDate = task.sourceType === 'ROUTINE' && task.localDueDate
+      ? formatLocalDate(task.localDueDate) : null;
+    const completedAt = routineDate && routineDate !== resolveRequestedLocalDate(undefined, user.timezone)
+      ? buildUtcDayRangeForTimezone(routineDate, user.timezone).start : new Date();
     const updated = await this.prismaService.task.update({
       where: { id: taskId },
       data: {
         status: TaskStatus.DONE,
-        completedAt: task.completedAt ?? new Date(),
+        completedAt: task.completedAt ?? completedAt,
       },
     });
 

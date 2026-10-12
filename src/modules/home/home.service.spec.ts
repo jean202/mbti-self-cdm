@@ -430,6 +430,21 @@ describe('HomeService', () => {
       expect(result.home_mode).toBeNull();
     });
 
+    it('keeps all-day events visible without occupying timed calendar slots', async () => {
+      const prisma = createMockPrisma();
+      prisma.calendarEvent.findMany.mockResolvedValue([
+        { ...DEMO_EVENT, id: 'holiday', title: '한글날', isAllDay: true },
+        { ...DEMO_EVENT, isAllDay: false },
+      ]);
+      const result = await createHomeService(prisma, createMockProfileLoader()).getHome('user-1');
+      expect(result.calendar_summary.all_day_items).toEqual([{ id: 'holiday', title: '한글날' }]);
+      expect(result.calendar_summary.items.map((item) => item.id)).not.toContain('holiday');
+      expect(prisma.calendarEvent.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({ endsAt: expect.objectContaining({ gt: expect.any(Date) }) }),
+        select: expect.objectContaining({ isAllDay: true }),
+      }));
+    });
+
     it('should return empty calendar when no connections', async () => {
       const userNoCalendar = { ...DEMO_USER, calendarConnections: [] };
       const service = createHomeService(
