@@ -11,6 +11,7 @@
 
 - `api-contract.md`
 - `auth-login-integration.md`
+- `calendar-oauth-callback-integration.md`
 
 ## UX and product flow
 
