@@ -5,10 +5,13 @@ import { AuthProvider } from '@prisma/client';
 import { ProviderVerificationService } from './provider-verification.service';
 
 describe('ProviderVerificationService', () => {
+  // Materialize Node's lazy fetch export before Jest restores its spy descriptor.
+  const originalFetch = globalThis.fetch;
   let service: ProviderVerificationService;
   let fetchSpy: jest.SpiedFunction<typeof fetch>;
 
   beforeEach(() => {
+    globalThis.fetch = originalFetch;
     service = new ProviderVerificationService({
       get: jest.fn(),
     } as unknown as ConfigService);

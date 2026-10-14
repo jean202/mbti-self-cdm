@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   ParseUUIDPipe,
   Post,
   Query,
@@ -14,6 +15,8 @@ import { AuthGuard } from '../../common/auth/auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { RequestUser } from '../../common/types/request-user.type';
 import { CreateRoutineDto } from './dto/create-routine.dto';
+import { ScheduleRoutineDto } from './dto/schedule-routine.dto';
+import { UpdateRecommendationWindowDto } from './dto/update-recommendation-window.dto';
 import { RoutinesService } from './routines.service';
 
 @ApiTags('Routines')
@@ -30,6 +33,26 @@ export class RoutinesController {
     @Body() dto: CreateRoutineDto,
   ) {
     return this.routinesService.createRoutine(user.userId, dto);
+  }
+
+  @Patch(':routine_id/recommendation-window')
+  @ApiOperation({ summary: '루틴 추천 시간 설정 또는 제거' })
+  updateRecommendationWindow(
+    @CurrentUser() user: RequestUser,
+    @Param('routine_id', new ParseUUIDPipe()) routineId: string,
+    @Body() dto: UpdateRecommendationWindowDto,
+  ) {
+    return this.routinesService.updateRecommendationWindow(user.userId, routineId, dto);
+  }
+
+  @Post(':routine_id/schedule')
+  @ApiOperation({ summary: '선택한 시각에 루틴 Task 예약' })
+  scheduleRoutine(
+    @CurrentUser() user: RequestUser,
+    @Param('routine_id', new ParseUUIDPipe()) routineId: string,
+    @Body() dto: ScheduleRoutineDto,
+  ) {
+    return this.routinesService.scheduleRoutine(user.userId, routineId, dto.dueAt);
   }
 
   @Get()

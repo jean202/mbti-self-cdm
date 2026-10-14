@@ -10,6 +10,8 @@ import {
   Min,
 } from 'class-validator';
 
+import { IsRecommendationWindow, type RecommendationWindow } from './recommendation-window';
+
 export class CreateRoutineDto {
   @ApiProperty({ description: '루틴 제목', example: '아침 10분 명상' })
   @IsString()
@@ -40,6 +42,16 @@ export class CreateRoutineDto {
   @Max(6)
   @IsOptional()
   timesPerWeek?: number;
+
+  @ApiPropertyOptional({
+    description: '추천 시간. CLOCK: startMinutes/endMinutes(0~1439, 서로 다름), AFTER_WAKE/BEFORE_SLEEP: durationMinutes(1~1440), ANYTIME: 기상 시간 내 언제든지. 생략/null이면 자동 추천 없음',
+    type: Object,
+    nullable: true,
+    example: { mode: 'AFTER_WAKE', durationMinutes: 60 },
+  })
+  @IsOptional()
+  @IsRecommendationWindow()
+  recommendationWindow?: RecommendationWindow | null;
 
   @ApiPropertyOptional({ description: '활성화 여부', default: true })
   @IsBoolean()

@@ -22,6 +22,9 @@ import {
 } from '../../common/utils/local-date.util';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { CreateRoutineDto } from './dto/create-routine.dto';
+import { isRecommendationWindow, type RecommendationWindow } from './dto/recommendation-window';
+import { isScheduleDueAt } from './dto/schedule-routine.dto';
+import { UpdateRecommendationWindowDto } from './dto/update-recommendation-window.dto';
 
 type RoutineTaskSource = Pick<
   Task,
@@ -35,7 +38,11 @@ type RoutineTaskSource = Pick<
   | 'createdAt'
 >;
 
-type RoutineCadenceRule = { daysOfWeek?: number[]; timesPerWeek?: number };
+type RoutineCadenceRule = {
+  daysOfWeek?: number[];
+  timesPerWeek?: number;
+  recommendationWindow?: RecommendationWindow | null;
+};
 
 type WeeklyProgress = {
   doneCount: number;
@@ -60,6 +67,15 @@ export class RoutinesService {
       );
     }
 
+    if (dto.recommendationWindow !== undefined && dto.recommendationWindow !== null
+      && !isRecommendationWindow(dto.recommendationWindow)) {
+      throw new BadRequestException('Invalid recommendationWindow.');
+    }
+
+    const cadencePayload = hasTimesPerWeek
+      ? { timesPerWeek: dto.timesPerWeek }
+      : { daysOfWeek: dto.daysOfWeek };
+
     return this.prisma.routine.create({
       data: {
         userId,
@@ -69,11 +85,112 @@ export class RoutinesService {
           ? RoutineCadenceType.CUSTOM
           : RoutineCadenceType.WEEKLY,
         isActive: dto.isActive ?? true,
-        cadencePayloadJson: (hasTimesPerWeek
-          ? { timesPerWeek: dto.timesPerWeek }
-          : { daysOfWeek: dto.daysOfWeek }) as Prisma.InputJsonValue,
+        cadencePayloadJson: {
+          ...cadencePayload,
+          ...(dto.recommendationWindow !== undefined
+            ? { recommendationWindow: dto.recommendationWindow }
+            : {}),
+        } as Prisma.InputJsonValue,
       },
     });
+  }
+
+  async updateRecommendationWindow(
+    userId: string,
+    routineId: string,
+    dto: UpdateRecommendationWindowDto,
+  ) {
+    const window = dto?.recommendationWindow;
+    if (window !== null && !isRecommendationWindow(window)) {
+      throw new BadRequestException('Provide recommendationWindow as a valid window or null.');
+    }
+
+    const routine = await this.prisma.routine.findFirst({
+      where: { id: routineId, userId },
+    });
+    if (!routine) {
+      throw new NotFoundException('Routine was not found.');
+    }
+
+    const payload = {
+      ...(routine.cadencePayloadJson as Prisma.JsonObject | null),
+    };
+    if (window === null) {
+      delete payload.recommendationWindow;
+    } else {
+      payload.recommendationWindow = window;
+    }
+
+    return this.prisma.routine.update({
+      where: { id: routineId, userId },
+      data: { cadencePayloadJson: payload },
+    });
+  }
+
+  async scheduleRoutine(userId: string, routineId: string, dueAt: string): Promise<Task> {
+    if (!isScheduleDueAt(dueAt)) {
+      throw new BadRequestException('dueAt must be a valid ISO 8601 timestamp with Z or a timezone offset.');
+    }
+
+    const scheduledAt = new Date(dueAt);
+
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.prisma.$transaction(async (tx) => {
+          const user = await tx.user.findUnique({
+            where: { id: userId },
+            select: { id: true, timezone: true },
+          });
+          if (!user) {
+            throw new NotFoundException('User was not found.');
+          }
+
+          const routine = await tx.routine.findFirst({ where: { id: routineId, userId } });
+          if (!routine) {
+            throw new NotFoundException('Routine was not found.');
+          }
+          if (!routine.isActive) {
+            throw new BadRequestException('Inactive routines cannot be scheduled.');
+          }
+
+          const localDate = this.formatDateInTimezone(scheduledAt, user.timezone);
+          if (this.timesPerWeekOf(routine) === null && !this.isRoutineDueOn(routine, localDate)) {
+            throw new BadRequestException('Routine is not due on the selected local date.');
+          }
+
+          const localDueDate = parseLocalDate(localDate);
+          const existing = await tx.task.findFirst({
+            where: { userId, title: routine.name, sourceType: TaskSourceType.ROUTINE, localDueDate },
+          });
+          if (existing) {
+            if (existing.status === TaskStatus.DONE || existing.status === TaskStatus.ARCHIVED) {
+              throw new BadRequestException('Completed or skipped routine tasks cannot be scheduled.');
+            }
+            return tx.task.update({
+              where: { id: existing.id, userId },
+              data: { dueAt: scheduledAt },
+            });
+          }
+
+          return tx.task.create({
+            data: {
+              userId,
+              title: routine.name,
+              note: routine.note,
+              status: TaskStatus.INBOX,
+              sourceType: TaskSourceType.ROUTINE,
+              localDueDate,
+              dueAt: scheduledAt,
+            },
+          });
+        }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      } catch (error) {
+        if (!(error instanceof Prisma.PrismaClientKnownRequestError)
+          || error.code !== 'P2034' || attempt >= 2) {
+          throw error;
+        }
+      }
+    }
   }
 
   async getRoutines(userId: string, requestedDate?: string) {
@@ -291,6 +408,8 @@ export class RoutinesService {
       note: routine.note,
       cadenceType: routine.cadenceType,
       cadencePayloadJson: routine.cadencePayloadJson,
+      recommendation_window:
+        (routine.cadencePayloadJson as RoutineCadenceRule | null)?.recommendationWindow ?? null,
       isActive: routine.isActive,
       createdAt: routine.createdAt.toISOString(),
       updatedAt: routine.updatedAt.toISOString(),
