@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Query,
+  Res,
+} from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
 
 import { CompleteCalendarOAuthCallbackDto } from './dto/complete-calendar-oauth-callback.dto';
@@ -19,6 +26,7 @@ export class InternalCalendarOAuthController {
       query,
     );
 
-    return reply.redirect(result.redirect_to);
+    // Nest가 핸들러 전에 200을 먼저 설정하므로 코드를 명시하지 않으면 Location만 붙은 200이 나간다.
+    return reply.redirect(result.redirect_to, HttpStatus.FOUND);
   }
 }
