@@ -201,19 +201,11 @@ export class AuthTokenService {
   }
 
   private getAccessTokenSecret(): string {
-    return this.readString(
-      'AUTH_ACCESS_TOKEN_SECRET',
-      DEV_ACCESS_TOKEN_SECRET,
-      'AUTH_ACCESS_TOKEN_SECRET',
-    );
+    return this.readString('AUTH_ACCESS_TOKEN_SECRET', DEV_ACCESS_TOKEN_SECRET);
   }
 
   private getIssuer(): string {
-    return this.readString(
-      'AUTH_TOKEN_ISSUER',
-      'mbti-self-cdm-backend',
-      'AUTH_TOKEN_ISSUER',
-    );
+    return this.readString('AUTH_TOKEN_ISSUER', 'mbti-self-cdm-backend');
   }
 
   private readPositiveNumber(
@@ -236,13 +228,11 @@ export class AuthTokenService {
     return value;
   }
 
-  private readString(key: string, fallback: string, label: string): string {
-    const value = this.configService.get<string>(key) ?? fallback;
+  // 빈 값은 설정하지 않은 것으로 본다(validateEnv와 같은 규칙). 운영에서 빈 서명 키는
+  // validateEnv가 기동 전에 막는다.
+  private readString(key: string, fallback: string): string {
+    const value = this.configService.get<string>(key);
 
-    if (value.trim().length === 0) {
-      throw new InternalServerErrorException(`${label} must not be empty.`);
-    }
-
-    return value;
+    return value && value.trim().length > 0 ? value : fallback;
   }
 }

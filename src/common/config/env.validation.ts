@@ -55,7 +55,7 @@ function validateProductionEnv(config: Record<string, unknown>): void {
     encryptionKey === DEV_ENCRYPTION_KEY
   ) {
     logger.warn(
-      'ENCRYPTION_KEY is not set in production; calendar credentials are encrypted with the development fallback key.',
+      'ENCRYPTION_KEY is unset, blank or a known placeholder in production; calendar credentials are encrypted with a publicly known key.',
     );
   }
 }

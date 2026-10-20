@@ -185,11 +185,16 @@ describe('AuthTokenService', () => {
     );
   });
 
-  it('refuses a blank signing secret', () => {
-    const service = createService({ AUTH_ACCESS_TOKEN_SECRET: '   ' });
+  it('treats a blank signing secret or issuer as unset', () => {
+    // .env의 `AUTH_ACCESS_TOKEN_SECRET=`처럼 값만 비운 경우. 운영에서는 validateEnv가 기동을 막는다.
+    const blank = createService({ AUTH_ACCESS_TOKEN_SECRET: '   ', AUTH_TOKEN_ISSUER: '' });
+    const defaults = createService({});
 
-    expect(() =>
-      service.issueAccessToken({ userId: 'u', sessionId: 's' }),
-    ).toThrow('AUTH_ACCESS_TOKEN_SECRET must not be empty.');
+    const { token } = blank.issueAccessToken({ userId: 'u', sessionId: 's' });
+
+    expect(defaults.verifyAccessToken(token)).toMatchObject({
+      sub: 'u',
+      iss: 'mbti-self-cdm-backend',
+    });
   });
 });
