@@ -32,6 +32,10 @@
 - 각 `*_CLIENT_IDS`는 쉼표 구분 문자열을 허용한다
 - iOS / Android / Web client id가 서로 다르면 모두 넣는다
 - 운영 전환 시 `AUTH_ENABLE_DEV_IDENTITY_BRIDGE=false`로 변경한다
+- `NODE_ENV=production`(Docker 이미지 기본값)에서는 다음이 강제된다
+  - `AUTH_ACCESS_TOKEN_SECRET`이 비어 있거나 개발 기본값/`.env.example` 자리표시자이면 서버가 기동하지 않는다
+  - `AUTH_ENABLE_DEV_IDENTITY_BRIDGE`를 비워두면 우회 로그인이 꺼진다(명시적으로 `true`면 켜지고 경고를 남긴다)
+  - `ENCRYPTION_KEY`가 없으면 경고만 남긴다(이미 개발 키로 암호화한 캘린더 자격이 있을 수 있어 막지 않는다)
 
 예시:
 

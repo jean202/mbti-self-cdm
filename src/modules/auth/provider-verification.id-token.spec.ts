@@ -321,6 +321,31 @@ describe('ProviderVerificationService id_token verification', () => {
       expect(fetchSpy).not.toHaveBeenCalled();
     });
 
+    it('turns the bridge off by default in production and on elsewhere', async () => {
+      const bridgeLogin = login(undefined, AuthProvider.KAKAO, { provider_user_id: '12345' });
+
+      env.NODE_ENV = 'production';
+      await expect(service.verify(bridgeLogin)).rejects.toThrow(
+        new BadRequestException('provider_payload.id_token is required.'),
+      );
+
+      env.NODE_ENV = 'production';
+      env.AUTH_ENABLE_DEV_IDENTITY_BRIDGE = '  ';
+      await expect(service.verify(bridgeLogin)).rejects.toBeInstanceOf(BadRequestException);
+
+      env.NODE_ENV = 'production';
+      env.AUTH_ENABLE_DEV_IDENTITY_BRIDGE = 'true';
+      await expect(service.verify(bridgeLogin)).resolves.toMatchObject({
+        providerUserId: '12345',
+      });
+
+      env.NODE_ENV = 'development';
+      env.AUTH_ENABLE_DEV_IDENTITY_BRIDGE = undefined;
+      await expect(service.verify(bridgeLogin)).resolves.toMatchObject({
+        providerUserId: '12345',
+      });
+    });
+
     it('uses the lowercased email as the bridge identity when no user id is sent', async () => {
       env.AUTH_ENABLE_DEV_IDENTITY_BRIDGE = 'true';
 

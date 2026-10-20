@@ -25,6 +25,9 @@ type AccessTokenPayload = {
 
 export interface AccessTokenClaims extends AccessTokenPayload {}
 
+// 로컬 개발용 기본값. 운영(NODE_ENV=production)에서는 validateEnv가 이 값으로 기동하지 못하게 막는다.
+export const DEV_ACCESS_TOKEN_SECRET = 'dev-access-secret-change-me';
+
 @Injectable()
 export class AuthTokenService {
   constructor(private readonly configService: ConfigService) {}
@@ -200,7 +203,7 @@ export class AuthTokenService {
   private getAccessTokenSecret(): string {
     return this.readString(
       'AUTH_ACCESS_TOKEN_SECRET',
-      'dev-access-secret-change-me',
+      DEV_ACCESS_TOKEN_SECRET,
       'AUTH_ACCESS_TOKEN_SECRET',
     );
   }
