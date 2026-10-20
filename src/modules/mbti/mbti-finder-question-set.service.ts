@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { readFile, readdir } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
@@ -19,6 +23,9 @@ export interface MbtiFinderQuestionSet {
   questions: MbtiFinderQuestion[];
 }
 
+// 버전은 데이터 디렉터리의 파일 이름으로 쓰이므로 경로 구분자를 허용하지 않는다.
+const VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
 interface MbtiFinderQuestionSetFile {
   question_set_version?: string;
   scale?: unknown;
@@ -33,6 +40,11 @@ export class MbtiFinderQuestionSetService {
 
   async getQuestionSet(version?: string): Promise<MbtiFinderQuestionSet> {
     const resolvedVersion = version ?? (await this.getLatestVersion());
+
+    if (!VERSION_PATTERN.test(resolvedVersion)) {
+      throw new BadRequestException('Invalid MBTI finder question set version.');
+    }
+
     const cached = this.cache.get(resolvedVersion);
 
     if (cached) {
@@ -41,6 +53,7 @@ export class MbtiFinderQuestionSetService {
 
     const raw = (await this.readJson(
       join(this.getDataRoot(), `${resolvedVersion}.json`),
+      resolvedVersion,
     )) as MbtiFinderQuestionSetFile;
     const scale =
       Array.isArray(raw.scale) &&
@@ -121,7 +134,7 @@ export class MbtiFinderQuestionSetService {
     );
   }
 
-  private async readJson<T>(filePath: string): Promise<T> {
+  private async readJson<T>(filePath: string, version: string): Promise<T> {
     try {
       const raw = await readFile(filePath, 'utf8');
 
@@ -137,7 +150,7 @@ export class MbtiFinderQuestionSetService {
 
       if (code === 'ENOENT') {
         throw new NotFoundException(
-          `MBTI finder question set was not found: ${filePath}`,
+          `MBTI finder question set was not found: ${version}`,
         );
       }
 
