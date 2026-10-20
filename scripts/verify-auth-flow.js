@@ -97,6 +97,10 @@ async function main() {
         error instanceof Error ? error.message : 'session-revoked';
     }
 
+    if (revokedSessionCheck === 'unexpected-pass') {
+      throw new Error('Session was still valid after logout.');
+    }
+
     console.log(
       JSON.stringify(
         {
