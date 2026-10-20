@@ -72,7 +72,8 @@ export class SessionCleanupWorker implements OnModuleInit, OnModuleDestroy {
 
     let cursor = '0';
     let orphanCount = 0;
-    const sessionPattern = 'session:*'; // 사용하는 세션 키 패턴에 맞게 조정 가능
+    // SessionService.getSessionKey()와 같은 네임스페이스여야 한다.
+    const sessionPattern = 'auth:session:*';
 
     if (!this.connection) return;
 
@@ -105,6 +106,10 @@ export class SessionCleanupWorker implements OnModuleInit, OnModuleDestroy {
             if (!userExists) {
               // 유저는 삭제되었는데 세션이 남아있는 경우 (고아 세션)
               await this.connection.del(key);
+              await this.connection.srem(
+                `auth:user-sessions:${userId}`,
+                parsed.sessionId ?? key.slice('auth:session:'.length),
+              );
               orphanCount++;
               this.logger.log(`Deleted orphan session: ${key} (User ${userId} not found)`);
             }
