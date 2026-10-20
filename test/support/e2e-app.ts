@@ -31,6 +31,7 @@ const trackedUsers = new WeakMap<NestFastifyApplication, Set<string>>();
 
 // 실제 AppModule을 main.ts와 같은 전역 설정으로 띄운다. 인증 가드는 우회하지 않는다.
 // env는 이 앱 인스턴스에서만 ConfigService 값을 덮어쓴다(.env나 process.env보다 우선).
+// Redis는 e2e 전용 DB를 쓴다(e2eRedisUrl 참고).
 export async function createE2eApp(
   options: { env?: Record<string, string> } = {},
 ): Promise<E2eApp> {
@@ -38,9 +39,11 @@ export async function createE2eApp(
     imports: [AppModule],
   }).compile();
 
-  if (options.env) {
-    overrideConfig(moduleFixture.get(ConfigService), options.env);
-  }
+  const configService = moduleFixture.get(ConfigService);
+  overrideConfig(configService, {
+    REDIS_URL: e2eRedisUrl(configService.get<string>('REDIS_URL')),
+    ...options.env,
+  });
 
   const app = moduleFixture.createNestApplication<NestFastifyApplication>(
     new FastifyAdapter(),
@@ -65,6 +68,19 @@ export async function createE2eApp(
       await app.close();
     },
   };
+}
+
+// e2e는 Redis DB를 따로 쓴다. 같은 Redis에 로컬 개발 서버가 떠 있으면 그 서버의 BullMQ
+// 워커가 테스트가 넣은 잡(설정이 다른)을 가져가 처리할 수 있기 때문이다. E2E_REDIS_URL로 바꿀 수 있다.
+function e2eRedisUrl(configured: string | undefined): string {
+  if (process.env.E2E_REDIS_URL) {
+    return process.env.E2E_REDIS_URL;
+  }
+
+  const url = new URL(configured ?? 'redis://127.0.0.1:6379');
+  url.pathname = '/15';
+
+  return url.toString();
 }
 
 function overrideConfig(

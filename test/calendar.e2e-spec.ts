@@ -73,25 +73,35 @@ describe('Calendar (e2e)', () => {
     return params.get('connection_id')!;
   }
 
+  // Jest 타임아웃(test/jest-e2e.json)보다 먼저 끝나야 아래의 구체적인 오류가 보인다.
   async function waitForSync(user: LoggedInUser, connectionId: string) {
-    for (let attempt = 0; attempt < 50; attempt += 1) {
+    const deadline = Date.now() + 15_000;
+    let last: { status?: string; last_synced_at?: string | null } | undefined;
+
+    while (Date.now() < deadline) {
       const response = await authed(ctx.app, user, {
         method: 'GET',
         url: '/v1/calendar/connections',
       });
-      const connection = response
+      last = response
         .json()
         .data.find((item: { id: string }) => item.id === connectionId);
 
-      if (connection?.status === 'ACTIVE' && connection.last_synced_at) {
-        return connection;
+      if (last?.status === 'ACTIVE' && last.last_synced_at) {
+        return { status: last.status, last_synced_at: last.last_synced_at };
+      }
+      if (last?.status === 'ERROR') {
+        throw new Error(`connection ${connectionId} failed to sync: ${JSON.stringify(last)}`);
       }
 
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
 
-    throw new Error(`connection ${connectionId} was not synced in time`);
+    throw new Error(
+      `connection ${connectionId} was not synced in time: ${JSON.stringify(last)}`,
+    );
   }
+
 
   it('builds a Google authorize URL bound to a one-time state', async () => {
     const user = await loginOnboardedUser(ctx.app);
