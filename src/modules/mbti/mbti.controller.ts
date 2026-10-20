@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -48,7 +49,7 @@ export class MbtiController {
   @Get('finder/attempts/:attempt_id')
   getFinderAttempt(
     @CurrentUser() currentUser: RequestUser,
-    @Param('attempt_id') attemptId: string,
+    @Param('attempt_id', new ParseUUIDPipe()) attemptId: string,
   ) {
     return this.mbtiService.getFinderAttempt(currentUser.userId, attemptId);
   }
@@ -56,7 +57,7 @@ export class MbtiController {
   @Post('finder/attempts/:attempt_id/answers')
   submitFinderAnswers(
     @CurrentUser() currentUser: RequestUser,
-    @Param('attempt_id') attemptId: string,
+    @Param('attempt_id', new ParseUUIDPipe()) attemptId: string,
     @Body() body: SubmitMbtiFinderAnswersDto,
   ) {
     return this.mbtiService.submitFinderAnswers(
@@ -69,7 +70,7 @@ export class MbtiController {
   @Post('finder/attempts/:attempt_id/complete')
   completeFinderAttempt(
     @CurrentUser() currentUser: RequestUser,
-    @Param('attempt_id') attemptId: string,
+    @Param('attempt_id', new ParseUUIDPipe()) attemptId: string,
   ) {
     return this.mbtiService.completeFinderAttempt(currentUser.userId, attemptId);
   }

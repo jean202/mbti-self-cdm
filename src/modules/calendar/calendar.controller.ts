@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
   UseGuards,
@@ -39,7 +40,7 @@ export class CalendarController {
   @Post('connections/:connection_id/sync')
   syncConnection(
     @CurrentUser() currentUser: RequestUser,
-    @Param('connection_id') connectionId: string,
+    @Param('connection_id', new ParseUUIDPipe()) connectionId: string,
   ) {
     return this.calendarService.syncConnection(currentUser.userId, connectionId);
   }
@@ -47,7 +48,7 @@ export class CalendarController {
   @Post('connections/:connection_id/revoke')
   revokeConnection(
     @CurrentUser() currentUser: RequestUser,
-    @Param('connection_id') connectionId: string,
+    @Param('connection_id', new ParseUUIDPipe()) connectionId: string,
   ) {
     return this.calendarService.revokeConnection(currentUser.userId, connectionId);
   }
