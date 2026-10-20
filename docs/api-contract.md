@@ -644,6 +644,9 @@ Base path:
 
 - 실제 provider callback은 서버 내부 route에서 처리한다
 - Flutter 앱은 `authorize_url`을 열고, 연결 완료 후 내부 bootstrap 또는 연결 목록 API를 다시 조회한다
+- `redirect_uri`는 앱 주소만 받는다. 콜백이 인증 없이 이 주소로 302를 보내므로 웹 주소를 허용하면 오픈 리다이렉트가 된다.
+  `CALENDAR_OAUTH_ALLOWED_REDIRECT_URIS`가 비어 있으면 http/https 등 웹 스킴을 거부하고, 설정돼 있으면 그 목록(스킴+호스트+경로 접두어)만 허용한다.
+  허용되지 않으면 `400 INVALID_CALENDAR_REDIRECT_URI`
 
 ### 6.2 `GET /v1/calendar/connections`
 

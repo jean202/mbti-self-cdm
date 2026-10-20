@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class StartMbtiFinderAttemptDto {
@@ -6,5 +6,8 @@ export class StartMbtiFinderAttemptDto {
   @IsOptional()
   @IsString()
   @MaxLength(32)
+  @Matches(/^[A-Za-z0-9][A-Za-z0-9._-]*$/, {
+    message: 'question_set_version must be a plain version name.',
+  })
   question_set_version?: string;
 }

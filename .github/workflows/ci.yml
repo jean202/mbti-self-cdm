@@ -1,0 +1,163 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  check:
+    name: Typecheck · Unit tests · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # prisma validate는 datasource env를 요구한다. 연결은 하지 않는다.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Prisma schema
+        run: npm run prisma:validate
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npx jest --ci --coverage --coverageReporters=text-summary --coverageReporters=lcov
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: coverage/lcov-report
+          retention-days: 7
+          if-no-files-found: ignore
+
+  integration:
+    name: Integration (PostgreSQL · Redis)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: mbti_self_cdm
+          POSTGRES_USER: mbti_self_cdm
+          POSTGRES_PASSWORD: mbti_self_cdm
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mbti_self_cdm -d mbti_self_cdm"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://mbti_self_cdm:mbti_self_cdm@localhost:5432/mbti_self_cdm?schema=public
+      REDIS_URL: redis://localhost:6379
+      # CI 전용 값. 운영 비밀값과 무관하다.
+      AUTH_ACCESS_TOKEN_SECRET: ci-only-access-token-secret
+      ENCRYPTION_KEY: ci-only-encryption-key-32-bytes!
+      AUTH_ENABLE_DEV_IDENTITY_BRIDGE: 'true'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate
+
+      - name: Apply migrations to a clean database
+        run: npm run prisma:migrate:deploy
+
+      - name: Check schema.prisma matches the migration history
+        run: |
+          npx prisma migrate diff \
+            --from-url "$DATABASE_URL" \
+            --to-schema-datamodel prisma/schema.prisma \
+            --exit-code \
+            || { echo "::error::schema.prisma has changes without a migration. Run 'prisma migrate dev' and commit the migration."; exit 1; }
+
+      - name: Seed demo data
+        run: npm run db:seed
+
+      - name: Build
+        run: npm run build
+
+      - name: Run verification scripts
+        run: |
+          set -euo pipefail
+          for script in \
+            test-provider-verification \
+            verify-mbti-onboarding \
+            verify-calendar-oauth-start \
+            verify-calendar-oauth-callback \
+            verify-calendar-flow \
+            verify-vertical-slice \
+            verify-auth-flow
+          do
+            echo "::group::$script"
+            node "scripts/$script.js" > /dev/null
+            echo "::endgroup::"
+          done
+
+      - name: E2E tests
+        run: npm run test:e2e -- --ci
+
+  docker:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build production image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          tags: mbti-self-cdm:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

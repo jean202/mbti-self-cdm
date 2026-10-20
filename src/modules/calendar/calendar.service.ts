@@ -62,6 +62,22 @@ const OAUTH_PROVIDER_CONFIG: Partial<Record<CalendarProvider, OAuthProviderConfi
   },
 };
 
+// 콜백은 인증 없이 state만으로 redirect_uri로 302를 보낸다. 웹 주소를 허용하면 누구나 만든 flow로
+// 피해자를 임의 사이트로 보낼 수 있다(오픈 리다이렉트). 허용 목록이 없으면 앱 스킴만 받는다.
+const NON_APP_SCHEMES = new Set([
+  'http:',
+  'https:',
+  'javascript:',
+  'data:',
+  'file:',
+  'vbscript:',
+  'blob:',
+  'about:',
+  'ftp:',
+  'ws:',
+  'wss:',
+]);
+
 const CALENDAR_PROVIDER_LABELS: Record<CalendarProvider, string> = {
   [CalendarProvider.GOOGLE]: 'Google Calendar',
   [CalendarProvider.APPLE]: 'Apple Calendar',
@@ -101,6 +117,8 @@ export class CalendarService {
     const callbackUri =
       this.configService.get<string>(providerConfig.callbackUriEnvKey) ??
       this.buildDefaultCallbackUri(input.provider);
+
+    this.assertAllowedRedirectUri(input.redirect_uri);
 
     const flowId = randomUUID();
     const stateKey = this.getOAuthStateKey(input.provider, flowId);
@@ -161,6 +179,12 @@ export class CalendarService {
     }
 
     const state = this.parseStoredOAuthState(rawState);
+
+    if (!this.isAllowedRedirectUri(state.redirect_uri)) {
+      await this.redisService.getClient().del(stateKey);
+      this.logger.warn(`Stored redirect_uri is no longer allowed for flow ${state.flow_id}`);
+      throw this.invalidRedirectUri();
+    }
 
     if (state.provider !== provider) {
       await this.redisService.getClient().del(stateKey);
@@ -735,6 +759,67 @@ export class CalendarService {
     }
 
     return CALENDAR_PROVIDER_LABELS[provider];
+  }
+
+  private assertAllowedRedirectUri(redirectUri: string): void {
+    if (!this.isAllowedRedirectUri(redirectUri)) {
+      throw this.invalidRedirectUri();
+    }
+  }
+
+  private invalidRedirectUri(): BadRequestException {
+    return new BadRequestException({
+      code: 'INVALID_CALENDAR_REDIRECT_URI',
+      message: 'redirect_uri must be an allowed app redirect.',
+    });
+  }
+
+  private isAllowedRedirectUri(redirectUri: string): boolean {
+    const target = this.parseUrl(redirectUri);
+
+    if (!target) {
+      return false;
+    }
+
+    const allowed = (
+      this.configService.get<string>('CALENDAR_OAUTH_ALLOWED_REDIRECT_URIS') ?? ''
+    )
+      .split(',')
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+
+    if (allowed.length === 0) {
+      return !NON_APP_SCHEMES.has(target.protocol);
+    }
+
+    return allowed.some((entry) => {
+      const allowedUrl = this.parseUrl(entry);
+
+      if (
+        !allowedUrl ||
+        allowedUrl.protocol !== target.protocol ||
+        allowedUrl.host !== target.host
+      ) {
+        return false;
+      }
+
+      // 경로는 세그먼트 단위로 비교한다. "/calendar"가 "/calendar-evil"을 허용하지 않게 한다.
+      const allowedPath = allowedUrl.pathname.replace(/\/+$/, '');
+
+      return (
+        allowedPath === '' ||
+        target.pathname === allowedPath ||
+        target.pathname.startsWith(`${allowedPath}/`)
+      );
+    });
+  }
+
+  private parseUrl(value: string): URL | null {
+    try {
+      return new URL(value);
+    } catch {
+      return null;
+    }
   }
 
   private readFirstConfiguredValue(keys: string[]): string | undefined {

@@ -505,11 +505,18 @@ export class ProviderVerificationService {
       : undefined;
   }
 
+  // provider_user_id만으로 로그인하는 개발용 우회 경로. 값을 비워두면 운영에서는 꺼지고
+  // 그 밖의 환경(로컬, 테스트)에서는 켜진다.
   private isDevIdentityBridgeEnabled(): boolean {
-    return (
-      (this.configService.get<string>('AUTH_ENABLE_DEV_IDENTITY_BRIDGE') ??
-        'true') === 'true'
+    const configured = this.configService.get<string>(
+      'AUTH_ENABLE_DEV_IDENTITY_BRIDGE',
     );
+
+    if (configured === undefined || configured.trim() === '') {
+      return this.configService.get<string>('NODE_ENV') !== 'production';
+    }
+
+    return configured === 'true';
   }
 
   private nowInSeconds(): number {
