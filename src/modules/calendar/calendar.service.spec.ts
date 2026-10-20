@@ -379,6 +379,91 @@ describe('CalendarService', () => {
     });
   });
 
+  describe('redirect_uri allowlist', () => {
+    async function start(redirectUri: string, env: Record<string, string> = {}) {
+      return createHarness(env).service.startOAuthConnection('user-1', {
+        provider: CalendarProvider.GOOGLE,
+        redirect_uri: redirectUri,
+      });
+    }
+
+    it.each([
+      'mbtiapp://calendar/oauth-result',
+      'myapp://calendar-connect',
+      'com.example.app:/oauth2redirect',
+    ])('accepts the app redirect %p by default', async (redirectUri) => {
+      await expect(start(redirectUri)).resolves.toMatchObject({ provider: 'GOOGLE' });
+    });
+
+    it.each([
+      'https://evil.example/landing',
+      'http://localhost:3000/callback',
+      'javascript://x%0aalert(1)',
+      'data://text/html,hi',
+      'not a url',
+    ])('rejects the web or unsafe redirect %p by default', async (redirectUri) => {
+      await expect(start(redirectUri)).rejects.toMatchObject({
+        response: { code: 'INVALID_CALENDAR_REDIRECT_URI' },
+      });
+    });
+
+    it('only accepts configured redirects when an allowlist is set', async () => {
+      const env = {
+        CALENDAR_OAUTH_ALLOWED_REDIRECT_URIS:
+          'mbtiapp://calendar/oauth, https://app.example.com/calendar/',
+      };
+
+      await expect(start('mbtiapp://calendar/oauth', env)).resolves.toBeDefined();
+      await expect(start('mbtiapp://calendar/oauth/done?x=1', env)).resolves.toBeDefined();
+      await expect(start('https://app.example.com/calendar/return', env)).resolves.toBeDefined();
+
+      for (const redirectUri of [
+        'mbtiapp://calendar/oauth-evil',
+        'mbtiapp://calendar.evil/oauth',
+        'otherapp://calendar/oauth',
+        'https://app.example.com/other',
+        'https://app.example.com@evil.example/calendar/',
+        'http://app.example.com/calendar/return',
+      ]) {
+        await expect(start(redirectUri, env)).rejects.toMatchObject({
+          response: { code: 'INVALID_CALENDAR_REDIRECT_URI' },
+        });
+      }
+    });
+
+    it('stores nothing for a rejected redirect', async () => {
+      const harness = createHarness();
+
+      await expect(
+        harness.service.startOAuthConnection('user-1', {
+          provider: CalendarProvider.GOOGLE,
+          redirect_uri: 'https://evil.example',
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(harness.redis.strings.size).toBe(0);
+    });
+
+    it('refuses to redirect from a stored state whose redirect is not allowed', async () => {
+      const { service, redis, tx } = createHarness();
+      await redis.set(
+        'oauth_state:GOOGLE:flow-1',
+        JSON.stringify({
+          flow_id: 'flow-1',
+          user_id: 'user-1',
+          provider: 'GOOGLE',
+          redirect_uri: 'https://evil.example',
+          callback_uri: 'https://api.example.com/cb',
+        }),
+      );
+
+      await expect(
+        service.completeOAuthConnection('google', { state: 'flow-1', error: 'access_denied' }),
+      ).rejects.toMatchObject({ response: { code: 'INVALID_CALENDAR_REDIRECT_URI' } });
+      expect(redis.strings.has('oauth_state:GOOGLE:flow-1')).toBe(false);
+      expect(tx.calendarConnection.upsert).not.toHaveBeenCalled();
+    });
+  });
+
   describe('syncConnection', () => {
     it('marks the connection as syncing and enqueues a job', async () => {
       const { service, queue, prisma } = createHarness();

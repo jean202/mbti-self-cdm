@@ -201,6 +201,19 @@ describe('Calendar (e2e)', () => {
     expect(params.get('error_code')).toBe('CALENDAR_ONBOARDING_NOT_READY');
   });
 
+  it('refuses web redirect URIs so the public callback cannot become an open redirect', async () => {
+    const user = await loginOnboardedUser(ctx.app);
+
+    const response = await authed(ctx.app, user, {
+      method: 'POST',
+      url: '/v1/calendar/connections/oauth/start',
+      payload: { provider: 'GOOGLE', redirect_uri: 'https://evil.example/landing' },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().error.code).toBe('INVALID_CALENDAR_REDIRECT_URI');
+  });
+
   it('rejects redirect URIs without a scheme', async () => {
     const user = await loginOnboardedUser(ctx.app);
 
