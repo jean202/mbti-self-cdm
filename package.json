@@ -21,6 +21,7 @@
     "start:dev": "tsx watch src/main.ts",
     "test:provider-verifier": "npm run build && node scripts/test-provider-verification.js",
     "test": "jest",
+    "test:e2e": "jest --config test/jest-e2e.json --runInBand",
     "test:watch": "jest --watch",
     "export:openapi": "npm run build && node scripts/export-openapi.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
