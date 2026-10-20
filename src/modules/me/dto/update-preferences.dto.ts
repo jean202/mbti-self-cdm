@@ -3,6 +3,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  IsTimeZone,
   Matches,
   MaxLength,
   ValidateNested,
@@ -50,5 +51,6 @@ export class UpdatePreferencesDto {
   @IsOptional()
   @IsString()
   @MaxLength(64)
+  @IsTimeZone()
   timezone?: string;
 }
