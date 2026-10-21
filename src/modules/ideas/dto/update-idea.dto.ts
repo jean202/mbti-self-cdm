@@ -1,13 +1,14 @@
 import { IdeaStatus } from '@prisma/client';
 import {
   IsArray,
-  IsEnum,
+  IsIn,
   IsOptional,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsReviewDate } from '../idea-review-date';
 
 export class UpdateIdeaDto {
   @ApiPropertyOptional({ description: 'Updated idea title', example: 'Build a habit tracker app v2', minLength: 1, maxLength: 255 })
@@ -23,10 +24,15 @@ export class UpdateIdeaDto {
   @MaxLength(4000)
   note?: string | null;
 
-  @ApiPropertyOptional({ description: 'Updated idea status', enum: IdeaStatus, example: 'ACTIVE' })
+  @ApiPropertyOptional({ description: 'Updated idea status', enum: [IdeaStatus.ACTIVE, IdeaStatus.ARCHIVED], example: 'ACTIVE' })
   @IsOptional()
-  @IsEnum(IdeaStatus)
+  @IsIn([IdeaStatus.ACTIVE, IdeaStatus.ARCHIVED])
   status?: IdeaStatus;
+
+  @ApiPropertyOptional({ description: 'Local date to revisit; null clears it', example: '2026-10-18', nullable: true })
+  @IsOptional()
+  @IsReviewDate()
+  review_on?: string | null;
 
   @ApiPropertyOptional({ description: 'Updated tags for the idea', example: ['productivity', 'gamification'], type: String, isArray: true, nullable: true })
   @IsOptional()

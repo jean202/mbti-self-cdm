@@ -1214,19 +1214,19 @@ Base path:
 
 ### 8.9 `GET /v1/ideas`
 
-목적:
-
-- Idea 목록을 조회한다
-
-인증:
-
-- 필요
+인증된 사용자 본인의 Idea 목록을 조회한다.
 
 쿼리 파라미터:
 
-- `status`
-- `cursor`
-- `limit`
+- `status`: `ACTIVE` / `ARCHIVED` / `CONVERTED`. 생략 시 ARCHIVED 제외.
+- `q`: 제목·본문의 대소문자 무관 부분 검색(최대 4,000자). `%`, `_`도 문자 그대로 검색.
+- `review_before`: 유효한 `YYYY-MM-DD`. 해당 날짜 이하의 review_on이 있는 ACTIVE만 반환한다. ARCHIVED/CONVERTED status와 함께 지정하면 빈 목록.
+- `cursor`: 응답의 `meta.next_cursor`를 가공 없이 전달하는 불투명 문자열.
+- `limit`: 1~100, 기본 50.
+
+정렬은 `updated_at DESC, id DESC`이며 커서는 마지막 행의 시각·ID·사용자 범위를 포함한다. 기존 UUID 커서도 본인 소유 행에 한해 지원한다. 잘못된/다른 계정 불투명 커서는 400, 없는/다른 계정 UUID 커서는 404. 종료 페이지의 next_cursor는 null이다.
+
+목록 응답은 `{ "items": [...], "meta": { "next_cursor": "..." } }`. 생성·상세·수정·목록의 Idea 응답에는 기존 필드와 함께 `created_at`, `updated_at`(ISO 시각), `review_on`(`YYYY-MM-DD` 또는 null)이 포함된다. review_on은 푸시 예약이 아닌 앱 내 다시 보기 날짜이며, 다음 날에도 만료되지 않는다.
 
 ### 8.10 `GET /v1/ideas/{idea_id}`
 
@@ -1240,21 +1240,20 @@ Base path:
 
 ### 8.11 `PATCH /v1/ideas/{idea_id}`
 
-목적:
+인증된 소유자만 미전환 Idea의 내용·다시 보기 날짜·보관 상태를 수정한다.
 
-- Idea를 수정하거나 보관한다
-
-인증:
-
-- 필요
-
-요청 예시:
+- `title`, `note`, `tags`: 기존 필드. note: null은 본문 제거, 생략은 유지.
+- `review_on`: 유효한 `YYYY-MM-DD` 또는 null. 생략은 유지, null은 다시 보기 해제.
+- `status`: `ACTIVE` 또는 `ARCHIVED`만 허용. ACTIVE로 복원할 수 있으나 이전 review_on은 자동 복원하지 않는다.
+- ARCHIVED 상태로 변경/수정하면 review_on을 지운다. 동일 요청에 날짜를 보내도 보관 상태가 우선한다.
+- CONVERTED의 PATCH는 메타데이터까지 모두 거부한다. PATCH로 CONVERTED를 지정할 수 없으며 전환 API를 사용해야 한다.
+- 소유자가 아닌 경우 404. 동시에 보관/전환/삭제된 행의 변경은 거부하므로 재조회 후 재시도한다.
 
 ```json
 {
   "title": "발표 도입부 아이디어",
   "note": "질문형 오프닝 검토",
-  "status": "ARCHIVED",
+  "review_on": "2026-10-20",
   "tags": ["presentation"]
 }
 ```
@@ -1292,6 +1291,14 @@ Base path:
   }
 }
 ```
+
+전환은 기존 Idea 내용으로 Task를 만들고 review_on과 archived_at을 지운다. 이미 전환했거나 읽은 뒤 내용이 변경된 경우 전환을 거부하며 트랜잭션 전체를 취소한다.
+
+### 8.13 `DELETE /v1/ideas/{idea_id}`
+
+인증된 소유자만 영구 삭제할 수 있다. ACTIVE, ARCHIVED, CONVERTED 모두 삭제 가능하다. 삭제 확인 UI는 클라이언트 책임이며 보관과 별도 동작이다.
+
+성공: 200 `{ "data": { "id": "uuid" } }`. 없는 행과 다른 계정 행은 모두 404, UUID 형식 오류는 400이다. 연결된 Task는 삭제하지 않는다. 초기 마이그레이션에 배포된 `tasks.linked_idea_id ON DELETE SET NULL`을 그대로 사용하며 FK 변경은 없다.
 
 ## 9. Reflect API
 

@@ -12,12 +12,15 @@ import {
   type User,
 } from '@prisma/client';
 
+import { isUUID } from 'class-validator';
+
 import { parseLocalDate } from '../../common/utils/local-date.util';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { ConvertIdeaToTaskDto } from './dto/convert-idea-to-task.dto';
 import { CreateIdeaDto } from './dto/create-idea.dto';
 import { ListIdeasQueryDto } from './dto/list-ideas-query.dto';
 import { UpdateIdeaDto } from './dto/update-idea.dto';
+import { parseReviewDate } from './idea-review-date';
 
 type IdeaResponseSource = Pick<
   Idea,
@@ -30,6 +33,7 @@ type IdeaResponseSource = Pick<
   | 'createdAt'
   | 'updatedAt'
   | 'archivedAt'
+  | 'reviewOn'
 >;
 
 @Injectable()
@@ -53,21 +57,36 @@ export class IdeasService {
   async listIdeas(userId: string, query: ListIdeasQueryDto) {
     const where: Prisma.IdeaWhereInput = { userId };
 
-    if (query.status) {
-      where.status = query.status;
-    } else {
-      where.status = { not: IdeaStatus.ARCHIVED };
+    const reviewBefore = query.review_before === undefined
+      ? undefined
+      : parseReviewDate(query.review_before);
+    const cursor = query.cursor ? await this.decodeCursor(userId, query.cursor) : null;
+    if (reviewBefore && query.status && query.status !== IdeaStatus.ACTIVE) {
+      return { items: [], meta: { next_cursor: null } };
     }
-
+    where.status = query.status ?? (reviewBefore ? IdeaStatus.ACTIVE : { not: IdeaStatus.ARCHIVED });
+    if (reviewBefore) where.reviewOn = { lte: reviewBefore };
+    if (query.q) {
+      // Escape SQL LIKE wildcards so user-entered search text is literal.
+      const text = query.q.replace(/[\\%_]/g, '\\$&');
+      where.OR = [
+        { title: { contains: text, mode: 'insensitive' } },
+        { note: { contains: text, mode: 'insensitive' } },
+      ];
+    }
+    if (cursor) {
+      where.AND = [{
+        OR: [
+          { updatedAt: { lt: cursor.updatedAt } },
+          { updatedAt: cursor.updatedAt, id: { lt: cursor.id } },
+        ],
+      }];
+    }
     const take = (query.limit ?? 50) + 1;
-
-    if (query.cursor) {
-      where.id = { lt: query.cursor };
-    }
 
     const ideas = await this.prismaService.idea.findMany({
       where,
-      orderBy: [{ updatedAt: 'desc' }],
+      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
       take,
     });
 
@@ -78,7 +97,7 @@ export class IdeasService {
     return {
       items: items.map((idea) => this.toIdeaResponse(idea)),
       meta: {
-        next_cursor: hasMore ? items[items.length - 1].id : null,
+        next_cursor: hasMore ? this.encodeCursor(userId, items[items.length - 1]) : null,
       },
     };
   }
@@ -110,25 +129,44 @@ export class IdeasService {
       );
     }
 
+    if (input.status === IdeaStatus.CONVERTED) {
+      throw new BadRequestException('Use convert-to-task to convert an idea.');
+    }
+    const reviewOn = input.review_on === undefined
+      ? undefined
+      : input.review_on === null ? null : parseReviewDate(input.review_on);
     const nextStatus = input.status ?? existingIdea.status;
 
-    const idea = await this.prismaService.idea.update({
-      where: { id: ideaId },
-      data: {
-        title: input.title ?? undefined,
-        note: input.note === undefined ? undefined : input.note,
-        status: input.status ?? undefined,
-        tagsJson:
-          input.tags === undefined
-            ? undefined
-            : input.tags === null
-              ? Prisma.JsonNull
-              : input.tags,
-        archivedAt: this.resolveArchivedAt(existingIdea.archivedAt, nextStatus),
-      },
-    });
-
+    let idea: Idea;
+    try {
+      idea = await this.prismaService.idea.update({
+        // A concurrent conversion/archive must not be undone by a stale PATCH.
+        where: { id: ideaId, userId, status: existingIdea.status },
+        data: {
+          title: input.title ?? undefined,
+          note: input.note === undefined ? undefined : input.note,
+          status: input.status ?? undefined,
+          tagsJson:
+            input.tags === undefined
+              ? undefined
+              : input.tags === null
+                ? Prisma.JsonNull
+                : input.tags,
+          archivedAt: this.resolveArchivedAt(existingIdea.archivedAt, nextStatus),
+          reviewOn: nextStatus === IdeaStatus.ARCHIVED ? null : reviewOn,
+        },
+      });
+    } catch (error) {
+      this.rethrowMutationConflict(error);
+    }
     return this.toIdeaResponse(idea);
+  }
+
+  async deleteIdea(userId: string, ideaId: string) {
+    // Task.linkedIdea uses ON DELETE SET NULL; never delete the linked task.
+    const result = await this.prismaService.idea.deleteMany({ where: { id: ideaId, userId } });
+    if (result.count === 0) throw new NotFoundException('Idea was not found.');
+    return { id: ideaId };
   }
 
   async convertToTask(
@@ -177,16 +215,18 @@ export class IdeasService {
         });
 
         const converted = await tx.idea.update({
-          where: { id: ideaId },
+          where: { id: ideaId, userId, status: idea.status, updatedAt: idea.updatedAt },
           data: {
             status: IdeaStatus.CONVERTED,
             convertedTaskId: createdTask.id,
+            reviewOn: null,
+            archivedAt: null,
           },
         });
 
         return [converted, createdTask] as const;
       },
-    );
+    ).catch((error: unknown) => this.rethrowMutationConflict(error));
 
     return {
       idea_id: updatedIdea.id,
@@ -196,6 +236,41 @@ export class IdeasService {
         status: task.status,
       },
     };
+  }
+
+  private rethrowMutationConflict(error: unknown): never {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw new BadRequestException('Idea changed or was deleted. Reload before retrying.');
+    }
+    throw error;
+  }
+
+  private encodeCursor(userId: string, idea: IdeaResponseSource): string {
+    return Buffer.from(JSON.stringify({
+      v: 1, userId, updatedAt: idea.updatedAt.toISOString(), id: idea.id,
+    })).toString('base64url');
+  }
+
+  private async decodeCursor(userId: string, cursor: string): Promise<{ updatedAt: Date; id: string }> {
+    if (isUUID(cursor)) {
+      const idea = await this.prismaService.idea.findFirst({ where: { id: cursor, userId } });
+      if (!idea) throw new NotFoundException('Idea cursor was not found.');
+      return { id: idea.id, updatedAt: idea.updatedAt };
+    }
+    try {
+      if (!/^[A-Za-z0-9_-]+$/.test(cursor) || cursor.length > 2048) throw new Error('Invalid encoding');
+      const data = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8'));
+      if (data.v !== 1 || data.userId !== userId ||
+          typeof data.id !== 'string' || !isUUID(data.id) ||
+          typeof data.updatedAt !== 'string') {
+        throw new Error('Invalid cursor');
+      }
+      const updatedAt = new Date(data.updatedAt);
+      if (Number.isNaN(updatedAt.getTime()) || updatedAt.toISOString() !== data.updatedAt) throw new Error('Invalid timestamp');
+      return { updatedAt, id: data.id };
+    } catch {
+      throw new BadRequestException('Invalid idea cursor.');
+    }
   }
 
   private async findUserOrThrow(
@@ -268,6 +343,7 @@ export class IdeasService {
       created_at: idea.createdAt.toISOString(),
       updated_at: idea.updatedAt.toISOString(),
       archived_at: idea.archivedAt?.toISOString() ?? null,
+      review_on: idea.reviewOn?.toISOString().slice(0, 10) ?? null,
     };
   }
 }

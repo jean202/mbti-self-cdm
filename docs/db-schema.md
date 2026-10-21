@@ -187,10 +187,15 @@ erDiagram
 | `created_at` | `timestamp with time zone` | N | 생성 시각 |
 | `updated_at` | `timestamp with time zone` | N | 수정 시각 |
 | `archived_at` | `timestamp with time zone` | Y | 보관 시각 |
+| `review_on` | `date` | Y | 선택적 다시 보기 날짜(YYYY-MM-DD); 보관·태스크 전환 시 해제 |
 
 인덱스:
 
 - `idx_ideas_user_id_status_updated_at (user_id, status, updated_at desc)`
+- `idx_ideas_user_updated_id (user_id, updated_at desc, id desc)`
+- `idx_ideas_user_status_review_on (user_id, status, review_on)`
+
+Idea 삭제 시 연결 Task는 유지된다. 초기 스키마의 `tasks.linked_idea_id` FK는 이미 `ON DELETE SET NULL`이며 이번 변경은 review_on 컬럼·인덱스 추가뿐이다.
 
 ### 5.7 `today_focuses`
 

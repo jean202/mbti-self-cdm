@@ -217,11 +217,14 @@ model Idea {
   createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
   archivedAt      DateTime?  @map("archived_at") @db.Timestamptz(6)
+  reviewOn        DateTime?  @map("review_on") @db.Date
   user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   convertedTask   Task?      @relation("IdeaConvertedTask", fields: [convertedTaskId], references: [id], onDelete: SetNull)
   linkedTasks     Task[]     @relation("TaskLinkedIdea")
 
   @@index([userId, status, updatedAt(sort: Desc)], map: "idx_ideas_user_id_status_updated_at")
+  @@index([userId, updatedAt(sort: Desc), id(sort: Desc)], map: "idx_ideas_user_updated_id")
+  @@index([userId, status, reviewOn], map: "idx_ideas_user_status_review_on")
   @@map("ideas")
 }
 

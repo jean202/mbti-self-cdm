@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -58,6 +59,14 @@ export class IdeasController {
     @Body() body: UpdateIdeaDto,
   ) {
     return this.ideasService.updateIdea(currentUser.userId, ideaId, body);
+  }
+
+  @Delete(':idea_id')
+  deleteIdea(
+    @CurrentUser() currentUser: RequestUser,
+    @Param('idea_id', new ParseUUIDPipe()) ideaId: string,
+  ) {
+    return this.ideasService.deleteIdea(currentUser.userId, ideaId);
   }
 
   @Post(':idea_id/convert-to-task')
